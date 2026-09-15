@@ -32,7 +32,9 @@ $username = $_SESSION["username"];
         <a href="../practice.php" class="nav-link active">Practice Mode</a>
         <a href="../games.php" class="nav-link">Games</a>
         <a href="#" class="nav-link">Multiplayer Lobby</a>
-        <a href="#" class="nav-link">Leaderboards</a>
+        <a href="../leaderboards.php" class="nav-link">Leaderboards</a>
+        <a href="../achievements.php" class="nav-link">Achievements</a>
+        <a href="../profile.php" class="nav-link">Profile</a>
         <a href="../logout.php" class="nav-link">Log Out</a>
     </aside>
 
@@ -124,17 +126,35 @@ input.addEventListener("keydown", (e) => { if (e.key === "Enter") submitAnswer()
 document.getElementById("endBtn").addEventListener("click", async () => {
     document.querySelector(".binary-stage").closest(".game-card").style.display = "none";
 
+    let xpResult = null;
     try {
-        await fetch("../includes/save_score.php", {
+        const res = await fetch("../includes/save_score.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ game_type: "binary_practice", points: score })
+            body: JSON.stringify({ game_type: "binary_practice", points: score, correct: correct, wrong: wrong })
         });
+        xpResult = await res.json();
     } catch (e) { /* saving is best-effort; still show the summary */ }
 
     document.getElementById("finalCorrect").textContent = correct;
     document.getElementById("finalWrong").textContent = wrong;
     document.getElementById("finalScore").textContent = "+" + score + " XP";
+    if (xpResult && xpResult.leveled_up) {
+        const banner = document.createElement("div");
+        banner.className = "feedback-banner feedback-correct";
+        banner.style.marginTop = "0.8rem";
+        banner.textContent = `🎉 Level Up! You're now Level ${xpResult.new_level}!`;
+        document.getElementById("summaryCard").appendChild(banner);
+    }
+    if (xpResult && xpResult.new_badges && xpResult.new_badges.length > 0) {
+        xpResult.new_badges.forEach(b => {
+            const banner = document.createElement("div");
+            banner.className = "feedback-banner feedback-correct";
+            banner.style.marginTop = "0.8rem";
+            banner.innerHTML = `${b.icon} Badge Unlocked: <b>${b.name}</b>`;
+            document.getElementById("summaryCard").appendChild(banner);
+        });
+    }
     document.getElementById("summaryCard").style.display = "block";
 });
 

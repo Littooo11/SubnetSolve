@@ -3,6 +3,8 @@ session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
 require "../includes/subnet_engine.php";
+require "../includes/xp_engine.php";
+require "../includes/badge_engine.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -48,11 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["submit_answer"])) {
             mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
             mysqli_stmt_execute($stmt);
 
-            $update = mysqli_prepare($conn, "UPDATE user_progress
-                SET total_xp = total_xp + ?, quizzes_completed = quizzes_completed + 1
-                WHERE user_id = ?");
-            mysqli_stmt_bind_param($update, "ii", $state["score"], $userId);
-            mysqli_stmt_execute($update);
+            $xpResult = award_xp($conn, $userId, $state["score"]);
+            $updateQuiz = mysqli_prepare($conn, "UPDATE user_progress SET quizzes_completed = quizzes_completed + 1, total_correct = total_correct + ?, total_wrong = total_wrong + ? WHERE user_id = ?");
+            mysqli_stmt_bind_param($updateQuiz, "iii", $state["correct"], $state["wrong"], $userId);
+            mysqli_stmt_execute($updateQuiz);
+
+            $newBadges = check_and_award_badges($conn, $userId);
 
             $finalScore = $state["score"];
             $finalCorrect = $state["correct"];
@@ -92,7 +95,9 @@ $q = $state["question"] ?? null;
         <a href="../practice.php" class="nav-link">Practice Mode</a>
         <a href="../games.php" class="nav-link active">Games</a>
         <a href="#" class="nav-link">Multiplayer Lobby</a>
-        <a href="#" class="nav-link">Leaderboards</a>
+        <a href="../leaderboards.php" class="nav-link">Leaderboards</a>
+        <a href="../achievements.php" class="nav-link">Achievements</a>
+        <a href="../profile.php" class="nav-link">Profile</a>
         <a href="../logout.php" class="nav-link">Log Out</a>
     </aside>
 
@@ -106,6 +111,18 @@ $q = $state["question"] ?? null;
                 <div class="stat-line"><span>Correct Answers</span><span class="good"><?= $finalCorrect ?></span></div>
                 <div class="stat-line"><span>Wrong Answers</span><span class="bad"><?= $finalWrong ?></span></div>
                 <div class="stat-line"><span>Total Score</span><span class="xp">+<?= $finalScore ?> XP</span></div>
+                <?php if ($xpResult["leveled_up"]): ?>
+                    <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;">
+                        🎉 Level Up! You're now Level <?= $xpResult["new_level"] ?>!
+                    </div>
+                <?php endif; ?>
+                <?php if (!empty($newBadges)): ?>
+                    <?php foreach ($newBadges as $b): ?>
+                        <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;">
+                            <?= $b["icon"] ?> Badge Unlocked: <b><?= htmlspecialchars($b["name"]) ?></b>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
                 <div class="game-actions">
                     <a href="dissect_ip_timed.php?restart=1" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                     <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Games</a>

@@ -8,6 +8,7 @@ header("Pragma: no-cache");
 header("Expires: 0");
 
 require "config.php";
+require "includes/avatars.php";
 
 // If no active session, try to restore login from the remember-me cookie
 if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
@@ -38,15 +39,17 @@ $userId   = $_SESSION["user_id"];
 
 // Safety check: if the database was reset/reimported, old session IDs
 // may no longer point to a real user. Catch that here instead of crashing.
-$userCheck = mysqli_prepare($conn, "SELECT id FROM users WHERE id = ?");
+$userCheck = mysqli_prepare($conn, "SELECT id, avatar FROM users WHERE id = ?");
 mysqli_stmt_bind_param($userCheck, "i", $userId);
 mysqli_stmt_execute($userCheck);
-if (!mysqli_stmt_get_result($userCheck)->fetch_assoc()) {
+$userRow = mysqli_stmt_get_result($userCheck)->fetch_assoc();
+if (!$userRow) {
     session_unset();
     session_destroy();
     header("Location: login.php");
     exit();
 }
+$myAvatar = $userRow["avatar"];
 
 // Pull this user's real progress. If for some reason there's no row yet
 // (e.g. an account created before this table existed), default to zeros.
@@ -62,24 +65,44 @@ if (!$progress) {
     mysqli_stmt_execute($insertProgress);
 
     $progress = [
-        "level" => 1, "total_xp" => 0, "xp_to_next_level" => 500,
+        "level" => 1, "career_xp" => 0, "total_xp" => 0, "xp_to_next_level" => 500,
         "lessons_completed" => 0, "quizzes_completed" => 0, "current_streak" => 0
     ];
 }
 
 $level        = $progress["level"];
+$careerXP     = $progress["career_xp"];
 $totalXP      = $progress["total_xp"];
 $xpToNextLvl  = $progress["xp_to_next_level"];
 $lessonsDone  = $progress["lessons_completed"];
 $quizzesDone  = $progress["quizzes_completed"];
 $streak       = $progress["current_streak"];
 
-// TODO: once matches/quizzes are built, this becomes a real leaderboard query,
-// e.g. SELECT username, total_xp FROM user_progress JOIN users ... ORDER BY total_xp DESC LIMIT 4
+// Real leaderboard preview: top 4 by career XP
 $topPlayers = [];
+$topResult = mysqli_query($conn, "SELECT u.username, u.avatar, up.career_xp
+    FROM user_progress up JOIN users u ON u.id = up.user_id
+    ORDER BY up.career_xp DESC LIMIT 4");
+while ($row = mysqli_fetch_assoc($topResult)) {
+    $topPlayers[] = ["name" => $row["username"], "avatar" => $row["avatar"], "xp" => $row["career_xp"]];
+}
 
 // TODO: pull from a real activity log once games/quizzes exist
+$gameLabels = [
+    "subnet_dissect_practice" => "Dissect an IP Address (Practice)",
+    "subnet_dissect_timed"    => "Dissect an IP Address (Timed)",
+    "binary_practice"         => "Binary Game (Practice)",
+    "binary_game"             => "Binary Game (Timed)",
+];
 $recentActivity = [];
+$activityResult = mysqli_query($conn, "SELECT game_type, points, played_at FROM scores WHERE user_id = $userId ORDER BY played_at DESC LIMIT 3");
+while ($row = mysqli_fetch_assoc($activityResult)) {
+    $recentActivity[] = [
+        "text" => $gameLabels[$row["game_type"]] ?? $row["game_type"],
+        "xp"   => "+" . $row["points"] . " XP",
+        "time" => date("M j, g:i A", strtotime($row["played_at"])),
+    ];
+}
 
 $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
 ?>
@@ -108,9 +131,9 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
         <a href="#" class="nav-link">Multiplayer Lobby</a>
-        <a href="#" class="nav-link">Leaderboards</a>
-        <a href="#" class="nav-link">Achievements</a>
-        <a href="#" class="nav-link">Profile</a>
+        <a href="leaderboards.php" class="nav-link">Leaderboards</a>
+        <a href="achievements.php" class="nav-link">Achievements</a>
+        <a href="profile.php" class="nav-link">Profile</a>
         <a href="#" class="nav-link">Settings</a>
         <a href="logout.php" class="nav-link">Log Out</a>
 
@@ -127,7 +150,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <div class="topbar">
             <input class="search" placeholder="Search lessons, topics, or challenges...">
             <div class="topbar-right">
-                <div class="avatar"></div>
+                <?= render_avatar($myAvatar, 34) ?>
                 <div>
                     <div style="font-weight:bold; font-size:0.9rem;"><?= htmlspecialchars($username) ?></div>
                     <div style="font-size:0.75rem; color:var(--blue);">Level <?= $level ?></div>
@@ -165,7 +188,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
             <div class="stat-card">
                 <div class="stat-icon" style="background:rgba(234,179,8,0.15); color:var(--gold);">XP</div>
                 <div>
-                    <div class="value"><?= number_format($totalXP) ?></div>
+                    <div class="value"><?= number_format($careerXP) ?></div>
                     <div class="label">Total XP</div>
                 </div>
             </div>
@@ -197,12 +220,12 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
                 <div class="explore-card">
                     <div style="color:var(--gold);">Leaderboards</div>
                     <p>See your rank and compete with top players.</p>
-                    <a href="#" style="background:var(--gold); color:#1a1a1a;">View Rankings</a>
+                    <a href="leaderboards.php" style="background:var(--gold); color:#1a1a1a;">View Rankings</a>
                 </div>
                 <div class="explore-card">
                     <div style="color:var(--teal);">Achievements</div>
                     <p>Unlock badges and earn rewards as you progress.</p>
-                    <a href="#" style="background:var(--teal);">View Badges</a>
+                    <a href="achievements.php" style="background:var(--teal);">View Badges</a>
                 </div>
             </div>
         </div>
@@ -232,7 +255,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
                 <?php foreach ($topPlayers as $i => $p): ?>
                     <div class="player-row">
                         <span class="rank"><?= $i + 1 ?></span>
-                        <div class="avatar" style="width:26px; height:26px;"></div>
+                        <?= render_avatar($p["avatar"], 26) ?>
                         <span><?= htmlspecialchars($p["name"]) ?></span>
                         <span class="xp"><?= number_format($p["xp"]) ?> XP</span>
                     </div>
