@@ -17,6 +17,7 @@ $period = $_GET["period"] ?? "all";
 $gameFilter = "";
 if ($tab === "subnet") $gameFilter = "AND s.game_type LIKE 'subnet_dissect%'";
 if ($tab === "binary") $gameFilter = "AND s.game_type LIKE 'binary%'";
+if ($tab === "showdown") $gameFilter = "AND s.game_type LIKE 'showdown%'";
 
 $dateFilter = "";
 if ($period === "7") $dateFilter = "AND s.played_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
@@ -96,8 +97,7 @@ foreach ($tiersList as $i => $t) {
         <a href="leaderboards.php" class="nav-link active">Leaderboards</a>
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
-        <a href="#" class="nav-link">Settings</a>
-        <a href="logout.php" class="nav-link">Log Out</a>
+        <a href="settings.php" class="nav-link">Settings</a>
     </aside>
 
     <main class="main">
@@ -117,6 +117,7 @@ foreach ($tiersList as $i => $t) {
             <a href="<?= tab_url('overall', $period) ?>" class="tab-btn <?= $tab === 'overall' ? 'active' : '' ?>">Overall</a>
             <a href="<?= tab_url('subnet', $period) ?>" class="tab-btn <?= $tab === 'subnet' ? 'active' : '' ?>">Subnetting Game</a>
             <a href="<?= tab_url('binary', $period) ?>" class="tab-btn <?= $tab === 'binary' ? 'active' : '' ?>">Binary Game</a>
+            <a href="<?= tab_url('showdown', $period) ?>" class="tab-btn <?= $tab === 'showdown' ? 'active' : '' ?>">Subnet Showdown</a>
             <span class="tab-btn disabled">1v1 Matches (Coming Soon)</span>
         </div>
 

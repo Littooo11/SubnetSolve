@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 14, 2026 at 03:31 PM
+-- Generation Time: Sep 19, 2026 at 03:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,16 +24,91 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `badges`
+--
+
+CREATE TABLE `badges` (
+  `id` int(11) NOT NULL,
+  `code` varchar(50) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `icon` varchar(10) NOT NULL,
+  `criteria_type` varchar(30) NOT NULL,
+  `criteria_value` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `badges`
+--
+
+INSERT INTO `badges` (`id`, `code`, `name`, `description`, `icon`, `criteria_type`, `criteria_value`) VALUES
+(1, 'first_quiz', 'First Steps', 'Complete your first quiz or game session.', '🎯', 'quizzes_completed', 1),
+(2, 'ten_quizzes', 'Getting Warmed Up', 'Complete 10 quiz or game sessions.', '🔥', 'quizzes_completed', 10),
+(3, 'fifty_quizzes', 'Subnet Sensei', 'Complete 50 quiz or game sessions.', '🥋', 'quizzes_completed', 50),
+(4, 'level_5', 'Rising Star', 'Reach Level 5.', '⭐', 'level', 5),
+(5, 'level_10', 'Network Novice', 'Reach Level 10.', '🌟', 'level', 10),
+(6, 'level_20', 'Subnet Master', 'Reach Level 20.', '👑', 'level', 20),
+(7, 'streak_3', 'Streak Starter', 'Hit a 3-day streak.', '🔥', 'current_streak', 3),
+(8, 'streak_7', 'On Fire', 'Hit a 7-day streak.', '🚀', 'current_streak', 7),
+(9, 'xp_5000', 'XP Grinder', 'Earn 5,000 career XP.', '💎', 'career_xp', 5000),
+(10, 'xp_20000', 'XP Legend', 'Earn 20,000 career XP.', '🏆', 'career_xp', 20000);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `matches`
 --
 
 CREATE TABLE `matches` (
   `id` int(11) NOT NULL,
-  `player1_id` int(11) DEFAULT NULL,
-  `player2_id` int(11) DEFAULT NULL,
-  `status` varchar(20) DEFAULT 'waiting',
+  `room_code` varchar(10) NOT NULL,
+  `room_name` varchar(100) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `password_hash` varchar(255) DEFAULT NULL,
+  `game_mode` varchar(20) NOT NULL DEFAULT 'subnetting',
+  `visibility` varchar(20) NOT NULL DEFAULT 'public',
+  `max_players` int(11) NOT NULL DEFAULT 2,
+  `host_user_id` int(11) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'waiting',
+  `current_question_index` int(11) NOT NULL DEFAULT 0,
+  `total_questions` int(11) NOT NULL DEFAULT 10,
   `winner_id` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL
+  `created_at` datetime NOT NULL,
+  `started_at` datetime DEFAULT NULL,
+  `ended_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `match_players`
+--
+
+CREATE TABLE `match_players` (
+  `id` int(11) NOT NULL,
+  `match_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `score` int(11) NOT NULL DEFAULT 0,
+  `correct_count` int(11) NOT NULL DEFAULT 0,
+  `wrong_count` int(11) NOT NULL DEFAULT 0,
+  `current_answer_index` int(11) DEFAULT NULL,
+  `answered_at` datetime DEFAULT NULL,
+  `joined_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `match_questions`
+--
+
+CREATE TABLE `match_questions` (
+  `id` int(11) NOT NULL,
+  `match_id` int(11) NOT NULL,
+  `question_index` int(11) NOT NULL,
+  `prompt` text NOT NULL,
+  `options_json` text NOT NULL,
+  `correct_index` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -89,15 +164,22 @@ CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `avatar` varchar(30) NOT NULL DEFAULT 'fox',
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `users`
+-- Table structure for table `user_badges`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`) VALUES
-(1, 'Carlo', 'cma@gm.com', '$2y$10$3FyOMXJzUgdHo4i2Xl/kEOePj4L97jia7NYfNip1J6v4JHdt3LOpi', '2026-09-13 22:45:33');
+CREATE TABLE `user_badges` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `badge_id` int(11) NOT NULL,
+  `earned_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -108,33 +190,51 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`) VALUES
 CREATE TABLE `user_progress` (
   `user_id` int(11) NOT NULL,
   `level` int(11) NOT NULL DEFAULT 1,
+  `career_xp` int(11) NOT NULL DEFAULT 0,
   `total_xp` int(11) NOT NULL DEFAULT 0,
   `xp_to_next_level` int(11) NOT NULL DEFAULT 500,
   `lessons_completed` int(11) NOT NULL DEFAULT 0,
   `quizzes_completed` int(11) NOT NULL DEFAULT 0,
+  `total_correct` int(11) NOT NULL DEFAULT 0,
+  `total_wrong` int(11) NOT NULL DEFAULT 0,
   `current_streak` int(11) NOT NULL DEFAULT 0,
   `last_activity_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `user_progress`
---
-
-INSERT INTO `user_progress` (`user_id`, `level`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `current_streak`, `last_activity_date`) VALUES
-(1, 1, 0, 500, 0, 0, 0, NULL);
 
 --
 -- Indexes for dumped tables
 --
 
 --
+-- Indexes for table `badges`
+--
+ALTER TABLE `badges`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
 -- Indexes for table `matches`
 --
 ALTER TABLE `matches`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `player1_id` (`player1_id`),
-  ADD KEY `player2_id` (`player2_id`),
+  ADD UNIQUE KEY `room_code` (`room_code`),
+  ADD KEY `host_user_id` (`host_user_id`),
   ADD KEY `winner_id` (`winner_id`);
+
+--
+-- Indexes for table `match_players`
+--
+ALTER TABLE `match_players`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `match_user` (`match_id`,`user_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `match_questions`
+--
+ALTER TABLE `match_questions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `match_qindex` (`match_id`,`question_index`);
 
 --
 -- Indexes for table `questions`
@@ -165,6 +265,14 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `user_badges`
+--
+ALTER TABLE `user_badges`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_badge` (`user_id`,`badge_id`),
+  ADD KEY `badge_id` (`badge_id`);
+
+--
 -- Indexes for table `user_progress`
 --
 ALTER TABLE `user_progress`
@@ -175,9 +283,27 @@ ALTER TABLE `user_progress`
 --
 
 --
+-- AUTO_INCREMENT for table `badges`
+--
+ALTER TABLE `badges`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `match_players`
+--
+ALTER TABLE `match_players`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `match_questions`
+--
+ALTER TABLE `match_questions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -202,7 +328,13 @@ ALTER TABLE `scores`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_badges`
+--
+ALTER TABLE `user_badges`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -212,9 +344,21 @@ ALTER TABLE `users`
 -- Constraints for table `matches`
 --
 ALTER TABLE `matches`
-  ADD CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`player1_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`player2_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`winner_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`host_user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`winner_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `match_players`
+--
+ALTER TABLE `match_players`
+  ADD CONSTRAINT `match_players_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`),
+  ADD CONSTRAINT `match_players_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `match_questions`
+--
+ALTER TABLE `match_questions`
+  ADD CONSTRAINT `match_questions_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`);
 
 --
 -- Constraints for table `remember_tokens`
@@ -228,6 +372,13 @@ ALTER TABLE `remember_tokens`
 ALTER TABLE `scores`
   ADD CONSTRAINT `scores_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `scores_ibfk_2` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`);
+
+--
+-- Constraints for table `user_badges`
+--
+ALTER TABLE `user_badges`
+  ADD CONSTRAINT `user_badges_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `user_badges_ibfk_2` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`);
 
 --
 -- Constraints for table `user_progress`

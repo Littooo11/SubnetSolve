@@ -23,6 +23,11 @@ $games = [
         "url"  => "games/binary_game.php",
     ],
     [
+        "name" => "Subnet Showdown",
+        "desc" => "Multiple-choice questions on network address, masks, host range, IP class, and public/private — 30 seconds each.",
+        "url"  => "games/subnet_showdown_timed.php",
+    ],
+    [
         "name" => "1v1 Match",
         "desc" => "Challenge another player to a head-to-head subnetting race.",
         "url"  => null,
@@ -52,11 +57,10 @@ $games = [
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link active">Games</a>
         <a href="#" class="nav-link">Multiplayer Lobby</a>
-        <a href="#" class="nav-link">Leaderboards</a>
-        <a href="#" class="nav-link">Achievements</a>
-        <a href="#" class="nav-link">Profile</a>
-        <a href="#" class="nav-link">Settings</a>
-        <a href="logout.php" class="nav-link">Log Out</a>
+        <a href="leaderboards.php" class="nav-link">Leaderboards</a>
+        <a href="achievements.php" class="nav-link">Achievements</a>
+        <a href="profile.php" class="nav-link">Profile</a>
+        <a href="settings.php" class="nav-link">Settings</a>
     </aside>
 
     <main class="main">

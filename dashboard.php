@@ -93,6 +93,8 @@ $gameLabels = [
     "subnet_dissect_timed"    => "Dissect an IP Address (Timed)",
     "binary_practice"         => "Binary Game (Practice)",
     "binary_game"             => "Binary Game (Timed)",
+    "showdown_practice"       => "Subnet Showdown (Practice)",
+    "showdown_timed"          => "Subnet Showdown",
 ];
 $recentActivity = [];
 $activityResult = mysqli_query($conn, "SELECT game_type, points, played_at FROM scores WHERE user_id = $userId ORDER BY played_at DESC LIMIT 3");
@@ -134,8 +136,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <a href="leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
-        <a href="#" class="nav-link">Settings</a>
-        <a href="logout.php" class="nav-link">Log Out</a>
+        <a href="settings.php" class="nav-link">Settings</a>
 
         <div class="daily-challenge">
             <h4>Daily Challenge</h4>

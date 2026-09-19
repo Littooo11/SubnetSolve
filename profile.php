@@ -96,6 +96,8 @@ $gameLabels = [
     "subnet_dissect_timed"    => ["Dissect an IP Address (Timed)", "🌐"],
     "binary_practice"         => ["Binary Game (Practice)", "01"],
     "binary_game"             => ["Binary Game (Timed)", "01"],
+    "showdown_practice"       => ["Subnet Showdown (Practice)", "🎯"],
+    "showdown_timed"          => ["Subnet Showdown", "🎯"],
 ];
 
 // Achievement preview (first 6 by requirement level)
@@ -131,8 +133,7 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
         <a href="leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link active">Profile</a>
-        <a href="#" class="nav-link">Settings</a>
-        <a href="logout.php" class="nav-link">Log Out</a>
+        <a href="settings.php" class="nav-link">Settings</a>
     </aside>
 
     <main class="main">

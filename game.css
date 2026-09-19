@@ -480,6 +480,119 @@
 .rank-tier-legend .tier-name { display: flex; align-items: center; gap: 0.5rem; }
 .tier-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
+/* Subnet Showdown */
+.showdown-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1.2rem;
+    padding: 1.5rem 2rem;
+}
+
+.showdown-profile {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    text-align: center;
+    align-self: start;
+}
+
+.showdown-profile .name { font-weight: bold; margin-top: 0.6rem; }
+.showdown-profile .tag { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1rem; }
+
+.showdown-stat-box {
+    background: var(--panel-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem;
+    margin-bottom: 0.6rem;
+    text-align: left;
+}
+.showdown-stat-box .lbl { font-size: 0.72rem; color: var(--text-dim); }
+.showdown-stat-box .num { font-size: 1.4rem; font-weight: bold; }
+
+.showdown-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+}
+
+.showdown-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.showdown-back { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; }
+
+.progress-dots { display: flex; gap: 0.35rem; }
+.progress-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+.progress-dot.done { background: var(--green); }
+.progress-dot.current { background: var(--blue); }
+
+.showdown-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.category-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(59,130,246,0.12);
+    color: var(--blue);
+    font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 7px;
+}
+
+.showdown-timer {
+    font-family: "Consolas", monospace;
+    font-weight: bold;
+    color: var(--green);
+    font-size: 0.9rem;
+}
+.showdown-timer.low { color: #f87171; }
+
+.showdown-question { font-size: 1.1rem; margin-bottom: 1.3rem; line-height: 1.5; }
+
+.mcq-option {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--panel-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.7rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.mcq-option:hover { border-color: var(--blue); }
+.mcq-option.selected { border-color: var(--blue); background: rgba(59,130,246,0.08); }
+.mcq-option.correct { border-color: var(--green); background: rgba(34,197,94,0.1); }
+.mcq-option.incorrect { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+
+.mcq-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--text-dim);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+}
+.mcq-option.selected .mcq-radio { border-color: var(--blue); }
+.mcq-option.selected .mcq-radio::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--blue); }
+.mcq-option.correct .mcq-radio { border-color: var(--green); }
+.mcq-option.correct .mcq-radio::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+.mcq-option.incorrect .mcq-radio { border-color: #ef4444; }
+.mcq-option.incorrect .mcq-radio::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #ef4444; }
+
+.mcq-letter { font-weight: bold; color: var(--text-dim); }
+
 /* Games hub */
 .games-grid {
     display: grid;

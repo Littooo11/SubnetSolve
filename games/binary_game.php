@@ -35,7 +35,7 @@ $username = $_SESSION["username"];
         <a href="../leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="../achievements.php" class="nav-link">Achievements</a>
         <a href="../profile.php" class="nav-link">Profile</a>
-        <a href="../logout.php" class="nav-link">Log Out</a>
+        <a href="../settings.php" class="nav-link">Settings</a>
     </aside>
 
     <main class="game-main">

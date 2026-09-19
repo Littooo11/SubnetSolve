@@ -22,6 +22,11 @@ $practiceModes = [
         "desc" => "Practice converting binary to decimal with no time pressure, unlimited questions.",
         "url"  => "games/binary_practice.php",
     ],
+    [
+        "name" => "Subnet Showdown",
+        "desc" => "Multiple-choice questions on network address, masks, host range, IP class, and public/private — no timer.",
+        "url"  => "games/subnet_showdown_practice.php",
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -47,11 +52,10 @@ $practiceModes = [
         <a href="practice.php" class="nav-link active">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
         <a href="#" class="nav-link">Multiplayer Lobby</a>
-        <a href="#" class="nav-link">Leaderboards</a>
-        <a href="#" class="nav-link">Achievements</a>
-        <a href="#" class="nav-link">Profile</a>
-        <a href="#" class="nav-link">Settings</a>
-        <a href="logout.php" class="nav-link">Log Out</a>
+        <a href="leaderboards.php" class="nav-link">Leaderboards</a>
+        <a href="achievements.php" class="nav-link">Achievements</a>
+        <a href="profile.php" class="nav-link">Profile</a>
+        <a href="settings.php" class="nav-link">Settings</a>
     </aside>
 
     <main class="main">
