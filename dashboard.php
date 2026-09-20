@@ -95,6 +95,7 @@ $gameLabels = [
     "binary_game"             => "Binary Game (Timed)",
     "showdown_practice"       => "Subnet Showdown (Practice)",
     "showdown_timed"          => "Subnet Showdown",
+    "multiplayer_1v1"         => "1v1 Multiplayer Match",
 ];
 $recentActivity = [];
 $activityResult = mysqli_query($conn, "SELECT game_type, points, played_at FROM scores WHERE user_id = $userId ORDER BY played_at DESC LIMIT 3");
@@ -132,7 +133,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <a href="#" class="nav-link">Learning Modules</a>
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
-        <a href="#" class="nav-link">Multiplayer Lobby</a>
+        <a href="lobby.php" class="nav-link">Multiplayer Lobby</a>
         <a href="leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
@@ -149,7 +150,10 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
     <!-- ===== Main content ===== -->
     <main class="main">
         <div class="topbar">
-            <input class="search" placeholder="Search lessons, topics, or challenges...">
+            <div class="search-wrapper">
+                <input class="search" id="dashSearch" placeholder="Search lessons, topics, or challenges..." autocomplete="off">
+                <div class="search-results" id="searchResults" style="display:none;"></div>
+            </div>
             <div class="topbar-right">
                 <?= render_avatar($myAvatar, 34) ?>
                 <div>
@@ -216,7 +220,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
                 <div class="explore-card">
                     <div style="color:var(--purple);">Multiplayer Lobby</div>
                     <p>Challenge other players in real-time subnetting matches.</p>
-                    <a href="#" style="background:var(--purple);">Join Lobby</a>
+                    <a href="lobby.php" style="background:var(--purple);">Join Lobby</a>
                 </div>
                 <div class="explore-card">
                     <div style="color:var(--gold);">Leaderboards</div>
@@ -283,5 +287,50 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
     </aside>
 
 </div>
+
+<script>
+const searchInput = document.getElementById("dashSearch");
+const searchResults = document.getElementById("searchResults");
+let searchTimeout;
+
+const typeTagLabels = { game: "Game", practice: "Practice", lesson: "Lesson" };
+
+searchInput.addEventListener("input", () => {
+    clearTimeout(searchTimeout);
+    const q = searchInput.value.trim();
+
+    if (q === "") {
+        searchResults.style.display = "none";
+        return;
+    }
+
+    searchTimeout = setTimeout(() => {
+        fetch("search.php?q=" + encodeURIComponent(q))
+            .then(r => r.json())
+            .then(results => {
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<div class="search-no-results">No matches yet — try a different word.</div>';
+                } else {
+                    searchResults.innerHTML = results.map(item => `
+                        <a href="${item.url}" class="search-result-row">
+                            <span class="search-result-icon">${item.icon}</span>
+                            <span class="search-result-text">
+                                <span class="name">${item.name}</span>
+                                <span class="desc">${item.desc}</span>
+                            </span>
+                            <span class="search-result-tag">${typeTagLabels[item.type] || item.type}</span>
+                        </a>
+                    `).join("");
+                }
+                searchResults.style.display = "block";
+            })
+            .catch(() => { searchResults.style.display = "none"; });
+    }, 200);
+});
+
+document.addEventListener("click", (e) => {
+    if (!e.target.closest(".search-wrapper")) searchResults.style.display = "none";
+});
+</script>
 </body>
 </html>

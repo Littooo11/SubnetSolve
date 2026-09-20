@@ -51,7 +51,7 @@ $practiceModes = [
         <a href="#" class="nav-link">Learning Modules</a>
         <a href="practice.php" class="nav-link active">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
-        <a href="#" class="nav-link">Multiplayer Lobby</a>
+        <a href="lobby.php" class="nav-link">Multiplayer Lobby</a>
         <a href="leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>

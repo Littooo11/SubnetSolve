@@ -143,6 +143,34 @@ function generate_public_private_question() {
     ];
 }
 
+function generate_binary_mcq_question() {
+    $decimal = rand(0, 15);
+    $binaryStr = str_pad(decbin($decimal), 4, "0", STR_PAD_LEFT);
+    $correct = (string) $decimal;
+
+    $distractors = [];
+    while (count($distractors) < 3) {
+        $d = rand(0, 15);
+        if ($d !== $decimal && !in_array((string) $d, $distractors)) $distractors[] = (string) $d;
+    }
+    $built = build_mcq_options($correct, $distractors);
+
+    return [
+        "prompt"   => "What is the decimal value of the binary number $binaryStr?",
+        "options"  => $built["options"],
+        "correct_index" => $built["correct_index"],
+    ];
+}
+
+// Mode-aware entry point for multiplayer matches: 'subnetting', 'binary', or 'both'
+function generate_match_question($gameMode) {
+    if ($gameMode === "binary") return generate_binary_mcq_question();
+    if ($gameMode === "both") {
+        return rand(0, 1) === 0 ? generate_showdown_question() : generate_binary_mcq_question();
+    }
+    return generate_showdown_question();
+}
+
 // Main entry point: picks a random topic and generates its question.
 function generate_showdown_question() {
     $topics = ["network", "broadcast", "first", "last", "mask", "wildcard", "host_count", "ip_class", "public_private"];

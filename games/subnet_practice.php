@@ -93,7 +93,7 @@ $q = $state["question"] ?? null;
         <a href="#" class="nav-link">Learning Modules</a>
         <a href="../practice.php" class="nav-link active">Practice Mode</a>
         <a href="../games.php" class="nav-link">Games</a>
-        <a href="#" class="nav-link">Multiplayer Lobby</a>
+        <a href="../lobby.php" class="nav-link">Multiplayer Lobby</a>
         <a href="../leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="../achievements.php" class="nav-link">Achievements</a>
         <a href="../profile.php" class="nav-link">Profile</a>
@@ -101,7 +101,7 @@ $q = $state["question"] ?? null;
     </aside>
 
     <main class="game-main">
-        <div class="breadcrumb">Games &gt; Dissect an IP Address &gt; <b>Question <?= $state["q_index"] ?? 1 ?></b></div>
+        <div class="breadcrumb"><a href="../practice.php" class="showdown-back">← Exit</a> &nbsp; Games &gt; Dissect an IP Address &gt; <b>Question <?= $state["q_index"] ?? 1 ?></b></div>
 
         <?php if (isset($sessionDone)): ?>
             <div class="game-card">

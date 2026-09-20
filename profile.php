@@ -98,6 +98,7 @@ $gameLabels = [
     "binary_game"             => ["Binary Game (Timed)", "01"],
     "showdown_practice"       => ["Subnet Showdown (Practice)", "🎯"],
     "showdown_timed"          => ["Subnet Showdown", "🎯"],
+    "multiplayer_1v1"         => ["1v1 Multiplayer Match", "⚔️"],
 ];
 
 // Achievement preview (first 6 by requirement level)
@@ -129,7 +130,7 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
         <a href="#" class="nav-link">Learning Modules</a>
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
-        <a href="#" class="nav-link">Multiplayer Lobby</a>
+        <a href="lobby.php" class="nav-link">Multiplayer Lobby</a>
         <a href="leaderboards.php" class="nav-link">Leaderboards</a>
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link active">Profile</a>
