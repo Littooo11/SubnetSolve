@@ -15,12 +15,12 @@ $modules = [
     [
         "name" => "How to Play: Dissect an IP Address",
         "desc" => "Learn how network address, broadcast address, subnet mask, wildcard mask, and usable host range are calculated.",
-        "url"  => "#",
+        "url"  => "learning/dissect_ip.php",
     ],
     [
         "name" => "How to Play: Binary Game",
         "desc" => "Learn how to convert binary numbers to decimal, step by step.",
-        "url"  => "#",
+        "url"  => "learning/binary_game.php",
     ],
     [
         "name" => "How to Play: Subnet Showdown",
