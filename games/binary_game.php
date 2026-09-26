@@ -8,6 +8,12 @@ if (!isset($_SESSION["user_id"])) {
     exit();
 }
 $username = $_SESSION["username"];
+
+$difficultyDigits = ["easy" => 3, "medium" => 4, "hard" => 5];
+$difficulty = $_GET["difficulty"] ?? null;
+$showDifficultyScreen = !array_key_exists($difficulty, $difficultyDigits);
+$digits = $difficultyDigits[$difficulty] ?? 4;
+$maxVal = (1 << $digits) - 1;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,7 +34,7 @@ $username = $_SESSION["username"];
             </div>
         </div>
         <a href="../dashboard.php" class="nav-link">Dashboard</a>
-        <a href="#" class="nav-link">Learning Modules</a>
+        <a href="../learning_modules.php" class="nav-link">Learning Modules</a>
         <a href="../practice.php" class="nav-link">Practice Mode</a>
         <a href="../games.php" class="nav-link active">Games</a>
         <a href="../lobby.php" class="nav-link">Multiplayer Lobby</a>
@@ -41,19 +47,39 @@ $username = $_SESSION["username"];
     <main class="game-main">
         <div class="breadcrumb"><a href="../games.php" class="showdown-back">← Exit</a> &nbsp; Games &gt; <b>Binary Game</b></div>
 
+        <?php if ($showDifficultyScreen): ?>
+            <div class="game-card">
+                <div class="difficulty-select">
+                    <h2>Choose a Difficulty</h2>
+                    <p class="sub">This controls how many binary digits you'll convert.</p>
+                    <div class="difficulty-grid">
+                        <a href="?difficulty=easy" class="difficulty-card easy">
+                            <span class="icon">🟢</span><h4>Easy</h4><p>3-digit binary (0-7)</p>
+                        </a>
+                        <a href="?difficulty=medium" class="difficulty-card medium">
+                            <span class="icon">🟡</span><h4>Medium</h4><p>4-digit binary (0-15)</p>
+                        </a>
+                        <a href="?difficulty=hard" class="difficulty-card hard">
+                            <span class="icon">🔴</span><h4>Difficult</h4><p>5-digit binary (0-31)</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+
         <div class="game-card" id="gameCard">
-            <div class="mode-tag">TIMED CHALLENGE — 3:00</div>
+            <div class="mode-tag">TIMED CHALLENGE — 3:00 · <?= strtoupper($difficulty) ?></div>
             <h2>Guess the Decimal Value</h2>
-            <p class="sub">A 4-digit binary number is shown below. Type its decimal equivalent (0-15) as fast as you can — answer as many as possible before time runs out!</p>
+            <p class="sub">A <?= $digits ?>-digit binary number is shown below. Type its decimal equivalent (0-<?= $maxVal ?>) as fast as you can — answer as many as possible before time runs out!</p>
 
             <div class="big-timer" id="timerDisplay" style="margin-bottom:1rem;">03:00</div>
 
             <div class="binary-stage">
-                <div class="binary-number" id="binaryDisplay">----</div>
+                <div class="binary-number" id="binaryDisplay"><?= str_repeat("-", $digits) ?></div>
                 <div class="binary-hint">Convert this binary number to decimal</div>
 
                 <div class="binary-input-row">
-                    <input type="number" min="0" max="15" class="binary-input" id="answerInput" autocomplete="off" placeholder="?">
+                    <input type="number" min="0" max="<?= $maxVal ?>" class="binary-input" id="answerInput" autocomplete="off" placeholder="?">
                     <button class="btn btn-primary" id="submitBtn">Submit</button>
                 </div>
 
@@ -74,16 +100,20 @@ $username = $_SESSION["username"];
             <div class="stat-line"><span>Wrong Answers</span><span class="bad" id="finalWrong"></span></div>
             <div class="stat-line"><span>Total Score</span><span class="xp" id="finalScore"></span></div>
             <div class="game-actions">
-                <a href="binary_game.php" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
+                <a href="binary_game.php?difficulty=<?= $difficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                 <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Games</a>
             </div>
         </div>
+        <?php endif; ?>
     </main>
 </div>
 
+<?php if (!$showDifficultyScreen): ?>
 <script>
+const DIGITS = <?= $digits ?>;
+const MAX_VAL = <?= $maxVal ?>;
 let correct = 0, wrong = 0, score = 0, currentAnswer = 0;
-let timeLeft = 180; // 3 minutes
+let timeLeft = 180;
 let ended = false;
 
 const display = document.getElementById("binaryDisplay");
@@ -92,8 +122,8 @@ const feedback = document.getElementById("feedback");
 const timerDisplay = document.getElementById("timerDisplay");
 
 function nextQuestion() {
-    currentAnswer = Math.floor(Math.random() * 16); // 0-15
-    display.textContent = currentAnswer.toString(2).padStart(4, "0");
+    currentAnswer = Math.floor(Math.random() * (MAX_VAL + 1));
+    display.textContent = currentAnswer.toString(2).padStart(DIGITS, "0");
     input.value = "";
     feedback.textContent = "";
     feedback.className = "binary-feedback";
@@ -174,5 +204,6 @@ const countdown = setInterval(async () => {
 
 nextQuestion();
 </script>
+<?php endif; ?>
 </body>
 </html>

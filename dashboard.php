@@ -14,7 +14,7 @@ require "includes/avatars.php";
 if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
     $token = $_COOKIE["remember_token"];
 
-    $stmt = mysqli_prepare($conn, "SELECT u.id, u.username FROM remember_tokens rt
+    $stmt = mysqli_prepare($conn, "SELECT u.id, u.username, u.is_admin FROM remember_tokens rt
                                     JOIN users u ON u.id = rt.user_id
                                     WHERE rt.token = ? AND rt.expires_at > NOW()");
     mysqli_stmt_bind_param($stmt, "s", $token);
@@ -25,6 +25,7 @@ if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
     if ($user) {
         $_SESSION["user_id"]  = $user["id"];
         $_SESSION["username"] = $user["username"];
+        $_SESSION["is_admin"] = (bool) $user["is_admin"];
     }
 }
 
@@ -115,6 +116,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
     <meta charset="UTF-8">
     <title>Dashboard - SubNetSolve</title>
     <link rel="stylesheet" href="dash.css">
+    <link rel="stylesheet" href="game.css">
 </head>
 <body>
 <div class="layout">
@@ -130,7 +132,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         </div>
 
         <a href="dashboard.php" class="nav-link active">Dashboard</a>
-        <a href="#" class="nav-link">Learning Modules</a>
+        <a href="learning_modules.php" class="nav-link">Learning Modules</a>
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
         <a href="lobby.php" class="nav-link">Multiplayer Lobby</a>
@@ -138,6 +140,9 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
+        <?php if (!empty($_SESSION["is_admin"])): ?>
+            <a href="admin/dashboard.php" class="nav-link" style="color:var(--orange);">🛠 Admin Panel</a>
+        <?php endif; ?>
 
         <div class="daily-challenge">
             <h4>Daily Challenge</h4>
@@ -162,6 +167,10 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
                 </div>
             </div>
         </div>
+
+        <?php if (!empty($_GET["error"])): ?>
+            <div class="feedback-banner feedback-wrong" style="margin-bottom:1rem;"><?= htmlspecialchars($_GET["error"]) ?></div>
+        <?php endif; ?>
 
         <div class="welcome">
             <h2>Welcome back, <?= htmlspecialchars($username) ?>!</h2>
@@ -205,7 +214,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
                 <div class="explore-card">
                     <div style="color:var(--blue);">Learning Modules</div>
                     <p>Learn IPv4 addressing and subnetting step by step.</p>
-                    <a href="#" style="background:var(--blue);">Start Learning</a>
+                    <a href="learning_modules.php" style="background:var(--blue);">Start Learning</a>
                 </div>
                 <div class="explore-card">
                     <div style="color:var(--green);">Practice Mode</div>

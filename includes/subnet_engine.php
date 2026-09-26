@@ -9,8 +9,14 @@ function subnet_prefix_to_mask_long($prefix) {
 // Generates a random subnetting question.
 // Restricted to /24-/30 so only the last octet varies across
 // network/broadcast/mask/wildcard - keeps the UI simple (matches the mockup).
-function generate_subnet_question() {
-    $prefix = rand(24, 30);
+function generate_subnet_question($difficulty = "medium") {
+    $ranges = [
+        "easy"   => [24, 25],
+        "medium" => [26, 28],
+        "hard"   => [29, 30],
+    ];
+    [$min, $max] = $ranges[$difficulty] ?? $ranges["medium"];
+    $prefix = rand($min, $max);
     $maskLong = subnet_prefix_to_mask_long($prefix);
     $wildcardLong = (~$maskLong) & 0xFFFFFFFF;
     $blockSize = $wildcardLong + 1; // number of addresses per subnet

@@ -706,6 +706,35 @@
     margin-top: 1rem;
 }
 
+/* Difficulty selector */
+.difficulty-select {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+.difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 520px;
+    margin: 1.5rem auto 0;
+}
+.difficulty-card {
+    background: var(--panel-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.3rem 1rem;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+}
+.difficulty-card:hover { border-color: var(--blue); }
+.difficulty-card .icon { font-size: 1.8rem; display: block; margin-bottom: 0.5rem; }
+.difficulty-card h4 { margin: 0 0 0.3rem; }
+.difficulty-card p { margin: 0; font-size: 0.78rem; color: var(--text-dim); }
+.difficulty-card.easy h4 { color: var(--green); }
+.difficulty-card.medium h4 { color: var(--gold); }
+.difficulty-card.hard h4 { color: #f87171; }
+
 /* Games hub */
 .games-grid {
     display: grid;

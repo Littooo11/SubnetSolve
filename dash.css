@@ -21,7 +21,10 @@
 body {
     margin: 0;
     font-family: "Segoe UI", Arial, sans-serif;
-    background: var(--bg);
+    background: linear-gradient(rgba(11,18,36,0.85), rgba(11,18,36,0.85)), url('images/Background_edited.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--text);
 }
 

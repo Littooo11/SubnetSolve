@@ -14,63 +14,73 @@ $userId   = $_SESSION["user_id"];
 $username = $_SESSION["username"];
 
 $TOTAL_QUESTIONS = 10;
-$TIME_PER_QUESTION = 90; // seconds
+$TIME_PER_QUESTION = 90;
+$validDifficulties = ["easy", "medium", "hard"];
+$difficulty = $_GET["difficulty"] ?? null;
 
-// Start a fresh timed session (separate session key from the untimed Practice Mode version)
-if (!isset($_SESSION["dissect_timed"]) || isset($_GET["restart"])) {
-    $_SESSION["dissect_timed"] = [
-        "q_index" => 1,
-        "correct" => 0,
-        "wrong"   => 0,
-        "score"   => 0,
-        "question" => generate_subnet_question(),
-    ];
+$needsNewSession = !isset($_SESSION["dissect_timed"]) || isset($_GET["restart"]);
+$showDifficultyScreen = false;
+
+if ($needsNewSession) {
+    if (!in_array($difficulty, $validDifficulties)) {
+        $showDifficultyScreen = true;
+    } else {
+        $_SESSION["dissect_timed"] = [
+            "q_index" => 1,
+            "correct" => 0,
+            "wrong"   => 0,
+            "score"   => 0,
+            "difficulty" => $difficulty,
+            "question" => generate_subnet_question($difficulty),
+        ];
+    }
 }
 
-$state = &$_SESSION["dissect_timed"];
-$feedback = null;
+if (!$showDifficultyScreen) {
+    $state = &$_SESSION["dissect_timed"];
+    $feedback = null;
 
-// Handle answer submission
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["submit_answer"])) {
-    $result = check_subnet_answer($state["question"], $_POST);
-    $feedback = $result;
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["submit_answer"])) {
+        $result = check_subnet_answer($state["question"], $_POST);
+        $feedback = $result;
 
-    if ($result["correct"]) {
-        $state["correct"]++;
-        $state["score"] += 30;
-    } else {
-        $state["wrong"]++;
-    }
-
-    if (isset($_POST["next"])) {
-        if ($state["q_index"] >= $TOTAL_QUESTIONS) {
-            // session finished - save to database, then reset
-            $gameType = "subnet_dissect_timed";
-            $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
-            mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
-            mysqli_stmt_execute($stmt);
-
-            $xpResult = award_xp($conn, $userId, $state["score"]);
-            $updateQuiz = mysqli_prepare($conn, "UPDATE user_progress SET quizzes_completed = quizzes_completed + 1, total_correct = total_correct + ?, total_wrong = total_wrong + ? WHERE user_id = ?");
-            mysqli_stmt_bind_param($updateQuiz, "iii", $state["correct"], $state["wrong"], $userId);
-            mysqli_stmt_execute($updateQuiz);
-
-            $newBadges = check_and_award_badges($conn, $userId);
-
-            $finalScore = $state["score"];
-            $finalCorrect = $state["correct"];
-            $finalWrong = $state["wrong"];
-            unset($_SESSION["dissect_timed"]);
-            $sessionDone = true;
+        if ($result["correct"]) {
+            $state["correct"]++;
+            $state["score"] += 30;
         } else {
-            $state["q_index"]++;
-            $state["question"] = generate_subnet_question();
-            $feedback = null; // clear feedback for the new question
+            $state["wrong"]++;
+        }
+
+        if (isset($_POST["next"])) {
+            if ($state["q_index"] >= $TOTAL_QUESTIONS) {
+                $gameType = "subnet_dissect_timed";
+                $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
+                mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
+                mysqli_stmt_execute($stmt);
+
+                $xpResult = award_xp($conn, $userId, $state["score"]);
+                $updateQuiz = mysqli_prepare($conn, "UPDATE user_progress SET quizzes_completed = quizzes_completed + 1, total_correct = total_correct + ?, total_wrong = total_wrong + ? WHERE user_id = ?");
+                mysqli_stmt_bind_param($updateQuiz, "iii", $state["correct"], $state["wrong"], $userId);
+                mysqli_stmt_execute($updateQuiz);
+
+                $newBadges = check_and_award_badges($conn, $userId);
+
+                $finalScore = $state["score"];
+                $finalCorrect = $state["correct"];
+                $finalWrong = $state["wrong"];
+                $sessionDifficulty = $state["difficulty"];
+                unset($_SESSION["dissect_timed"]);
+                $sessionDone = true;
+            } else {
+                $state["q_index"]++;
+                $state["question"] = generate_subnet_question($state["difficulty"]);
+                $feedback = null;
+            }
         }
     }
-}
 
-$q = $state["question"] ?? null;
+    $q = $state["question"] ?? null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,7 +101,7 @@ $q = $state["question"] ?? null;
             </div>
         </div>
         <a href="../dashboard.php" class="nav-link">Dashboard</a>
-        <a href="#" class="nav-link">Learning Modules</a>
+        <a href="../learning_modules.php" class="nav-link">Learning Modules</a>
         <a href="../practice.php" class="nav-link">Practice Mode</a>
         <a href="../games.php" class="nav-link active">Games</a>
         <a href="../lobby.php" class="nav-link">Multiplayer Lobby</a>
@@ -102,9 +112,27 @@ $q = $state["question"] ?? null;
     </aside>
 
     <main class="game-main">
-        <div class="breadcrumb"><a href="../games.php" class="showdown-back">← Exit</a> &nbsp; Games &gt; Dissect an IP Address &gt; <b>Question <?= $state["q_index"] ?? 1 ?></b></div>
+        <div class="breadcrumb"><a href="../games.php" class="showdown-back">← Exit</a> &nbsp; Games &gt; Dissect an IP Address <?= !$showDifficultyScreen ? "&gt; <b>Question " . ($state["q_index"] ?? 1) . "</b>" : "" ?></div>
 
-        <?php if (isset($sessionDone)): ?>
+        <?php if ($showDifficultyScreen): ?>
+            <div class="game-card">
+                <div class="difficulty-select">
+                    <h2>Choose a Difficulty</h2>
+                    <p class="sub">This controls the subnet size (prefix length) you'll be working with.</p>
+                    <div class="difficulty-grid">
+                        <a href="?difficulty=easy" class="difficulty-card easy">
+                            <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks</p>
+                        </a>
+                        <a href="?difficulty=medium" class="difficulty-card medium">
+                            <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks</p>
+                        </a>
+                        <a href="?difficulty=hard" class="difficulty-card hard">
+                            <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php elseif (isset($sessionDone)): ?>
             <div class="game-card">
                 <h2>Session Complete!</h2>
                 <p class="sub">Here's how you did:</p>
@@ -124,20 +152,19 @@ $q = $state["question"] ?? null;
                     <?php endforeach; ?>
                 <?php endif; ?>
                 <div class="game-actions">
-                    <a href="dissect_ip_timed.php?restart=1" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
+                    <a href="dissect_ip_timed.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                     <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Games</a>
                 </div>
             </div>
         <?php else: ?>
             <div class="game-card">
-                <span class="difficulty-tag">Difficulty: <?= $q["prefix"] >= 28 ? "Medium" : "Hard" ?></span>
+                <span class="difficulty-tag">Difficulty: <?= ucfirst($state["difficulty"]) ?></span>
                 <div class="mode-tag">TIMED CHALLENGE</div>
                 <h2>Question <?= $state["q_index"] ?> of <?= $TOTAL_QUESTIONS ?></h2>
                 <h2>Given the IP address <span class="ip"><?= $q["given_ip"] ?>/<?= $q["prefix"] ?></span>, fill in the blanks.</h2>
                 <p class="sub">Provide the missing information for the subnet before time runs out.</p>
 
                 <form method="POST" id="answerForm">
-                    <!-- Network Address -->
                     <div class="q-row">
                         <div class="label">🔷 Network Address</div>
                         <div class="octet-group">
@@ -148,7 +175,6 @@ $q = $state["question"] ?? null;
                         </div>
                     </div>
 
-                    <!-- Broadcast Address -->
                     <div class="q-row">
                         <div class="label">📡 Broadcast Address</div>
                         <div class="octet-group">
@@ -159,7 +185,6 @@ $q = $state["question"] ?? null;
                         </div>
                     </div>
 
-                    <!-- Usable Host Range -->
                     <div class="q-row">
                         <div class="label">👥 Usable Host Range</div>
                         <div class="octet-group">
@@ -175,7 +200,6 @@ $q = $state["question"] ?? null;
                         </div>
                     </div>
 
-                    <!-- Subnet Mask -->
                     <div class="q-row">
                         <div class="label">➕ Subnet Mask</div>
                         <div class="octet-group">
@@ -186,7 +210,6 @@ $q = $state["question"] ?? null;
                         </div>
                     </div>
 
-                    <!-- Wildcard Mask -->
                     <div class="q-row">
                         <div class="label"># Wildcard Mask</div>
                         <div class="octet-group">
@@ -197,7 +220,6 @@ $q = $state["question"] ?? null;
                         </div>
                     </div>
 
-                    <!-- Number of Usable Hosts -->
                     <div class="q-row">
                         <div class="label">🔢 Number of Usable Hosts</div>
                         <input class="hosts-input" type="number" min="0" name="usable_hosts" required style="max-width:200px;">
@@ -226,7 +248,7 @@ $q = $state["question"] ?? null;
     </main>
 
     <aside class="right-col">
-        <?php if (!isset($sessionDone)): ?>
+        <?php if (!$showDifficultyScreen && !isset($sessionDone)): ?>
         <div class="panel-box">
             <h4>⏱ Time Left</h4>
             <div class="timer-value" id="timerDisplay"><?= gmdate("i:s", $TIME_PER_QUESTION) ?></div>
@@ -245,18 +267,19 @@ $q = $state["question"] ?? null;
         </div>
         <?php endif; ?>
 
+        <?php if (!$showDifficultyScreen): ?>
         <div class="panel-box">
             <h4>🏆 Your Progress</h4>
             <div class="stat-line"><span>Correct Answers</span><span class="good"><?= $state['correct'] ?? $finalCorrect ?? 0 ?></span></div>
             <div class="stat-line"><span>Wrong Answers</span><span class="bad"><?= $state['wrong'] ?? $finalWrong ?? 0 ?></span></div>
             <div class="stat-line"><span>Score</span><span class="xp"><?= $state['score'] ?? $finalScore ?? 0 ?> XP</span></div>
         </div>
+        <?php endif; ?>
     </aside>
 </div>
 
-<?php if (!isset($sessionDone)): ?>
+<?php if (!$showDifficultyScreen && !isset($sessionDone)): ?>
 <script>
-// Countdown timer. On hitting zero, auto-submit whatever's filled in.
 let timeLeft = <?= $TIME_PER_QUESTION ?>;
 const display = document.getElementById("timerDisplay");
 const form = document.getElementById("answerForm");

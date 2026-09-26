@@ -13,12 +13,17 @@ function get_search_index() {
         ["type" => "game", "name" => "Subnet Showdown", "desc" => "Multiple-choice subnetting quiz, 30 seconds per question.", "url" => "games/subnet_showdown_timed.php", "icon" => "🎯"],
         ["type" => "game", "name" => "Multiplayer Lobby", "desc" => "Create or join a live 1v1 or group match.", "url" => "lobby.php", "icon" => "⚔️"],
 
+        // Learning Modules (how-to guides for each game)
+        ["type" => "lesson", "name" => "How to Play: Dissect an IP Address", "desc" => "Network address, broadcast, mask, and host range explained.", "url" => "learning_modules.php", "icon" => "📘"],
+        ["type" => "lesson", "name" => "How to Play: Binary Game", "desc" => "How to convert binary numbers to decimal.", "url" => "learning_modules.php", "icon" => "📘"],
+        ["type" => "lesson", "name" => "How to Play: Subnet Showdown", "desc" => "The multiple-choice quiz format explained.", "url" => "learning_modules.php", "icon" => "📘"],
+        ["type" => "lesson", "name" => "How to Play: 1v1 Multiplayer", "desc" => "Lobbies, room codes, and live matches explained.", "url" => "learning_modules.php", "icon" => "📘"],
+
         // Practice modes (untimed)
         ["type" => "practice", "name" => "Dissect an IP Address (Practice)", "desc" => "Same subnetting challenge, no timer.", "url" => "games/subnet_practice.php", "icon" => "🌐"],
         ["type" => "practice", "name" => "Binary Conversion (Practice)", "desc" => "Binary-to-decimal practice, no time pressure.", "url" => "games/binary_practice.php", "icon" => "01"],
         ["type" => "practice", "name" => "Subnet Showdown (Practice)", "desc" => "Same MCQ quiz, no timer.", "url" => "games/subnet_showdown_practice.php", "icon" => "🎯"],
 
-        // Lessons - none built yet; add entries here once Learning Modules exists, e.g.:
-        // ["type" => "lesson", "name" => "IPv4 Addressing Basics", "desc" => "...", "url" => "lessons/ipv4-basics.php", "icon" => "📘"],
+        // More lessons: add entries here as individual lesson pages get built.
     ];
 }

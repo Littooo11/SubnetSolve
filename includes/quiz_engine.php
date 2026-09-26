@@ -5,6 +5,16 @@
 
 require_once __DIR__ . "/subnet_engine.php";
 
+// Difficulty -> prefix range used by every subnet-based question below.
+function difficulty_prefix_range($difficulty) {
+    $ranges = [
+        "easy"   => [24, 25],
+        "medium" => [26, 28],
+        "hard"   => [29, 30],
+    ];
+    return $ranges[$difficulty] ?? $ranges["medium"];
+}
+
 // Shuffles a correct answer + 3 distractors, returns [options[], correct_index]
 function build_mcq_options($correct, $distractors) {
     $distractors = array_values(array_unique($distractors));
@@ -18,8 +28,8 @@ function build_mcq_options($correct, $distractors) {
 // Topics 1-4: network address, broadcast address, first host, last host.
 // All four reuse the same subnet context, so the 4 candidate values
 // (network/broadcast/host-start/host-end) double as natural distractors.
-function generate_address_question($topic) {
-    $q = generate_subnet_question();
+function generate_address_question($topic, $difficulty = "medium") {
+    $q = generate_subnet_question($difficulty);
     $base = "{$q['oct1']}.{$q['oct2']}.{$q['oct3']}.";
 
     $pool = [
@@ -47,8 +57,14 @@ function generate_address_question($topic) {
     ];
 }
 
-function generate_mask_question($topic) {
-    $prefixes = range(24, 30);
+function generate_mask_question($topic, $difficulty = "medium") {
+    [$min, $max] = difficulty_prefix_range($difficulty);
+    $prefixes = range($min, $max);
+
+    // Masks/wildcards only meaningfully differ across the 24-30 range, so if a
+    // difficulty band is too narrow to supply 3 distractors, widen just for this question.
+    if (count($prefixes) < 4) $prefixes = range(24, 30);
+
     $correctPrefix = $prefixes[array_rand($prefixes)];
     $otherPrefixes = array_values(array_diff($prefixes, [$correctPrefix]));
     shuffle($otherPrefixes);
@@ -73,8 +89,11 @@ function generate_mask_question($topic) {
     ];
 }
 
-function generate_host_count_question() {
-    $prefixes = range(24, 30);
+function generate_host_count_question($difficulty = "medium") {
+    [$min, $max] = difficulty_prefix_range($difficulty);
+    $prefixes = range($min, $max);
+    if (count($prefixes) < 4) $prefixes = range(24, 30);
+
     $correctPrefix = $prefixes[array_rand($prefixes)];
     $otherPrefixes = array_values(array_diff($prefixes, [$correctPrefix]));
     shuffle($otherPrefixes);
@@ -143,14 +162,16 @@ function generate_public_private_question() {
     ];
 }
 
-function generate_binary_mcq_question() {
-    $decimal = rand(0, 15);
-    $binaryStr = str_pad(decbin($decimal), 4, "0", STR_PAD_LEFT);
+// $digits: how many bits/digits the binary number has (3, 4, or 5) - controls difficulty.
+function generate_binary_mcq_question($digits = 4) {
+    $max = (1 << $digits) - 1; // e.g. 4 digits -> 0-15
+    $decimal = rand(0, $max);
+    $binaryStr = str_pad(decbin($decimal), $digits, "0", STR_PAD_LEFT);
     $correct = (string) $decimal;
 
     $distractors = [];
-    while (count($distractors) < 3) {
-        $d = rand(0, 15);
+    while (count($distractors) < 3 && count($distractors) < $max) {
+        $d = rand(0, $max);
         if ($d !== $decimal && !in_array((string) $d, $distractors)) $distractors[] = (string) $d;
     }
     $built = build_mcq_options($correct, $distractors);
@@ -163,16 +184,16 @@ function generate_binary_mcq_question() {
 }
 
 // Mode-aware entry point for multiplayer matches: 'subnetting', 'binary', or 'both'
-function generate_match_question($gameMode) {
-    if ($gameMode === "binary") return generate_binary_mcq_question();
+function generate_match_question($gameMode, $difficulty = "medium") {
+    if ($gameMode === "binary") return generate_binary_mcq_question(4);
     if ($gameMode === "both") {
-        return rand(0, 1) === 0 ? generate_showdown_question() : generate_binary_mcq_question();
+        return rand(0, 1) === 0 ? generate_showdown_question($difficulty) : generate_binary_mcq_question(4);
     }
-    return generate_showdown_question();
+    return generate_showdown_question($difficulty);
 }
 
 // Main entry point: picks a random topic and generates its question.
-function generate_showdown_question() {
+function generate_showdown_question($difficulty = "medium") {
     $topics = ["network", "broadcast", "first", "last", "mask", "wildcard", "host_count", "ip_class", "public_private"];
     $topic = $topics[array_rand($topics)];
 
@@ -181,13 +202,13 @@ function generate_showdown_question() {
         case "broadcast":
         case "first":
         case "last":
-            return generate_address_question($topic);
+            return generate_address_question($topic, $difficulty);
         case "mask":
-            return generate_mask_question("mask");
+            return generate_mask_question("mask", $difficulty);
         case "wildcard":
-            return generate_mask_question("wildcard");
+            return generate_mask_question("wildcard", $difficulty);
         case "host_count":
-            return generate_host_count_question();
+            return generate_host_count_question($difficulty);
         case "ip_class":
             return generate_ip_class_question();
         case "public_private":

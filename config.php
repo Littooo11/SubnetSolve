@@ -4,7 +4,7 @@
 $host = "localhost";
 $db   = "subnet_game";       // change to your database name
 $user = "root";         // default XAMPP username
-$pass = "password123";             // default XAMPP password (blank)
+$pass = "";             // default XAMPP password (blank)
 
 // Using mysqli (procedural)
 $conn = mysqli_connect($host, $user, $pass, $db);

@@ -71,7 +71,7 @@ function status_label($s) {
             </div>
         </div>
         <a href="dashboard.php" class="nav-link">Dashboard</a>
-        <a href="#" class="nav-link">Learning Modules</a>
+        <a href="learning_modules.php" class="nav-link">Learning Modules</a>
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
         <a href="lobby.php" class="nav-link active">Multiplayer Lobby</a>

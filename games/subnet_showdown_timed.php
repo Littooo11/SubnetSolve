@@ -21,65 +21,79 @@ $myAvatar = mysqli_stmt_get_result($avStmt)->fetch_assoc()["avatar"] ?? "fox";
 
 $TOTAL_QUESTIONS = 10;
 $TIME_PER_QUESTION = 30;
+$validDifficulties = ["easy", "medium", "hard"];
+$difficulty = $_GET["difficulty"] ?? null;
 
-if (!isset($_SESSION["showdown_timed"]) || isset($_GET["restart"])) {
-    $_SESSION["showdown_timed"] = [
-        "q_index" => 1,
-        "correct" => 0,
-        "wrong"   => 0,
-        "score"   => 0,
-        "streak"  => 0,
-        "question" => generate_showdown_question(),
-        "answered" => false,
-        "selected"  => null,
-    ];
-}
-$state = &$_SESSION["showdown_timed"];
+$needsNewSession = !isset($_SESSION["showdown_timed"]) || isset($_GET["restart"]);
+$showDifficultyScreen = false;
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    if (isset($_POST["submit_answer"]) && !$state["answered"]) {
-        $selected = isset($_POST["selected"]) ? (int) $_POST["selected"] : -1;
-        $state["selected"] = $selected;
-        $state["answered"] = true;
-
-        if ($selected === $state["question"]["correct_index"]) {
-            $state["correct"]++;
-            $state["streak"]++;
-            $state["score"] += 20 + min($state["streak"] * 2, 20);
-        } else {
-            $state["wrong"]++;
-            $state["streak"] = 0;
-        }
-    } elseif (isset($_POST["next"])) {
-        if ($state["q_index"] >= $TOTAL_QUESTIONS) {
-            $gameType = "showdown_timed";
-            $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
-            mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
-            mysqli_stmt_execute($stmt);
-
-            $xpResult = award_xp($conn, $userId, $state["score"]);
-            $updateQuiz = mysqli_prepare($conn, "UPDATE user_progress SET quizzes_completed = quizzes_completed + 1, total_correct = total_correct + ?, total_wrong = total_wrong + ? WHERE user_id = ?");
-            mysqli_stmt_bind_param($updateQuiz, "iii", $state["correct"], $state["wrong"], $userId);
-            mysqli_stmt_execute($updateQuiz);
-
-            $newBadges = check_and_award_badges($conn, $userId);
-
-            $finalScore = $state["score"];
-            $finalCorrect = $state["correct"];
-            $finalWrong = $state["wrong"];
-            unset($_SESSION["showdown_timed"]);
-            $sessionDone = true;
-        } else {
-            $state["q_index"]++;
-            $state["question"] = generate_showdown_question();
-            $state["answered"] = false;
-            $state["selected"] = null;
-        }
+if ($needsNewSession) {
+    if (!in_array($difficulty, $validDifficulties)) {
+        $showDifficultyScreen = true;
+    } else {
+        $_SESSION["showdown_timed"] = [
+            "q_index" => 1,
+            "correct" => 0,
+            "wrong"   => 0,
+            "score"   => 0,
+            "streak"  => 0,
+            "difficulty" => $difficulty,
+            "question" => generate_showdown_question($difficulty),
+            "answered" => false,
+            "selected"  => null,
+        ];
     }
 }
 
-$q = $state["question"] ?? null;
-$letters = ["A", "B", "C", "D"];
+if (!$showDifficultyScreen) {
+    $state = &$_SESSION["showdown_timed"];
+
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        if (isset($_POST["submit_answer"]) && !$state["answered"]) {
+            $selected = isset($_POST["selected"]) ? (int) $_POST["selected"] : -1;
+            $state["selected"] = $selected;
+            $state["answered"] = true;
+
+            if ($selected === $state["question"]["correct_index"]) {
+                $state["correct"]++;
+                $state["streak"]++;
+                $state["score"] += 20 + min($state["streak"] * 2, 20);
+            } else {
+                $state["wrong"]++;
+                $state["streak"] = 0;
+            }
+        } elseif (isset($_POST["next"])) {
+            if ($state["q_index"] >= $TOTAL_QUESTIONS) {
+                $gameType = "showdown_timed";
+                $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
+                mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
+                mysqli_stmt_execute($stmt);
+
+                $xpResult = award_xp($conn, $userId, $state["score"]);
+                $updateQuiz = mysqli_prepare($conn, "UPDATE user_progress SET quizzes_completed = quizzes_completed + 1, total_correct = total_correct + ?, total_wrong = total_wrong + ? WHERE user_id = ?");
+                mysqli_stmt_bind_param($updateQuiz, "iii", $state["correct"], $state["wrong"], $userId);
+                mysqli_stmt_execute($updateQuiz);
+
+                $newBadges = check_and_award_badges($conn, $userId);
+
+                $finalScore = $state["score"];
+                $finalCorrect = $state["correct"];
+                $finalWrong = $state["wrong"];
+                $sessionDifficulty = $state["difficulty"];
+                unset($_SESSION["showdown_timed"]);
+                $sessionDone = true;
+            } else {
+                $state["q_index"]++;
+                $state["question"] = generate_showdown_question($state["difficulty"]);
+                $state["answered"] = false;
+                $state["selected"] = null;
+            }
+        }
+    }
+
+    $q = $state["question"] ?? null;
+    $letters = ["A", "B", "C", "D"];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,7 +110,7 @@ $letters = ["A", "B", "C", "D"];
         <div class="name"><?= htmlspecialchars($username) ?></div>
         <div class="tag">You</div>
 
-        <?php if (!isset($sessionDone)): ?>
+        <?php if (!$showDifficultyScreen && !isset($sessionDone)): ?>
         <div class="showdown-stat-box"><div class="lbl">Score</div><div class="num" style="color:var(--gold);"><?= $state["score"] ?></div></div>
         <div class="showdown-stat-box"><div class="lbl">Correct</div><div class="num" style="color:var(--green);"><?= $state["correct"] ?></div></div>
         <div class="showdown-stat-box">
@@ -108,7 +122,25 @@ $letters = ["A", "B", "C", "D"];
         <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:block; margin-top:0.6rem; font-size:0.82rem;">← Back</a>
     </div>
 
-    <?php if (isset($sessionDone)): ?>
+    <?php if ($showDifficultyScreen): ?>
+        <div class="showdown-card">
+            <div class="difficulty-select">
+                <h2>Choose a Difficulty</h2>
+                <p class="sub">This controls the subnet size (prefix length) for subnet-related questions.</p>
+                <div class="difficulty-grid">
+                    <a href="?difficulty=easy" class="difficulty-card easy">
+                        <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks</p>
+                    </a>
+                    <a href="?difficulty=medium" class="difficulty-card medium">
+                        <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks</p>
+                    </a>
+                    <a href="?difficulty=hard" class="difficulty-card hard">
+                        <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <?php elseif (isset($sessionDone)): ?>
         <div class="showdown-card">
             <h2>Time's Up — Session Complete!</h2>
             <p style="color:var(--text-dim);">Here's how you did:</p>
@@ -122,7 +154,7 @@ $letters = ["A", "B", "C", "D"];
                 <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;"><?= $b["icon"] ?> Badge Unlocked: <b><?= htmlspecialchars($b["name"]) ?></b></div>
             <?php endforeach; ?>
             <div class="game-actions">
-                <a href="subnet_showdown_timed.php?restart=1" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
+                <a href="subnet_showdown_timed.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                 <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Games</a>
             </div>
         </div>
@@ -139,7 +171,7 @@ $letters = ["A", "B", "C", "D"];
             </div>
 
             <div class="showdown-meta-row">
-                <div class="category-pill">🌐 Subnet Showdown</div>
+                <div class="category-pill">🌐 Subnet Showdown · <?= ucfirst($state["difficulty"]) ?></div>
                 <div class="showdown-timer" id="timerDisplay">00:<?= str_pad($TIME_PER_QUESTION, 2, "0", STR_PAD_LEFT) ?></div>
             </div>
 
@@ -176,7 +208,7 @@ $letters = ["A", "B", "C", "D"];
     <?php endif; ?>
 </div>
 
-<?php if (!isset($sessionDone) && !$state["answered"]): ?>
+<?php if (!$showDifficultyScreen && !isset($sessionDone) && !$state["answered"]): ?>
 <script>
 let timeLeft = <?= $TIME_PER_QUESTION ?>;
 const display = document.getElementById("timerDisplay");
