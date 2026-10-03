@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 19, 2026 at 03:47 PM
+-- Generation Time: Oct 03, 2026 at 10:49 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,6 +71,7 @@ CREATE TABLE `matches` (
   `host_user_id` int(11) NOT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'waiting',
   `current_question_index` int(11) NOT NULL DEFAULT 0,
+  `current_question_started_at` datetime DEFAULT NULL,
   `total_questions` int(11) NOT NULL DEFAULT 10,
   `winner_id` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL,
@@ -138,6 +139,13 @@ CREATE TABLE `remember_tokens` (
   `expires_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `remember_tokens`
+--
+
+INSERT INTO `remember_tokens` (`id`, `user_id`, `token`, `expires_at`) VALUES
+(1, 4, '93d83fdce85cede763ef0784b4a73ad833f0f4f7df385aa0b1209e3fe1a87c9e', '2026-10-28 08:18:34');
+
 -- --------------------------------------------------------
 
 --
@@ -153,6 +161,14 @@ CREATE TABLE `scores` (
   `played_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `scores`
+--
+
+INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `played_at`) VALUES
+(1, 2, NULL, 'showdown_practice', 152, '2026-09-26 22:44:08'),
+(2, 2, NULL, 'binary_practice', 180, '2026-10-01 14:44:28');
+
 -- --------------------------------------------------------
 
 --
@@ -165,8 +181,19 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `avatar` varchar(30) NOT NULL DEFAULT 'fox',
+  `is_admin` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar`, `is_admin`, `created_at`) VALUES
+(1, 'Admin1', 'admin1@gg.com', '$2y$10$ar5q20r5lI8eswq5BRKZEeHHTOjWl.BcdF1.TmZ5Clu31y6jpTIQG', 'fox', 1, '2026-09-26 19:03:39'),
+(2, 'Carlo', 'cma@gm.com', '$2y$10$m2GgOmwTRKb0fEWwC4mwSOKCzglQMmbOB7s/h0bAWoJ5B7SRX5tR.', 'fox', 0, '2026-09-26 19:08:38'),
+(3, 'test', 'test@m.com', '$2y$10$WTCSTDqewk6Tma71Ed0N8OLTpe.c38rLsEOquwrxh34AQ7NtzhDmW', 'fox', 0, '2026-09-26 19:10:12'),
+(4, 'aki00', 'aki@gmail.com', '$2y$10$Pmliz1t9MmktkI8Zc0V6iOLx1Xwc3RhLvsaKOWa6yO/ioUJweVOyu', 'fox', 0, '2026-09-28 14:18:19');
 
 -- --------------------------------------------------------
 
@@ -180,6 +207,13 @@ CREATE TABLE `user_badges` (
   `badge_id` int(11) NOT NULL,
   `earned_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_badges`
+--
+
+INSERT INTO `user_badges` (`id`, `user_id`, `badge_id`, `earned_at`) VALUES
+(1, 2, 1, '2026-09-26 22:44:08');
 
 -- --------------------------------------------------------
 
@@ -200,6 +234,16 @@ CREATE TABLE `user_progress` (
   `current_streak` int(11) NOT NULL DEFAULT 0,
   `last_activity_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_progress`
+--
+
+INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`) VALUES
+(1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL),
+(2, 1, 332, 332, 400, 0, 2, 6, 4, 0, NULL),
+(3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL),
+(4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL);
 
 --
 -- Indexes for dumped tables
@@ -316,25 +360,25 @@ ALTER TABLE `questions`
 -- AUTO_INCREMENT for table `remember_tokens`
 --
 ALTER TABLE `remember_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user_badges`
 --
 ALTER TABLE `user_badges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
