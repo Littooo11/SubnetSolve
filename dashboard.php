@@ -140,6 +140,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
+        <a href="about.php" class="nav-link">About Us</a>
         <?php if (!empty($_SESSION["is_admin"])): ?>
             <a href="admin/dashboard.php" class="nav-link" style="color:var(--orange);">🛠 Admin Panel</a>
         <?php endif; ?>

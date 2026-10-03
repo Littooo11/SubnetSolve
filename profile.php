@@ -135,6 +135,7 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link active">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
+        <a href="about.php" class="nav-link">About Us</a>
     </aside>
 
     <main class="main">

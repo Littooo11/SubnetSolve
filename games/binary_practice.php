@@ -2,6 +2,8 @@
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
+require "../includes/xp_engine.php";
+require "../includes/easy_instructions.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -14,6 +16,7 @@ $difficulty = $_GET["difficulty"] ?? null;
 $showDifficultyScreen = !array_key_exists($difficulty, $difficultyDigits);
 $digits = $difficultyDigits[$difficulty] ?? 4;
 $maxVal = (1 << $digits) - 1;
+$pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_multiplier($difficulty));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,16 +54,16 @@ $maxVal = (1 << $digits) - 1;
             <div class="game-card">
                 <div class="difficulty-select">
                     <h2>Choose a Difficulty</h2>
-                    <p class="sub">This controls how many binary digits you'll convert.</p>
+                    <p class="sub">This controls how many binary digits you'll convert and how much XP each correct answer earns.</p>
                     <div class="difficulty-grid">
                         <a href="?difficulty=easy" class="difficulty-card easy">
-                            <span class="icon">🟢</span><h4>Easy</h4><p>3-digit binary (0-7)</p>
+                            <span class="icon">🟢</span><h4>Easy</h4><p>3-digit binary (0-7)<br>10 XP per correct</p>
                         </a>
                         <a href="?difficulty=medium" class="difficulty-card medium">
-                            <span class="icon">🟡</span><h4>Medium</h4><p>4-digit binary (0-15)</p>
+                            <span class="icon">🟡</span><h4>Medium</h4><p>4-digit binary (0-15)<br>15 XP per correct</p>
                         </a>
                         <a href="?difficulty=hard" class="difficulty-card hard">
-                            <span class="icon">🔴</span><h4>Difficult</h4><p>5-digit binary (0-31)</p>
+                            <span class="icon">🔴</span><h4>Difficult</h4><p>5-digit binary (0-31)<br>20 XP per correct</p>
                         </a>
                     </div>
                 </div>
@@ -70,7 +73,7 @@ $maxVal = (1 << $digits) - 1;
         <div class="game-card">
             <div class="mode-tag">PRACTICE MODE — NO TIMER · <?= strtoupper($difficulty) ?></div>
             <h2>Guess the Decimal Value</h2>
-            <p class="sub">A <?= $digits ?>-digit binary number is shown below. Type its decimal equivalent (0-<?= $maxVal ?>) and press Enter.</p>
+            <p class="sub">A <?= $digits ?>-digit binary number is shown below. Type its decimal equivalent (0-<?= $maxVal ?>) and press Enter. Each correct answer earns <?= $pointsPerCorrect ?> XP, saved when you click End Session or leave this page.</p>
 
             <div class="binary-stage">
                 <div class="binary-number" id="binaryDisplay"><?= str_repeat("-", $digits) ?></div>
@@ -106,6 +109,10 @@ $maxVal = (1 << $digits) - 1;
                 <a href="../practice.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Practice Mode</a>
             </div>
         </div>
+
+        <?php if ($difficulty === "easy"): ?>
+            <?= render_binary_instructions($digits) ?>
+        <?php endif; ?>
         <?php endif; ?>
     </main>
 </div>
@@ -114,7 +121,9 @@ $maxVal = (1 << $digits) - 1;
 <script>
 const DIGITS = <?= $digits ?>;
 const MAX_VAL = <?= $maxVal ?>;
+const POINTS_PER_CORRECT = <?= $pointsPerCorrect ?>;
 let correct = 0, wrong = 0, score = 0, currentAnswer = 0;
+let saved = false; // guards against saving the same session twice
 const display = document.getElementById("binaryDisplay");
 const input = document.getElementById("answerInput");
 const feedback = document.getElementById("feedback");
@@ -134,7 +143,7 @@ function submitAnswer() {
 
     if (guess === currentAnswer) {
         correct++;
-        score += 10;
+        score += POINTS_PER_CORRECT;
         feedback.textContent = "✅ Correct!";
         feedback.className = "binary-feedback good";
     } else {
@@ -153,7 +162,17 @@ function submitAnswer() {
 document.getElementById("submitBtn").addEventListener("click", submitAnswer);
 input.addEventListener("keydown", (e) => { if (e.key === "Enter") submitAnswer(); });
 
+function addBanner(html, cls) {
+    const banner = document.createElement("div");
+    banner.className = "feedback-banner " + cls;
+    banner.style.marginTop = "0.8rem";
+    banner.innerHTML = html;
+    document.getElementById("summaryCard").appendChild(banner);
+}
+
 document.getElementById("endBtn").addEventListener("click", async () => {
+    if (saved) return;
+    saved = true;
     document.querySelector(".binary-stage").closest(".game-card").style.display = "none";
 
     let xpResult = null;
@@ -164,28 +183,30 @@ document.getElementById("endBtn").addEventListener("click", async () => {
             body: JSON.stringify({ game_type: "binary_practice", points: score, correct: correct, wrong: wrong })
         });
         xpResult = await res.json();
-    } catch (e) { /* saving is best-effort; still show the summary */ }
+    } catch (e) { xpResult = null; }
 
     document.getElementById("finalCorrect").textContent = correct;
     document.getElementById("finalWrong").textContent = wrong;
     document.getElementById("finalScore").textContent = "+" + score + " XP";
-    if (xpResult && xpResult.leveled_up) {
-        const banner = document.createElement("div");
-        banner.className = "feedback-banner feedback-correct";
-        banner.style.marginTop = "0.8rem";
-        banner.textContent = `🎉 Level Up! You're now Level ${xpResult.new_level}!`;
-        document.getElementById("summaryCard").appendChild(banner);
-    }
-    if (xpResult && xpResult.new_badges && xpResult.new_badges.length > 0) {
-        xpResult.new_badges.forEach(b => {
-            const banner = document.createElement("div");
-            banner.className = "feedback-banner feedback-correct";
-            banner.style.marginTop = "0.8rem";
-            banner.innerHTML = `${b.icon} Badge Unlocked: <b>${b.name}</b>`;
-            document.getElementById("summaryCard").appendChild(banner);
-        });
+
+    if (!xpResult || !xpResult.success) {
+        addBanner("⚠️ Your XP couldn't be saved (server error). Check that includes/save_score.php exists and your database has the latest columns.", "feedback-wrong");
+    } else {
+        if (xpResult.leveled_up) addBanner(`🎉 Level Up! You're now Level ${xpResult.new_level}!`, "feedback-correct");
+        if (xpResult.new_badges && xpResult.new_badges.length > 0) {
+            xpResult.new_badges.forEach(b => addBanner(`${b.icon} Badge Unlocked: <b>${b.name}</b>`, "feedback-correct"));
+        }
     }
     document.getElementById("summaryCard").style.display = "block";
+});
+
+// If the player leaves without clicking End Session (Exit, sidebar link, closing the tab),
+// still save whatever they earned so far.
+window.addEventListener("pagehide", () => {
+    if (saved || score <= 0) return;
+    saved = true;
+    const payload = JSON.stringify({ game_type: "binary_practice", points: score, correct: correct, wrong: wrong });
+    navigator.sendBeacon("../includes/save_score.php", new Blob([payload], { type: "application/json" }));
 });
 
 nextQuestion();

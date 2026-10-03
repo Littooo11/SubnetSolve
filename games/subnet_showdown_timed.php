@@ -6,6 +6,7 @@ require "../includes/quiz_engine.php";
 require "../includes/xp_engine.php";
 require "../includes/badge_engine.php";
 require "../includes/avatars.php";
+require "../includes/easy_instructions.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -50,14 +51,15 @@ if (!$showDifficultyScreen) {
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (isset($_POST["submit_answer"]) && !$state["answered"]) {
-            $selected = isset($_POST["selected"]) ? (int) $_POST["selected"] : -1;
+            $selected = isset($_POST["selected"]) && $_POST["selected"] !== "" ? (int) $_POST["selected"] : -1;
             $state["selected"] = $selected;
             $state["answered"] = true;
 
             if ($selected === $state["question"]["correct_index"]) {
                 $state["correct"]++;
                 $state["streak"]++;
-                $state["score"] += 20 + min($state["streak"] * 2, 20);
+                $base = 20 + min($state["streak"] * 2, 20);
+                $state["score"] += round($base * difficulty_multiplier($state["difficulty"]));
             } else {
                 $state["wrong"]++;
                 $state["streak"] = 0;
@@ -126,23 +128,23 @@ if (!$showDifficultyScreen) {
         <div class="showdown-card">
             <div class="difficulty-select">
                 <h2>Choose a Difficulty</h2>
-                <p class="sub">This controls the subnet size (prefix length) for subnet-related questions.</p>
+                <p class="sub">This controls the subnet size for subnet-related questions and how much XP you earn.</p>
                 <div class="difficulty-grid">
                     <a href="?difficulty=easy" class="difficulty-card easy">
-                        <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks</p>
+                        <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks<br>XP ×1</p>
                     </a>
                     <a href="?difficulty=medium" class="difficulty-card medium">
-                        <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks</p>
+                        <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks<br>XP ×1.5</p>
                     </a>
                     <a href="?difficulty=hard" class="difficulty-card hard">
-                        <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks</p>
+                        <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks<br>XP ×2</p>
                     </a>
                 </div>
             </div>
         </div>
     <?php elseif (isset($sessionDone)): ?>
         <div class="showdown-card">
-            <h2>Time's Up — Session Complete!</h2>
+            <h2>Session Complete!</h2>
             <p style="color:var(--text-dim);">Here's how you did:</p>
             <div class="stat-line"><span>Correct Answers</span><span class="good"><?= $finalCorrect ?></span></div>
             <div class="stat-line"><span>Wrong Answers</span><span class="bad"><?= $finalWrong ?></span></div>
@@ -205,6 +207,10 @@ if (!$showDifficultyScreen) {
                 <?php endif; ?>
             </form>
         </div>
+
+        <?php if ($state["difficulty"] === "easy"): ?>
+            <?= render_mcq_instructions("Subnet Showdown") ?>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
 

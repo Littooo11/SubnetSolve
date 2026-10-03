@@ -4,9 +4,17 @@
 // instead of updating user_progress directly, so leveling stays consistent everywhere.
 
 // How much XP is needed to go from this level to the next.
-// Grows each level so higher levels take progressively longer.
+// Grows faster than a flat linear curve so leveling up stays meaningful at
+// higher levels, while still being close to the old curve early on.
 function xp_required_for_level($level) {
-    return 500 + ($level - 1) * 150;
+    return 400 + ($level - 1) * 200 + (int) floor(pow(max(0, $level - 1), 1.6) * 5);
+}
+
+// Difficulty-based XP multiplier - shared by every game so "Hard" is
+// always worth meaningfully more than "Easy" for the same performance.
+function difficulty_multiplier($difficulty) {
+    $multipliers = ["easy" => 1.0, "medium" => 1.5, "hard" => 2.0];
+    return $multipliers[$difficulty] ?? 1.0;
 }
 
 // Awards XP to a user, applies it to both career total and current-level progress,

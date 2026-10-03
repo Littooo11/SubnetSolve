@@ -5,6 +5,7 @@ require "../config.php";
 require "../includes/subnet_engine.php";
 require "../includes/xp_engine.php";
 require "../includes/badge_engine.php";
+require "../includes/easy_instructions.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -31,26 +32,36 @@ if ($needsNewSession) {
             "score"   => 0,
             "difficulty" => $difficulty,
             "question" => generate_subnet_question($difficulty),
+            "answered" => false,
+            "submitted" => [],
+            "feedback" => null,
         ];
     }
 }
 
+// Builds the attributes for one answer box: blank + required while answering,
+// then locked, pre-filled with what was typed, and colored green/red after submitting.
+function fld($name, $feedback, $submitted) {
+    if ($feedback) {
+        $val = htmlspecialchars((string) ($submitted[$name] ?? ""));
+        $ok = $feedback["details"][$name] ?? false;
+        $style = $ok
+            ? "border-color:#22c55e; background:rgba(34,197,94,0.12);"
+            : "border-color:#ef4444; background:rgba(239,68,68,0.12);";
+        return 'name="' . $name . '" value="' . $val . '" readonly style="' . $style . '"';
+    }
+    return 'name="' . $name . '" required';
+}
+
 if (!$showDifficultyScreen) {
     $state = &$_SESSION["practice"];
-    $feedback = null;
+    $state["answered"] ??= false;
+    $state["submitted"] ??= [];
+    $state["feedback"] ??= null;
 
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["submit_answer"])) {
-        $result = check_subnet_answer($state["question"], $_POST);
-        $feedback = $result;
-
-        if ($result["correct"]) {
-            $state["correct"]++;
-            $state["score"] += 30;
-        } else {
-            $state["wrong"]++;
-        }
-
-        if (isset($_POST["next"])) {
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        if (isset($_POST["next"]) && $state["answered"]) {
+            // Move on (or finish) - never re-scores the question
             if ($state["q_index"] >= $TOTAL_QUESTIONS) {
                 $gameType = "subnet_dissect_practice";
                 $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
@@ -73,11 +84,28 @@ if (!$showDifficultyScreen) {
             } else {
                 $state["q_index"]++;
                 $state["question"] = generate_subnet_question($state["difficulty"]);
-                $feedback = null;
+                $state["answered"] = false;
+                $state["submitted"] = [];
+                $state["feedback"] = null;
+            }
+        } elseif (isset($_POST["submit_answer"]) && !$state["answered"]) {
+            // Score the question exactly once
+            $result = check_subnet_answer($state["question"], $_POST);
+            $state["answered"] = true;
+            $state["feedback"] = $result;
+            $state["submitted"] = $_POST;
+
+            if ($result["correct"]) {
+                $state["correct"]++;
+                $state["score"] += (int) round(30 * difficulty_multiplier($state["difficulty"]));
+            } else {
+                $state["wrong"]++;
             }
         }
     }
 
+    $feedback = $state["feedback"];
+    $submitted = $state["submitted"];
     $q = $state["question"] ?? null;
 }
 ?>
@@ -117,16 +145,16 @@ if (!$showDifficultyScreen) {
             <div class="game-card">
                 <div class="difficulty-select">
                     <h2>Choose a Difficulty</h2>
-                    <p class="sub">This controls the subnet size (prefix length) you'll be working with.</p>
+                    <p class="sub">This controls the subnet size (prefix length) and how much XP you earn per correct answer.</p>
                     <div class="difficulty-grid">
                         <a href="?difficulty=easy" class="difficulty-card easy">
-                            <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks</p>
+                            <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks<br>XP ×1</p>
                         </a>
                         <a href="?difficulty=medium" class="difficulty-card medium">
-                            <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks</p>
+                            <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks<br>XP ×1.5</p>
                         </a>
                         <a href="?difficulty=hard" class="difficulty-card hard">
-                            <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks</p>
+                            <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks<br>XP ×2</p>
                         </a>
                     </div>
                 </div>
@@ -170,7 +198,7 @@ if (!$showDifficultyScreen) {
                             <input class="octet-box" value="<?= $q['oct1'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct2'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct3'] ?>" disabled><span class="octet-dot">.</span>
-                            <input class="octet-box" type="number" min="0" max="255" name="network_oct4" required>
+                            <input class="octet-box" type="number" min="0" max="255" <?= fld("network_oct4", $feedback, $submitted) ?>>
                         </div>
                     </div>
 
@@ -180,7 +208,7 @@ if (!$showDifficultyScreen) {
                             <input class="octet-box" value="<?= $q['oct1'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct2'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct3'] ?>" disabled><span class="octet-dot">.</span>
-                            <input class="octet-box" type="number" min="0" max="255" name="broadcast_oct4" required>
+                            <input class="octet-box" type="number" min="0" max="255" <?= fld("broadcast_oct4", $feedback, $submitted) ?>>
                         </div>
                     </div>
 
@@ -190,12 +218,12 @@ if (!$showDifficultyScreen) {
                             <input class="octet-box" value="<?= $q['oct1'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct2'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct3'] ?>" disabled><span class="octet-dot">.</span>
-                            <input class="octet-box" type="number" min="0" max="255" name="host_start_oct4" required>
+                            <input class="octet-box" type="number" min="0" max="255" <?= fld("host_start_oct4", $feedback, $submitted) ?>>
                             <span class="range-to">to</span>
                             <input class="octet-box" value="<?= $q['oct1'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct2'] ?>" disabled><span class="octet-dot">.</span>
                             <input class="octet-box" value="<?= $q['oct3'] ?>" disabled><span class="octet-dot">.</span>
-                            <input class="octet-box" type="number" min="0" max="255" name="host_end_oct4" required>
+                            <input class="octet-box" type="number" min="0" max="255" <?= fld("host_end_oct4", $feedback, $submitted) ?>>
                         </div>
                     </div>
 
@@ -203,7 +231,7 @@ if (!$showDifficultyScreen) {
                         <div class="label">➕ Subnet Mask</div>
                         <div class="octet-group">
                             <?php for ($i = 0; $i < 4; $i++): ?>
-                                <input class="octet-box" type="number" min="0" max="255" name="mask_<?= $i ?>" required>
+                                <input class="octet-box" type="number" min="0" max="255" <?= fld("mask_$i", $feedback, $submitted) ?>>
                                 <?php if ($i < 3) echo '<span class="octet-dot">.</span>'; ?>
                             <?php endfor; ?>
                         </div>
@@ -213,7 +241,7 @@ if (!$showDifficultyScreen) {
                         <div class="label"># Wildcard Mask</div>
                         <div class="octet-group">
                             <?php for ($i = 0; $i < 4; $i++): ?>
-                                <input class="octet-box" type="number" min="0" max="255" name="wildcard_<?= $i ?>" required>
+                                <input class="octet-box" type="number" min="0" max="255" <?= fld("wildcard_$i", $feedback, $submitted) ?>>
                                 <?php if ($i < 3) echo '<span class="octet-dot">.</span>'; ?>
                             <?php endfor; ?>
                         </div>
@@ -221,12 +249,19 @@ if (!$showDifficultyScreen) {
 
                     <div class="q-row">
                         <div class="label">🔢 Number of Usable Hosts</div>
-                        <input class="hosts-input" type="number" min="0" name="usable_hosts" required style="max-width:200px;">
+                        <input class="hosts-input" type="number" min="0" <?= fld("usable_hosts", $feedback, $submitted) ?> style="max-width:200px;">
                     </div>
 
                     <?php if ($feedback): ?>
                         <div class="feedback-banner <?= $feedback['correct'] ? 'feedback-correct' : 'feedback-wrong' ?>">
-                            <?= $feedback['correct'] ? '✅ Correct! Great job.' : '❌ Not quite — check the highlighted logic and try the next one.' ?>
+                            <?php if ($feedback['correct']): ?>
+                                ✅ Correct! Great job.
+                            <?php else: ?>
+                                ❌ Not quite. Correct answers — Network: .<?= $q['network_oct4'] ?>, Broadcast: .<?= $q['broadcast_oct4'] ?>,
+                                Range: .<?= $q['host_start_oct4'] ?> to .<?= $q['host_end_oct4'] ?>,
+                                Mask: <?= implode('.', $q['mask_parts']) ?>, Wildcard: <?= implode('.', $q['wildcard_parts']) ?>,
+                                Usable hosts: <?= $q['usable_hosts'] ?>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
 
@@ -235,14 +270,17 @@ if (!$showDifficultyScreen) {
                             <button type="button" class="btn btn-secondary" onclick="document.getElementById('answerForm').reset()">Reset</button>
                             <button type="submit" name="submit_answer" value="1" class="btn btn-primary">Submit Answer</button>
                         <?php else: ?>
-                            <button type="submit" name="submit_answer" value="1" class="btn btn-primary" onclick="document.getElementById('nextField').value=1">
+                            <button type="submit" name="next" value="1" class="btn btn-primary">
                                 <?= $state["q_index"] >= $TOTAL_QUESTIONS ? "Finish Session" : "Next Question" ?>
                             </button>
-                            <input type="hidden" name="next" id="nextField" value="1">
                         <?php endif; ?>
                     </div>
                 </form>
             </div>
+
+            <?php if ($state["difficulty"] === "easy" && $q): ?>
+                <?= render_dissect_instructions($q) ?>
+            <?php endif; ?>
         <?php endif; ?>
     </main>
 

@@ -2,7 +2,7 @@
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
-require "../includes/quiz_engine.php";
+require "../includes/scenario_engine.php";
 require "../includes/xp_engine.php";
 require "../includes/badge_engine.php";
 require "../includes/avatars.php";
@@ -24,21 +24,21 @@ $TOTAL_QUESTIONS = 10;
 $validDifficulties = ["easy", "medium", "hard"];
 $difficulty = $_GET["difficulty"] ?? null;
 
-$needsNewSession = !isset($_SESSION["showdown_practice"]) || isset($_GET["restart"]);
+$needsNewSession = !isset($_SESSION["scenario_practice"]) || isset($_GET["restart"]);
 $showDifficultyScreen = false;
 
 if ($needsNewSession) {
     if (!in_array($difficulty, $validDifficulties)) {
         $showDifficultyScreen = true;
     } else {
-        $_SESSION["showdown_practice"] = [
+        $_SESSION["scenario_practice"] = [
             "q_index" => 1,
             "correct" => 0,
             "wrong"   => 0,
             "score"   => 0,
             "streak"  => 0,
             "difficulty" => $difficulty,
-            "question" => generate_showdown_question($difficulty),
+            "question" => generate_scenario_question($difficulty),
             "answered" => false,
             "selected"  => null,
         ];
@@ -46,11 +46,11 @@ if ($needsNewSession) {
 }
 
 if (!$showDifficultyScreen) {
-    $state = &$_SESSION["showdown_practice"];
+    $state = &$_SESSION["scenario_practice"];
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (isset($_POST["submit_answer"]) && !$state["answered"]) {
-            $selected = isset($_POST["selected"]) ? (int) $_POST["selected"] : -1;
+            $selected = isset($_POST["selected"]) && $_POST["selected"] !== "" ? (int) $_POST["selected"] : -1;
             $state["selected"] = $selected;
             $state["answered"] = true;
 
@@ -58,14 +58,14 @@ if (!$showDifficultyScreen) {
                 $state["correct"]++;
                 $state["streak"]++;
                 $base = 20 + min($state["streak"] * 2, 20);
-                $state["score"] += round($base * difficulty_multiplier($state["difficulty"]));
+                $state["score"] += (int) round($base * difficulty_multiplier($state["difficulty"]));
             } else {
                 $state["wrong"]++;
                 $state["streak"] = 0;
             }
         } elseif (isset($_POST["next"])) {
             if ($state["q_index"] >= $TOTAL_QUESTIONS) {
-                $gameType = "showdown_practice";
+                $gameType = "scenario_practice";
                 $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
                 mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
                 mysqli_stmt_execute($stmt);
@@ -81,11 +81,11 @@ if (!$showDifficultyScreen) {
                 $finalCorrect = $state["correct"];
                 $finalWrong = $state["wrong"];
                 $sessionDifficulty = $state["difficulty"];
-                unset($_SESSION["showdown_practice"]);
+                unset($_SESSION["scenario_practice"]);
                 $sessionDone = true;
             } else {
                 $state["q_index"]++;
-                $state["question"] = generate_showdown_question($state["difficulty"]);
+                $state["question"] = generate_scenario_question($state["difficulty"]);
                 $state["answered"] = false;
                 $state["selected"] = null;
             }
@@ -100,7 +100,7 @@ if (!$showDifficultyScreen) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Subnet Showdown (Practice) - SubNetSolve</title>
+    <title>Scenario-Based Questions (Practice) - SubNetSolve</title>
     <link rel="stylesheet" href="../dash.css">
     <link rel="stylesheet" href="../game.css">
 </head>
@@ -127,16 +127,16 @@ if (!$showDifficultyScreen) {
         <div class="showdown-card">
             <div class="difficulty-select">
                 <h2>Choose a Difficulty</h2>
-                <p class="sub">This controls the subnet size for subnet-related questions and how much XP you earn.</p>
+                <p class="sub">This controls the subnet sizes used in scenarios and how much XP you earn.</p>
                 <div class="difficulty-grid">
                     <a href="?difficulty=easy" class="difficulty-card easy">
-                        <span class="icon">🟢</span><h4>Easy</h4><p>/24 - /25 networks<br>XP ×1</p>
+                        <span class="icon">🟢</span><h4>Easy</h4><p>Smaller subnets<br>XP ×1</p>
                     </a>
                     <a href="?difficulty=medium" class="difficulty-card medium">
-                        <span class="icon">🟡</span><h4>Medium</h4><p>/26 - /28 networks<br>XP ×1.5</p>
+                        <span class="icon">🟡</span><h4>Medium</h4><p>Mid-size subnets<br>XP ×1.5</p>
                     </a>
                     <a href="?difficulty=hard" class="difficulty-card hard">
-                        <span class="icon">🔴</span><h4>Difficult</h4><p>/29 - /30 networks<br>XP ×2</p>
+                        <span class="icon">🔴</span><h4>Difficult</h4><p>Smaller blocks, trickier math<br>XP ×2</p>
                     </a>
                 </div>
             </div>
@@ -155,7 +155,7 @@ if (!$showDifficultyScreen) {
                 <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;"><?= $b["icon"] ?> Badge Unlocked: <b><?= htmlspecialchars($b["name"]) ?></b></div>
             <?php endforeach; ?>
             <div class="game-actions">
-                <a href="subnet_showdown_practice.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
+                <a href="scenario_practice.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                 <a href="../practice.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Practice Mode</a>
             </div>
         </div>
@@ -172,7 +172,7 @@ if (!$showDifficultyScreen) {
             </div>
 
             <div class="showdown-meta-row">
-                <div class="category-pill">🌐 Subnet Showdown · <?= ucfirst($state["difficulty"]) ?></div>
+                <div class="category-pill">📋 Scenario Quiz · <?= ucfirst($state["difficulty"]) ?></div>
                 <div style="font-size:0.78rem; color:var(--text-dim);">No timer — Practice Mode</div>
             </div>
 
@@ -208,7 +208,7 @@ if (!$showDifficultyScreen) {
         </div>
 
         <?php if ($state["difficulty"] === "easy"): ?>
-            <?= render_mcq_instructions("Subnet Showdown") ?>
+            <?= render_mcq_instructions("Scenario-Based Questions") ?>
         <?php endif; ?>
     <?php endif; ?>
 </div>

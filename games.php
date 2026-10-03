@@ -32,6 +32,16 @@ $games = [
         "desc" => "Challenge another player to a live head-to-head quiz race.",
         "url"  => "lobby.php",
     ],
+    [
+    "name" => "Hex Conversion",
+    "desc" => "Convert hexadecimal numbers to decimal against a 3-minute clock.",
+    "url"  => "games/hex_game.php",
+    ],
+    [
+    "name" => "Scenario-Based Questions",
+    "desc" => "Real-world subnetting word problems — multiple choice, 30 seconds each.",
+    "url"  => "games/scenario_game.php",
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -61,6 +71,7 @@ $games = [
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
+        <a href="about.php" class="nav-link">About Us</a>
     </aside>
 
     <main class="main">

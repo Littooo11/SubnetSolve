@@ -27,6 +27,16 @@ $practiceModes = [
         "desc" => "Multiple-choice questions on network address, masks, host range, IP class, and public/private — no timer.",
         "url"  => "games/subnet_showdown_practice.php",
     ],
+    [
+    "name" => "Hex Conversion",
+    "desc" => "Practice converting hex to decimal with no time pressure, unlimited questions.",
+    "url"  => "games/hex_practice.php",
+    ],
+    [
+    "name" => "Scenario-Based Questions",
+    "desc" => "Real-world subnetting word problems, no timer.",
+    "url"  => "games/scenario_practice.php",
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -56,6 +66,7 @@ $practiceModes = [
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
+        <a href="about.php" class="nav-link">About Us</a>
     </aside>
 
     <main class="main">

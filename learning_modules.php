@@ -28,9 +28,9 @@ $modules = [
         "url"  => "#",
     ],
     [
-        "name" => "How to Play: 1v1 Multiplayer",
-        "desc" => "Learn how lobbies, room codes, and live matches work.",
-        "url"  => "#",
+    "name" => "How to Play: Hex Conversion",
+    "desc" => "Learn how to convert hexadecimal numbers to decimal, step by step.",
+    "url"  => "learning/hex_conversion.php",
     ],
 ];
 ?>
@@ -61,6 +61,7 @@ $modules = [
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
+        <a href="about.php" class="nav-link">About Us</a>
     </aside>
 
     <main class="main">

@@ -11,18 +11,18 @@ if (!isset($_SESSION["user_id"])) {
 }
 $username = $_SESSION["username"];
 
-$difficultyDigits = ["easy" => 3, "medium" => 4, "hard" => 5];
+$difficultyDigits = ["easy" => 2, "medium" => 3, "hard" => 4];
 $difficulty = $_GET["difficulty"] ?? null;
 $showDifficultyScreen = !array_key_exists($difficulty, $difficultyDigits);
-$digits = $difficultyDigits[$difficulty] ?? 4;
-$maxVal = (1 << $digits) - 1;
+$digits = $difficultyDigits[$difficulty] ?? 2;
+$maxVal = (1 << ($digits * 4)) - 1;
 $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_multiplier($difficulty));
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Binary Game - SubNetSolve</title>
+    <title>Hex Conversion - SubNetSolve</title>
     <link rel="stylesheet" href="../dash.css">
     <link rel="stylesheet" href="../game.css">
 </head>
@@ -48,22 +48,22 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
     </aside>
 
     <main class="game-main">
-        <div class="breadcrumb"><a href="../games.php" class="showdown-back">← Exit</a> &nbsp; Games &gt; <b>Binary Game</b></div>
+        <div class="breadcrumb"><a href="../games.php" class="showdown-back">← Exit</a> &nbsp; Games &gt; <b>Hex Conversion</b></div>
 
         <?php if ($showDifficultyScreen): ?>
             <div class="game-card">
                 <div class="difficulty-select">
                     <h2>Choose a Difficulty</h2>
-                    <p class="sub">This controls how many binary digits you'll convert and how much XP each correct answer earns.</p>
+                    <p class="sub">This controls how many hexadecimal digits you'll convert and how much XP each correct answer earns.</p>
                     <div class="difficulty-grid">
                         <a href="?difficulty=easy" class="difficulty-card easy">
-                            <span class="icon">🟢</span><h4>Easy</h4><p>3-digit binary (0-7)<br>10 XP per correct</p>
+                            <span class="icon">🟢</span><h4>Easy</h4><p>2-digit hex (0x00-0xFF)<br>10 XP per correct</p>
                         </a>
                         <a href="?difficulty=medium" class="difficulty-card medium">
-                            <span class="icon">🟡</span><h4>Medium</h4><p>4-digit binary (0-15)<br>15 XP per correct</p>
+                            <span class="icon">🟡</span><h4>Medium</h4><p>3-digit hex (0x000-0xFFF)<br>15 XP per correct</p>
                         </a>
                         <a href="?difficulty=hard" class="difficulty-card hard">
-                            <span class="icon">🔴</span><h4>Difficult</h4><p>5-digit binary (0-31)<br>20 XP per correct</p>
+                            <span class="icon">🔴</span><h4>Difficult</h4><p>4-digit hex (0x0000-0xFFFF)<br>20 XP per correct</p>
                         </a>
                     </div>
                 </div>
@@ -73,13 +73,13 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
         <div class="game-card" id="gameCard">
             <div class="mode-tag">TIMED CHALLENGE — 3:00 · <?= strtoupper($difficulty) ?></div>
             <h2>Guess the Decimal Value</h2>
-            <p class="sub">A <?= $digits ?>-digit binary number is shown below. Type its decimal equivalent (0-<?= $maxVal ?>) as fast as you can — each correct answer earns <?= $pointsPerCorrect ?> XP.</p>
+            <p class="sub">A <?= $digits ?>-digit hexadecimal number is shown below. Type its decimal equivalent (0-<?= $maxVal ?>) as fast as you can — each correct answer earns <?= $pointsPerCorrect ?> XP.</p>
 
             <div class="big-timer" id="timerDisplay" style="margin-bottom:1rem;">03:00</div>
 
             <div class="binary-stage">
-                <div class="binary-number" id="binaryDisplay"><?= str_repeat("-", $digits) ?></div>
-                <div class="binary-hint">Convert this binary number to decimal</div>
+                <div class="binary-number" id="hexDisplay">0x<?= str_repeat("-", $digits) ?></div>
+                <div class="binary-hint">Convert this hexadecimal number to decimal</div>
 
                 <div class="binary-input-row">
                     <input type="number" min="0" max="<?= $maxVal ?>" class="binary-input" id="answerInput" autocomplete="off" placeholder="?">
@@ -103,13 +103,13 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
             <div class="stat-line"><span>Wrong Answers</span><span class="bad" id="finalWrong"></span></div>
             <div class="stat-line"><span>Total Score</span><span class="xp" id="finalScore"></span></div>
             <div class="game-actions">
-                <a href="binary_game.php?difficulty=<?= $difficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
+                <a href="hex_game.php?difficulty=<?= $difficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                 <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Games</a>
             </div>
         </div>
 
         <?php if ($difficulty === "easy"): ?>
-            <?= render_binary_instructions($digits) ?>
+            <?= render_hex_instructions($digits) ?>
         <?php endif; ?>
         <?php endif; ?>
     </main>
@@ -124,14 +124,14 @@ let correct = 0, wrong = 0, score = 0, currentAnswer = 0;
 let timeLeft = 180;
 let ended = false;
 
-const display = document.getElementById("binaryDisplay");
+const display = document.getElementById("hexDisplay");
 const input = document.getElementById("answerInput");
 const feedback = document.getElementById("feedback");
 const timerDisplay = document.getElementById("timerDisplay");
 
 function nextQuestion() {
     currentAnswer = Math.floor(Math.random() * (MAX_VAL + 1));
-    display.textContent = currentAnswer.toString(2).padStart(DIGITS, "0");
+    display.textContent = "0x" + currentAnswer.toString(16).toUpperCase().padStart(DIGITS, "0");
     input.value = "";
     feedback.textContent = "";
     feedback.className = "binary-feedback";
@@ -163,6 +163,14 @@ function submitAnswer() {
 document.getElementById("submitBtn").addEventListener("click", submitAnswer);
 input.addEventListener("keydown", (e) => { if (e.key === "Enter") submitAnswer(); });
 
+function addBanner(html, cls) {
+    const banner = document.createElement("div");
+    banner.className = "feedback-banner " + cls;
+    banner.style.marginTop = "0.8rem";
+    banner.innerHTML = html;
+    document.getElementById("summaryCard").appendChild(banner);
+}
+
 const countdown = setInterval(async () => {
     timeLeft--;
     const m = String(Math.floor(timeLeft / 60)).padStart(2, "0");
@@ -182,29 +190,22 @@ const countdown = setInterval(async () => {
             const res = await fetch("../includes/save_score.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ game_type: "binary_game", points: score, correct: correct, wrong: wrong })
+                body: JSON.stringify({ game_type: "hex_game", points: score, correct: correct, wrong: wrong })
             });
             xpResult = await res.json();
-        } catch (e) { /* saving is best-effort; still show the summary */ }
+        } catch (e) { xpResult = null; }
 
         document.getElementById("finalCorrect").textContent = correct;
         document.getElementById("finalWrong").textContent = wrong;
         document.getElementById("finalScore").textContent = "+" + score + " XP";
-        if (xpResult && xpResult.leveled_up) {
-            const banner = document.createElement("div");
-            banner.className = "feedback-banner feedback-correct";
-            banner.style.marginTop = "0.8rem";
-            banner.textContent = `🎉 Level Up! You're now Level ${xpResult.new_level}!`;
-            document.getElementById("summaryCard").appendChild(banner);
-        }
-        if (xpResult && xpResult.new_badges && xpResult.new_badges.length > 0) {
-            xpResult.new_badges.forEach(b => {
-                const banner = document.createElement("div");
-                banner.className = "feedback-banner feedback-correct";
-                banner.style.marginTop = "0.8rem";
-                banner.innerHTML = `${b.icon} Badge Unlocked: <b>${b.name}</b>`;
-                document.getElementById("summaryCard").appendChild(banner);
-            });
+
+        if (!xpResult || !xpResult.success) {
+            addBanner("⚠️ Your XP couldn't be saved (server error).", "feedback-wrong");
+        } else {
+            if (xpResult.leveled_up) addBanner(`🎉 Level Up! You're now Level ${xpResult.new_level}!`, "feedback-correct");
+            if (xpResult.new_badges && xpResult.new_badges.length > 0) {
+                xpResult.new_badges.forEach(b => addBanner(`${b.icon} Badge Unlocked: <b>${b.name}</b>`, "feedback-correct"));
+            }
         }
         document.getElementById("summaryCard").style.display = "block";
     }
