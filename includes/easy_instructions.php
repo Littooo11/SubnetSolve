@@ -108,6 +108,29 @@ function render_hex_instructions($digits) {
     return ob_get_clean();
 }
 
+function render_ipv6_instructions() {
+    ob_start();
+    ?>
+    <div class="game-card" style="margin-top:1.2rem;">
+        <div class="mode-tag">📘 HOW TO PLAY: IPV6 GAME</div>
+        <div class="learn-step">
+            <div class="step-title">The basics</div>
+            <p>An IPv6 address is 128 bits, written as 8 groups of up to 4 hex digits each, separated by colons — e.g. <span class="formula">2001:0db8:0000:0000:0000:ff00:0042:8329</span>.</p>
+        </div>
+        <div class="learn-step">
+            <div class="step-title">Compression rules</div>
+            <p>Leading zeros in each group can be dropped (<span class="formula">0db8</span> → <span class="formula">db8</span>). The single longest run of consecutive all-zero groups can be replaced with <span class="formula">::</span> — but only once per address.</p>
+            <div class="worked">→ 2001:db8::ff00:42:8329</div>
+        </div>
+        <div class="learn-step">
+            <div class="step-title">Address types</div>
+            <p>Loopback is always <span class="formula">::1</span>. Link-local addresses start with <span class="formula">fe80:</span>. Multicast starts with <span class="formula">ff</span>. Unique local starts with <span class="formula">fc</span> or <span class="formula">fd</span>. Everything else starting with <span class="formula">2</span> or <span class="formula">3</span> is typically global unicast.</p>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
 // Subnet Showdown and Scenario-Based Questions cover a rotating mix of topics
 // (network address, masks, host count, IP class, public/private, scenarios),
 // so this is a general "how this game works" guide rather than one fixed formula.

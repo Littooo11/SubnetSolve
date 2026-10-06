@@ -37,6 +37,11 @@ $practiceModes = [
     "desc" => "Real-world subnetting word problems, no timer.",
     "url"  => "games/scenario_practice.php",
     ],
+    [
+    "name" => "IPv6 Game",
+    "desc" => "Address types, compression, and expansion, no timer.",
+    "url"  => "games/ipv6_practice.php",
+    ],
 ];
 ?>
 <!DOCTYPE html>

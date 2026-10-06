@@ -190,7 +190,233 @@ body {
     margin-bottom: 1.2rem;
 }
 
+/* =========================================================
+   MOBILE RESPONSIVE
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+}
+
 @media (max-width: 800px) {
-    .auth-layout { grid-template-columns: 1fr; }
-    .auth-brand-panel { display: none; }
+
+    /* Main layout */
+    .auth-layout {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    /* =========================
+       BRANDING
+       ========================= */
+
+    .auth-brand-panel {
+        display: flex;
+        width: 100%;
+        min-height: auto;
+
+        padding: 1.5rem 1.2rem;
+
+        justify-content: center;
+        align-items: center;
+
+        text-align: center;
+    }
+
+    /* Hide the large desktop description */
+    .auth-brand-panel h2,
+    .auth-brand-panel .tagline,
+    .auth-feature-list {
+        display: none;
+    }
+
+    .auth-brand-logo {
+        margin: 0;
+        justify-content: center;
+    }
+
+    .auth-brand-logo .logo {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .auth-brand-logo h1 {
+        font-size: 1.25rem;
+    }
+
+    .auth-brand-logo p {
+        font-size: 0.7rem;
+    }
+
+
+    /* =========================
+       FORM PANEL
+       ========================= */
+
+    .auth-form-panel {
+        width: 100%;
+        flex: 1;
+
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+
+        padding: 1.5rem 1rem;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .auth-card h2 {
+        font-size: 1.4rem;
+        line-height: 1.3;
+    }
+
+    .auth-card .sub {
+        font-size: 0.82rem;
+        line-height: 1.45;
+        margin-bottom: 1.3rem;
+    }
+
+    /* Inputs */
+    .auth-card input[type="text"],
+    .auth-card input[type="email"],
+    .auth-card input[type="password"] {
+        width: 100%;
+        min-height: 44px;
+        padding: 0.7rem 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    /* Labels */
+    .auth-card label {
+        font-size: 0.8rem;
+    }
+
+    /* Form spacing */
+    .auth-card .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* Remember me */
+    .auth-remember {
+        font-size: 0.8rem;
+    }
+
+    /* Submit button */
+    .auth-submit {
+        min-height: 44px;
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+
+    /* Footer */
+    .auth-footer {
+        font-size: 0.8rem;
+        margin-top: 1.2rem;
+        line-height: 1.5;
+    }
+
+    /* Error message */
+    .auth-error {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        padding: 0.65rem 0.75rem;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .auth-brand-panel {
+        padding: 1.1rem 0.8rem;
+    }
+
+    .auth-brand-logo {
+        gap: 0.55rem;
+    }
+
+    .auth-brand-logo .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .auth-brand-logo h1 {
+        font-size: 1.1rem;
+    }
+
+    .auth-brand-logo p {
+        font-size: 0.65rem;
+    }
+
+    .auth-form-panel {
+        padding: 1.2rem 0.8rem;
+    }
+
+    .auth-card h2 {
+        font-size: 1.25rem;
+    }
+
+    .auth-card .sub {
+        font-size: 0.78rem;
+    }
+
+    .auth-card input[type="text"],
+    .auth-card input[type="email"],
+    .auth-card input[type="password"] {
+        min-height: 42px;
+        font-size: 0.85rem;
+    }
+
+    .auth-submit {
+        min-height: 44px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+    .auth-brand-panel {
+        padding: 0.9rem 0.6rem;
+    }
+
+    .auth-form-panel {
+        padding: 1rem 0.7rem;
+    }
+
+    .auth-card h2 {
+        font-size: 1.15rem;
+    }
+
+    .auth-card .sub {
+        font-size: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .auth-card .form-group {
+        margin-bottom: 0.8rem;
+    }
 }

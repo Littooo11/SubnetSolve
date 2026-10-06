@@ -42,6 +42,11 @@ $games = [
     "desc" => "Real-world subnetting word problems — multiple choice, 30 seconds each.",
     "url"  => "games/scenario_game.php",
     ],
+    [
+    "name" => "IPv6 Game",
+    "desc" => "Address types, compression, and expansion — multiple choice, 30 seconds each.",
+    "url"  => "games/ipv6_game.php",
+    ],
 ];
 ?>
 <!DOCTYPE html>
