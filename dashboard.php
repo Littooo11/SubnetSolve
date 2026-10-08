@@ -38,6 +38,9 @@ if (!isset($_SESSION["user_id"])) {
 $username = $_SESSION["username"];
 $userId   = $_SESSION["user_id"];
 
+require "includes/daily_challenge.php";
+$dailyStatus = get_daily_challenge_progress($conn, $userId);
+
 // Safety check: if the database was reset/reimported, old session IDs
 // may no longer point to a real user. Catch that here instead of crashing.
 $userCheck = mysqli_prepare($conn, "SELECT id, avatar FROM users WHERE id = ?");
@@ -114,288 +117,9 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard - SubNetSolve</title>
     <link rel="stylesheet" href="dash.css">
     <link rel="stylesheet" href="game.css">
-
-    <style>
-        /* ===== Responsive/mobile dashboard fixes ===== */
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
-        img, svg, video {
-            max-width: 100%;
-            height: auto;
-        }
-
-        @media (max-width: 900px) {
-            .layout {
-                display: flex !important;
-                flex-direction: column !important;
-                width: 100% !important;
-                min-height: 100vh;
-            }
-
-            /* Turn the desktop sidebar into a compact horizontal mobile nav */
-            .sidebar {
-                position: static !important;
-                width: 100% !important;
-                min-width: 0 !important;
-                height: auto !important;
-                max-height: none !important;
-                overflow-x: auto !important;
-                overflow-y: hidden !important;
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                gap: .35rem !important;
-                padding: .75rem !important;
-                white-space: nowrap !important;
-                border-right: 0 !important;
-                border-bottom: 1px solid var(--border) !important;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .sidebar .brand {
-                flex: 0 0 auto;
-                margin: 0 .5rem 0 0 !important;
-            }
-
-            .sidebar .brand p {
-                display: none;
-            }
-
-            .sidebar .brand h1 {
-                font-size: 1rem;
-            }
-
-            .sidebar .logo {
-                width: 34px;
-                height: 34px;
-                min-width: 34px;
-            }
-
-            .sidebar .nav-link {
-                flex: 0 0 auto;
-                margin: 0 !important;
-                padding: .55rem .7rem !important;
-                font-size: .78rem !important;
-                border-radius: 8px;
-            }
-
-            .sidebar .daily-challenge {
-                display: none !important;
-            }
-
-            .main,
-            .right-col {
-                width: 100% !important;
-                min-width: 0 !important;
-                max-width: 100% !important;
-            }
-
-            .main {
-                padding: 1rem !important;
-            }
-
-            .right-col {
-                padding: 0 1rem 1rem !important;
-            }
-
-            .topbar {
-                width: 100%;
-                gap: .75rem;
-                flex-wrap: wrap;
-            }
-
-            .search-wrapper {
-                flex: 1 1 100% !important;
-                width: 100% !important;
-                min-width: 0 !important;
-            }
-
-            .search {
-                width: 100% !important;
-                max-width: 100% !important;
-                min-width: 0 !important;
-            }
-
-            .topbar-right {
-                width: 100%;
-                justify-content: flex-end;
-            }
-
-            .welcome {
-                margin-top: 1rem;
-            }
-
-            .welcome h2 {
-                font-size: 1.45rem;
-                line-height: 1.25;
-                overflow-wrap: anywhere;
-            }
-
-            .welcome p {
-                line-height: 1.5;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-                gap: .7rem !important;
-            }
-
-            .stat-card {
-                min-width: 0 !important;
-                padding: .8rem !important;
-            }
-
-            .stat-card .value {
-                font-size: 1.25rem;
-            }
-
-            .stat-card .label {
-                font-size: .72rem;
-                line-height: 1.25;
-            }
-
-            .explore-grid {
-                grid-template-columns: 1fr !important;
-                gap: .75rem !important;
-            }
-
-            .explore-card {
-                min-width: 0 !important;
-            }
-
-            .explore-card p,
-            .pro-tip p,
-            .panel-box p {
-                overflow-wrap: anywhere;
-                line-height: 1.5;
-            }
-
-            .pro-tip {
-                display: flex;
-                align-items: flex-start;
-                gap: .7rem;
-            }
-
-            .player-row {
-                min-width: 0 !important;
-                gap: .45rem !important;
-            }
-
-            .player-row > span:not(.rank):not(.xp) {
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .player-row .xp {
-                margin-left: auto;
-                white-space: nowrap;
-                font-size: .75rem;
-            }
-
-            .activity-row {
-                min-width: 0;
-            }
-
-            .activity-row > div:last-child {
-                min-width: 0;
-                overflow-wrap: anywhere;
-            }
-
-            .search-results {
-                width: 100% !important;
-                max-width: calc(100vw - 2rem);
-            }
-
-            .search-result-row {
-                min-width: 0;
-            }
-
-            .search-result-text {
-                min-width: 0;
-            }
-
-            .search-result-text .name,
-            .search-result-text .desc {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
-
-        @media (max-width: 520px) {
-            .sidebar {
-                padding: .6rem !important;
-            }
-
-            .sidebar .brand {
-                margin-right: .25rem !important;
-            }
-
-            .sidebar .brand > div:last-child {
-                display: none;
-            }
-
-            .sidebar .nav-link {
-                font-size: .72rem !important;
-                padding: .5rem .6rem !important;
-            }
-
-            .main {
-                padding: .8rem !important;
-            }
-
-            .right-col {
-                padding: 0 .8rem .8rem !important;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr !important;
-            }
-
-            .stat-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: .45rem;
-            }
-
-            .topbar-right {
-                justify-content: flex-start;
-            }
-
-            .section-title {
-                font-size: 1rem;
-            }
-
-            .panel-box {
-                padding: .85rem !important;
-            }
-
-            .player-row {
-                font-size: .78rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .stats-grid {
-                grid-template-columns: 1fr !important;
-            }
-        }
-    </style>
 </head>
 <body>
 <div class="layout">
@@ -425,11 +149,14 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <?php endif; ?>
 
         <div class="daily-challenge">
-            <h4>Daily Challenge</h4>
-            <p>Complete 3 subnetting questions correctly</p>
-            <div class="progress-bar"><div style="width:0%"></div></div>
-            <div style="font-size:0.75rem; color:var(--text-dim);">0 / 3</div>
-        </div>
+    <h4>Daily Challenge</h4>
+    <p>Complete 3 subnetting questions correctly</p>
+    <div class="progress-bar"><div style="width:<?= round(($dailyStatus["progress"] / $dailyStatus["target"]) * 100) ?>%"></div></div>
+    <div style="font-size:0.75rem; color:var(--text-dim);">
+        <?= $dailyStatus["progress"] ?> / <?= $dailyStatus["target"] ?>
+        <?= $dailyStatus["complete"] ? " ✅" : "" ?>
+    </div>
+</div>
     </aside>
 
     <!-- ===== Main content ===== -->
@@ -542,7 +269,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         </div>
 
         <div class="panel-box">
-            <h4>Top Players <a href="#" style="font-size:0.75rem; color:var(--blue); text-decoration:none;">View All</a></h4>
+            <h4>Top Players <a href="leaderboards.php" style="font-size:0.75rem; color:var(--blue); text-decoration:none;">View All</a></h4>
             <?php if (empty($topPlayers)): ?>
                 <p style="font-size:0.8rem; color:var(--text-dim); margin:0.4rem 0;">No leaderboard data yet — be the first to score!</p>
             <?php else: ?>

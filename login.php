@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </form>
 
             <p class="auth-footer">Don't have an account? <a href="register.php">Register</a></p>
-            <p class="auth-footer" style="margin-top:0.5rem;"><a href="about.php">About SubNetSolve</a></p>
+            <p class="auth-footer" style="margin-top:0.5rem;"><a href="about.php">About Us</a></p>
         </div>
     </div>
 </div>

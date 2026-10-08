@@ -5,6 +5,7 @@ require "../config.php";
 require "../includes/scenario_engine.php";
 require "../includes/xp_engine.php";
 require "../includes/badge_engine.php";
+require "../includes/daily_challenge.php";
 require "../includes/avatars.php";
 require "../includes/easy_instructions.php";
 
@@ -67,11 +68,12 @@ if (!$showDifficultyScreen) {
         } elseif (isset($_POST["next"])) {
             if ($state["q_index"] >= $TOTAL_QUESTIONS) {
                 $gameType = "scenario_timed";
-                $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
-                mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $state["score"]);
+                $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, correct_count, played_at) VALUES (?, NULL, ?, ?, ?, NOW())");
+                mysqli_stmt_bind_param($stmt, "isii", $userId, $gameType, $state["score"], $state["correct"]);
                 mysqli_stmt_execute($stmt);
 
                 $xpResult = award_xp($conn, $userId, $state["score"]);
+                $dailyBonus = check_and_award_daily_challenge($conn, $userId);
                 $updateQuiz = mysqli_prepare($conn, "UPDATE user_progress SET quizzes_completed = quizzes_completed + 1, total_correct = total_correct + ?, total_wrong = total_wrong + ? WHERE user_id = ?");
                 mysqli_stmt_bind_param($updateQuiz, "iii", $state["correct"], $state["wrong"], $userId);
                 mysqli_stmt_execute($updateQuiz);
@@ -151,6 +153,9 @@ if (!$showDifficultyScreen) {
             <div class="stat-line"><span>Total Score</span><span class="xp">+<?= $finalScore ?> XP</span></div>
             <?php if ($xpResult["leveled_up"]): ?>
                 <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;">🎉 Level Up! You're now Level <?= $xpResult["new_level"] ?>!</div>
+            <?php endif; ?>
+            <?php if ($dailyBonus["awarded"]): ?>
+                <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;">⭐ Daily Challenge Complete! +<?= $dailyBonus["bonus_xp"] ?> bonus XP</div>
             <?php endif; ?>
             <?php foreach ($newBadges as $b): ?>
                 <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;"><?= $b["icon"] ?> Badge Unlocked: <b><?= htmlspecialchars($b["name"]) ?></b></div>

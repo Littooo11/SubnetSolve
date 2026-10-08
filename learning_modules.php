@@ -32,6 +32,11 @@ $modules = [
     "desc" => "Learn how to convert hexadecimal numbers to decimal, step by step.",
     "url"  => "learning/hex_conversion.php",
     ],
+    [
+    "name" => "How to Play: IPv6 Game",
+    "desc" => "Learn how IPv6 addresses are written, compressed, and classified.",
+    "url"  => "learning/ipv6_game.php",
+],
 ];
 ?>
 <!DOCTYPE html>
@@ -61,7 +66,7 @@ $modules = [
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
-        <a href="about.php" class="nav-link">About Us</a>
+        <a href="about.php" class="nav-link">About Us</a>   
     </aside>
 
     <main class="main">

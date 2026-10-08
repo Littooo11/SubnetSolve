@@ -4,6 +4,7 @@ header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
 require "../includes/xp_engine.php";
 require "../includes/easy_instructions.php";
+require "../includes/conversion_charts.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -109,6 +110,8 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
                 <a href="../practice.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Practice Mode</a>
             </div>
         </div>
+
+        <?= render_hex_chart($digits) ?>
 
         <?php if ($difficulty === "easy"): ?>
             <?= render_hex_instructions($digits) ?>
