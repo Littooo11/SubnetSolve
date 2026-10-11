@@ -3,6 +3,8 @@ session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "config.php";
 require "includes/avatars.php";
+require "includes/block_admin_play.php";
+block_admins_from_playing($conn);
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
@@ -180,15 +182,18 @@ function status_label($s) {
             <p style="font-size:0.8rem; color:var(--text-dim); margin-top:-0.3rem;">Set up your match and share the room code with your opponent.</p>
 
             <form method="POST" action="create_lobby.php" class="profile-form">
-                <div class="form-group">
-                    <label>Game Mode</label>
-                    <div class="mode-pill-row" id="modePillRow">
-                        <div class="mode-pill selected" data-value="subnetting"><span class="icon">🌐</span>Subnetting</div>
-                        <div class="mode-pill" data-value="binary"><span class="icon">01</span>Binary</div>
-                        <div class="mode-pill" data-value="both"><span class="icon">🏆</span>Both</div>
+                    <div class="form-group">
+                        <label for="game_mode">Game Mode</label>
+                        <select name="game_mode" id="game_mode" class="form-control">
+                            <option value="subnetting">Subnet Dissect (IPv4)</option>
+                            <option value="binary">Binary Game</option>
+                            <option value="showdown">Subnet Showdown</option>
+                            <option value="hex">Hexadecimal Conversion</option>
+                            <option value="ipv6">IPv6 Challenge</option>
+                            <option value="scenario">Network Scenario Mode</option>
+                            <option value="both">All Topics (Mixed)</option>
+                        </select>
                     </div>
-                    <input type="hidden" name="game_mode" id="gameModeInput" value="subnetting">
-                </div>
 
                 <div class="form-group">
                     <label>Lobby Size</label>

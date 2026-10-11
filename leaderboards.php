@@ -11,8 +11,11 @@ if (!isset($_SESSION["user_id"])) {
 }
 $userId = $_SESSION["user_id"];
 
-$tab = $_GET["tab"] ?? "overall";
-$period = $_GET["period"] ?? "all";
+// Only allow known values - these get echoed back into links, so never trust them raw.
+$validTabs = ["overall", "subnet", "binary", "showdown"];
+$validPeriods = ["all", "7", "30"];
+$tab = in_array($_GET["tab"] ?? "", $validTabs, true) ? $_GET["tab"] : "overall";
+$period = in_array($_GET["period"] ?? "", $validPeriods, true) ? $_GET["period"] : "all";
 
 $gameFilter = "";
 if ($tab === "subnet") $gameFilter = "AND s.game_type LIKE 'subnet_dissect%'";
@@ -23,12 +26,14 @@ $dateFilter = "";
 if ($period === "7") $dateFilter = "AND s.played_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
 if ($period === "30") $dateFilter = "AND s.played_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
 
+// Admin accounts never appear on the leaderboard (WHERE u.is_admin = 0).
 $sql = "SELECT u.id, u.username, u.avatar, up.level,
         COALESCE(SUM(s.points), 0) AS total_score,
         COUNT(s.id) AS games_played
         FROM users u
         JOIN user_progress up ON up.user_id = u.id
         LEFT JOIN scores s ON s.user_id = u.id $gameFilter $dateFilter
+        WHERE u.is_admin = 0
         GROUP BY u.id, u.username, u.avatar, up.level
         ORDER BY total_score DESC
         LIMIT 50";
@@ -45,22 +50,24 @@ while ($row = mysqli_fetch_assoc($result)) {
     $rank++;
 }
 
-// If the current user isn't in the top 50, fetch their own stats separately
-if (!$myRow) {
+$adminCheck = mysqli_fetch_assoc(mysqli_query($conn, "SELECT is_admin FROM users WHERE id = " . (int) $userId));
+$viewerIsAdmin = !empty($adminCheck["is_admin"]);
+
+// If a (non-admin) viewer isn't in the top 50, fetch their own stats separately
+if (!$myRow && !$viewerIsAdmin) {
     $meSql = "SELECT u.id, u.username, u.avatar, up.level,
         COALESCE(SUM(s.points), 0) AS total_score,
         COUNT(s.id) AS games_played
         FROM users u
         JOIN user_progress up ON up.user_id = u.id
         LEFT JOIN scores s ON s.user_id = u.id $gameFilter $dateFilter
-        WHERE u.id = $userId
+        WHERE u.id = " . (int) $userId . "
         GROUP BY u.id, u.username, u.avatar, up.level";
     $myRow = mysqli_fetch_assoc(mysqli_query($conn, $meSql));
 }
 
 function tab_url($tab, $period) { return "leaderboards.php?tab=$tab&period=$period"; }
 
-// Precompute display ranges for the tier legend (e.g. "500 - 999")
 $tiersList = get_rank_tiers();
 $tierRanges = [];
 foreach ($tiersList as $i => $t) {
@@ -98,7 +105,9 @@ foreach ($tiersList as $i => $t) {
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
-        <a href="about.php" class="nav-link">About Us</a>
+        <?php if ($viewerIsAdmin): ?>
+            <a href="admin/dashboard.php" class="nav-link" style="color:var(--orange);">🛠 Admin Panel</a>
+        <?php endif; ?>
     </aside>
 
     <main class="main">
@@ -140,8 +149,8 @@ foreach ($tiersList as $i => $t) {
             </table>
             <?php endif; ?>
 
-            <?php if ($myRank && $myRank > 50): ?>
-                <p style="margin-top:1rem; color:var(--text-dim); font-size:0.85rem;">You're ranked #<?= $myRank ?> for this filter — keep playing to break into the top 50!</p>
+            <?php if ($myRank === null && $myRow): ?>
+                <p style="margin-top:1rem; color:var(--text-dim); font-size:0.85rem;">You're outside the top 50 for this filter — keep playing to break in!</p>
             <?php endif; ?>
         </div>
     </main>
@@ -149,7 +158,9 @@ foreach ($tiersList as $i => $t) {
     <aside class="right-col">
         <div class="panel-box">
             <h4>🏆 Your Rank</h4>
-            <?php if ($myRow): ?>
+            <?php if ($viewerIsAdmin): ?>
+                <p style="font-size:0.82rem; color:var(--text-dim);">Admin accounts aren't ranked on the leaderboard.</p>
+            <?php elseif ($myRow): ?>
                 <div style="display:flex; align-items:center; gap:0.7rem; margin-bottom:0.8rem;">
                     <?= render_avatar($myRow["avatar"], 44) ?>
                     <div>

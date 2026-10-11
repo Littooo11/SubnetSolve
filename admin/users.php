@@ -42,15 +42,8 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link active">👥 User Management</a>
-        <a href="#" class="admin-nav-link">📘 Learning Modules <span class="soon">Soon</span></a>
-        <a href="#" class="admin-nav-link">📋 Question Management <span class="soon">Soon</span></a>
-        <a href="#" class="admin-nav-link">🎮 Game Management <span class="soon">Soon</span></a>
-        <a href="../lobby.php" class="admin-nav-link">⚔️ 1v1 Multiplayer</a>
         <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
         <a href="reports.php" class="admin-nav-link">📊 Reports</a>
-        <a href="#" class="admin-nav-link">🕓 Activity Logs <span class="soon">Soon</span></a>
-        <a href="#" class="admin-nav-link">📣 Announcements <span class="soon">Soon</span></a>
-        <a href="#" class="admin-nav-link">⚙️ System Settings <span class="soon">Soon</span></a>
         <div class="admin-nav-label">ACCOUNT</div>
         <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
         <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>

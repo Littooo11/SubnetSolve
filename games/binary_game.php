@@ -2,6 +2,7 @@
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
+require "../includes/block_admin_play.php";
 require "../includes/xp_engine.php";
 require "../includes/easy_instructions.php";
 
@@ -9,6 +10,7 @@ if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
     exit();
 }
+block_admins_from_playing($conn);
 $username = $_SESSION["username"];
 
 $difficultyDigits = ["easy" => 3, "medium" => 4, "hard" => 5];
@@ -71,11 +73,11 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
         <?php else: ?>
 
         <div class="game-card" id="gameCard">
-            <div class="mode-tag">TIMED CHALLENGE — 3:00 · <?= strtoupper($difficulty) ?></div>
+            <div class="mode-tag">TIMED CHALLENGE — 1:00 · <?= strtoupper($difficulty) ?></div>
             <h2>Guess the Decimal Value</h2>
             <p class="sub">A <?= $digits ?>-digit binary number is shown below. Type its decimal equivalent (0-<?= $maxVal ?>) as fast as you can — each correct answer earns <?= $pointsPerCorrect ?> XP.</p>
 
-            <div class="big-timer" id="timerDisplay" style="margin-bottom:1rem;">03:00</div>
+            <div class="big-timer" id="timerDisplay" style="margin-bottom:1rem;">01:00</div>
 
             <div class="binary-stage">
                 <div class="binary-number" id="binaryDisplay"><?= str_repeat("-", $digits) ?></div>
@@ -121,7 +123,7 @@ const DIGITS = <?= $digits ?>;
 const MAX_VAL = <?= $maxVal ?>;
 const POINTS_PER_CORRECT = <?= $pointsPerCorrect ?>;
 let correct = 0, wrong = 0, score = 0, currentAnswer = 0;
-let timeLeft = 180;
+let timeLeft = 60;
 let ended = false;
 
 const display = document.getElementById("binaryDisplay");
@@ -168,7 +170,7 @@ const countdown = setInterval(async () => {
     const m = String(Math.floor(timeLeft / 60)).padStart(2, "0");
     const s = String(timeLeft % 60).padStart(2, "0");
     timerDisplay.textContent = `${m}:${s}`;
-    if (timeLeft <= 30) timerDisplay.classList.add("low");
+    if (timeLeft <= 15) timerDisplay.classList.add("low");
 
     if (timeLeft <= 0) {
         clearInterval(countdown);
@@ -185,7 +187,7 @@ const countdown = setInterval(async () => {
                 body: JSON.stringify({ game_type: "binary_game", points: score, correct: correct, wrong: wrong })
             });
             xpResult = await res.json();
-        } catch (e) { /* saving is best-effort; still show the summary */ }
+        } catch (e) { /* saving is best-effort; still show summary */ }
 
         document.getElementById("finalCorrect").textContent = correct;
         document.getElementById("finalWrong").textContent = wrong;

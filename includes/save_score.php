@@ -7,6 +7,8 @@ session_start();
 header("Content-Type: application/json");
 require __DIR__ . "/../config.php";
 require __DIR__ . "/xp_engine.php";
+require __DIR__ . "/block_admin_play.php";
+block_admins_from_playing($conn, true);
 
 if (!isset($_SESSION["user_id"])) {
     http_response_code(401);

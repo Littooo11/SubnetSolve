@@ -2,7 +2,11 @@
 session_start();
 require "config.php";
 require "includes/quiz_engine.php";
+require "includes/xp_engine.php";
+require "includes/badge_engine.php";
 require "includes/lobby_engine.php";
+require "includes/block_admin_play.php";
+block_admins_from_playing($conn);
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");

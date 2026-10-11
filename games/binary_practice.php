@@ -2,6 +2,7 @@
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
+require "../includes/block_admin_play.php";
 require "../includes/xp_engine.php";
 require "../includes/easy_instructions.php";
 require "../includes/conversion_charts.php";
@@ -10,6 +11,7 @@ if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
     exit();
 }
+block_admins_from_playing($conn);
 $username = $_SESSION["username"];
 
 $difficultyDigits = ["easy" => 3, "medium" => 4, "hard" => 5];

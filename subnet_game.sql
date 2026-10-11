@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 03, 2026 at 10:49 AM
+-- Generation Time: Oct 11, 2026 at 01:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -144,7 +144,10 @@ CREATE TABLE `remember_tokens` (
 --
 
 INSERT INTO `remember_tokens` (`id`, `user_id`, `token`, `expires_at`) VALUES
-(1, 4, '93d83fdce85cede763ef0784b4a73ad833f0f4f7df385aa0b1209e3fe1a87c9e', '2026-10-28 08:18:34');
+(1, 4, '93d83fdce85cede763ef0784b4a73ad833f0f4f7df385aa0b1209e3fe1a87c9e', '2026-10-28 08:18:34'),
+(2, 5, '6af8086bb23527c3f7f4c59247d8691a8dbe80ae37723c87a2f04fc51f84180d', '2026-11-05 10:17:13'),
+(3, 5, '41545392b1ee5ce4ae20fe64fd5017e5d3afdb9527dd2681abaa294ae9d7132a', '2026-11-05 11:49:04'),
+(4, 5, 'a4e5605f5831ae1fb68026dfc729ce2e1ec4697586886aa731d37231c3fd2e21', '2026-11-10 06:42:06');
 
 -- --------------------------------------------------------
 
@@ -158,16 +161,254 @@ CREATE TABLE `scores` (
   `match_id` int(11) DEFAULT NULL,
   `game_type` varchar(50) NOT NULL DEFAULT 'general',
   `points` int(11) NOT NULL DEFAULT 0,
-  `played_at` datetime NOT NULL
+  `played_at` datetime NOT NULL,
+  `correct_count` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `scores`
 --
 
-INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `played_at`) VALUES
-(1, 2, NULL, 'showdown_practice', 152, '2026-09-26 22:44:08'),
-(2, 2, NULL, 'binary_practice', 180, '2026-10-01 14:44:28');
+INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `played_at`, `correct_count`) VALUES
+(1, 2, NULL, 'showdown_practice', 152, '2026-09-26 22:44:08', 0),
+(2, 2, NULL, 'binary_practice', 180, '2026-10-01 14:44:28', 0),
+(3, 5, NULL, 'binary_practice', 90, '2026-10-06 16:18:58', 0),
+(4, 6, NULL, 'binary_practice', 130, '2026-10-06 16:23:42', 0),
+(5, 5, NULL, 'binary_practice', 100, '2026-10-06 16:25:30', 0),
+(6, 6, NULL, 'binary_game', 460, '2026-10-06 16:26:50', 0),
+(7, 5, NULL, 'binary_practice', 360, '2026-10-06 16:29:27', 0),
+(8, 6, NULL, 'binary_game', 525, '2026-10-06 16:30:01', 0),
+(9, 5, NULL, 'binary_game', 560, '2026-10-06 16:32:45', 0),
+(10, 5, NULL, 'binary_game', 620, '2026-10-06 16:36:04', 0),
+(11, 5, NULL, 'binary_game', 580, '2026-10-06 16:39:24', 0),
+(12, 5, NULL, 'binary_game', 780, '2026-10-06 16:43:08', 0),
+(13, 5, NULL, 'binary_game', 640, '2026-10-06 16:46:22', 0),
+(14, 5, NULL, 'binary_game', 800, '2026-10-06 16:49:26', 0),
+(15, 5, NULL, 'binary_practice', 1580, '2026-10-06 17:00:11', 0),
+(16, 7, NULL, 'binary_game', 1000, '2026-10-06 17:02:26', 0),
+(17, 5, NULL, 'binary_game', 880, '2026-10-06 17:04:21', 0),
+(18, 5, NULL, 'binary_game', 940, '2026-10-06 17:07:39', 0),
+(19, 5, NULL, 'binary_game', 900, '2026-10-06 17:10:59', 0),
+(20, 8, NULL, 'binary_game', 510, '2026-10-06 20:30:04', 0),
+(21, 8, NULL, 'binary_game', 770, '2026-10-06 20:33:34', 0),
+(22, 9, NULL, 'subnet_dissect_timed', 1850, '2026-10-10 21:50:50', 8),
+(23, 2, NULL, 'showdown_timed', 22, '2026-10-11 14:36:00', 1),
+(24, 10, NULL, 'subnet_dissect_practice', 180, '2026-10-06 20:27:16', 0),
+(25, 10, NULL, 'subnet_dissect_practice', 180, '2026-10-06 20:28:16', 0),
+(26, 10, NULL, 'subnet_dissect_practice', 180, '2026-10-06 20:29:16', 0),
+(27, 10, NULL, 'subnet_dissect_practice', 180, '2026-10-06 20:30:16', 0),
+(28, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:31:42', 0),
+(29, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:32:42', 0),
+(30, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:33:42', 0),
+(31, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:34:42', 0),
+(32, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:35:42', 0),
+(33, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:36:42', 0),
+(34, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:37:42', 0),
+(35, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:38:42', 0),
+(36, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:39:42', 0),
+(37, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:40:42', 0),
+(38, 11, NULL, 'subnet_dissect_practice', 205, '2026-10-06 20:41:42', 0),
+(39, 11, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:42:42', 0),
+(40, 12, NULL, 'subnet_dissect_practice', 220, '2026-10-06 20:36:08', 0),
+(41, 12, NULL, 'subnet_dissect_practice', 220, '2026-10-06 20:37:08', 0),
+(42, 12, NULL, 'subnet_dissect_practice', 220, '2026-10-06 20:38:08', 0),
+(43, 12, NULL, 'subnet_dissect_practice', 220, '2026-10-06 20:39:08', 0),
+(44, 12, NULL, 'subnet_dissect_practice', 220, '2026-10-06 20:40:08', 0),
+(45, 12, NULL, 'subnet_dissect_practice', 220, '2026-10-06 20:41:08', 0),
+(46, 13, NULL, 'subnet_dissect_practice', 196, '2026-10-06 20:40:25', 0),
+(47, 13, NULL, 'subnet_dissect_practice', 196, '2026-10-06 20:41:25', 0),
+(48, 13, NULL, 'subnet_dissect_practice', 196, '2026-10-06 20:42:25', 0),
+(49, 13, NULL, 'subnet_dissect_practice', 196, '2026-10-06 20:43:25', 0),
+(50, 13, NULL, 'subnet_dissect_practice', 196, '2026-10-06 20:44:25', 0),
+(51, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:45:13', 0),
+(52, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:46:13', 0),
+(53, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:47:13', 0),
+(54, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:48:13', 0),
+(55, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:49:13', 0),
+(56, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:50:13', 0),
+(57, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:51:13', 0),
+(58, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:52:13', 0),
+(59, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:53:13', 0),
+(60, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:54:13', 0),
+(61, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:55:13', 0),
+(62, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:56:13', 0),
+(63, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:57:13', 0),
+(64, 14, NULL, 'subnet_dissect_practice', 186, '2026-10-06 20:58:13', 0),
+(65, 14, NULL, 'subnet_dissect_practice', 176, '2026-10-06 20:59:13', 0),
+(66, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:49:37', 0),
+(67, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:50:37', 0),
+(68, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:51:37', 0),
+(69, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:52:37', 0),
+(70, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:53:37', 0),
+(71, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:54:37', 0),
+(72, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:55:37', 0),
+(73, 15, NULL, 'subnet_dissect_practice', 174, '2026-10-06 20:56:37', 0),
+(74, 15, NULL, 'subnet_dissect_practice', 168, '2026-10-06 20:57:37', 0),
+(75, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:54:02', 0),
+(76, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:55:02', 0),
+(77, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:56:02', 0),
+(78, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:57:02', 0),
+(79, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:58:02', 0),
+(80, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 20:59:02', 0),
+(81, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 21:00:02', 0),
+(82, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 21:01:02', 0),
+(83, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 21:02:02', 0),
+(84, 16, NULL, 'subnet_dissect_practice', 195, '2026-10-06 21:03:02', 0),
+(85, 16, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:04:02', 0),
+(86, 17, NULL, 'subnet_dissect_practice', 214, '2026-10-06 20:58:41', 0),
+(87, 17, NULL, 'subnet_dissect_practice', 213, '2026-10-06 20:59:41', 0),
+(88, 17, NULL, 'subnet_dissect_practice', 213, '2026-10-06 21:00:41', 0),
+(89, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:03:19', 0),
+(90, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:04:19', 0),
+(91, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:05:19', 0),
+(92, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:06:19', 0),
+(93, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:07:19', 0),
+(94, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:08:19', 0),
+(95, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:09:19', 0),
+(96, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:10:19', 0),
+(97, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:11:19', 0),
+(98, 18, NULL, 'subnet_dissect_practice', 192, '2026-10-06 21:12:19', 0),
+(99, 19, NULL, 'subnet_dissect_practice', 187, '2026-10-06 21:08:44', 0),
+(100, 19, NULL, 'subnet_dissect_practice', 187, '2026-10-06 21:09:44', 0),
+(101, 19, NULL, 'subnet_dissect_practice', 187, '2026-10-06 21:10:44', 0),
+(102, 19, NULL, 'subnet_dissect_practice', 187, '2026-10-06 21:11:44', 0),
+(103, 19, NULL, 'subnet_dissect_practice', 186, '2026-10-06 21:12:44', 0),
+(104, 19, NULL, 'subnet_dissect_practice', 186, '2026-10-06 21:13:44', 0),
+(105, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:14:06', 0),
+(106, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:15:06', 0),
+(107, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:16:06', 0),
+(108, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:17:06', 0),
+(109, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:18:06', 0),
+(110, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:19:06', 0),
+(111, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:20:06', 0),
+(112, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:21:06', 0),
+(113, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:22:06', 0),
+(114, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:23:06', 0),
+(115, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:24:06', 0),
+(116, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:25:06', 0),
+(117, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:26:06', 0),
+(118, 20, NULL, 'subnet_dissect_practice', 190, '2026-10-06 21:27:06', 0),
+(243, 21, NULL, 'hex_conversion', 210, '2026-10-07 20:24:50', 0),
+(244, 21, NULL, 'scenario_practice', 210, '2026-10-07 20:25:50', 0),
+(245, 21, NULL, 'ipv6_practice', 210, '2026-10-07 20:26:50', 0),
+(246, 21, NULL, 'subnet_dissect_practice', 210, '2026-10-07 20:27:50', 0),
+(247, 22, NULL, 'scenario_practice', 208, '2026-10-07 20:29:50', 0),
+(248, 22, NULL, 'ipv6_practice', 207, '2026-10-07 20:30:50', 0),
+(249, 22, NULL, 'subnet_dissect_practice', 207, '2026-10-07 20:31:50', 0),
+(250, 22, NULL, 'binary_practice', 207, '2026-10-07 20:32:50', 0),
+(251, 22, NULL, 'showdown_practice', 207, '2026-10-07 20:33:50', 0),
+(252, 22, NULL, 'hex_conversion', 207, '2026-10-07 20:34:50', 0),
+(253, 22, NULL, 'scenario_practice', 207, '2026-10-07 20:35:50', 0),
+(254, 23, NULL, 'ipv6_practice', 184, '2026-10-07 20:34:50', 0),
+(255, 23, NULL, 'subnet_dissect_practice', 184, '2026-10-07 20:35:50', 0),
+(256, 23, NULL, 'binary_practice', 184, '2026-10-07 20:36:50', 0),
+(257, 23, NULL, 'showdown_practice', 184, '2026-10-07 20:37:50', 0),
+(258, 23, NULL, 'hex_conversion', 184, '2026-10-07 20:38:50', 0),
+(259, 24, NULL, 'subnet_dissect_practice', 192, '2026-10-07 20:39:50', 0),
+(260, 24, NULL, 'binary_practice', 192, '2026-10-07 20:40:50', 0),
+(261, 24, NULL, 'showdown_practice', 192, '2026-10-07 20:41:50', 0),
+(262, 24, NULL, 'hex_conversion', 192, '2026-10-07 20:42:50', 0),
+(263, 24, NULL, 'scenario_practice', 192, '2026-10-07 20:43:50', 0),
+(264, 24, NULL, 'ipv6_practice', 192, '2026-10-07 20:44:50', 0),
+(265, 24, NULL, 'subnet_dissect_practice', 191, '2026-10-07 20:45:50', 0),
+(266, 24, NULL, 'binary_practice', 191, '2026-10-07 20:46:50', 0),
+(267, 24, NULL, 'showdown_practice', 191, '2026-10-07 20:47:50', 0),
+(268, 24, NULL, 'hex_conversion', 191, '2026-10-07 20:48:50', 0),
+(269, 24, NULL, 'scenario_practice', 191, '2026-10-07 20:49:50', 0),
+(270, 24, NULL, 'ipv6_practice', 191, '2026-10-07 20:50:50', 0),
+(271, 24, NULL, 'subnet_dissect_practice', 191, '2026-10-07 20:51:50', 0),
+(272, 24, NULL, 'binary_practice', 191, '2026-10-07 20:52:50', 0),
+(273, 25, NULL, 'binary_practice', 195, '2026-10-07 20:44:50', 0),
+(274, 25, NULL, 'showdown_practice', 195, '2026-10-07 20:45:50', 0),
+(275, 25, NULL, 'hex_conversion', 195, '2026-10-07 20:46:50', 0),
+(276, 25, NULL, 'scenario_practice', 195, '2026-10-07 20:47:50', 0),
+(277, 25, NULL, 'ipv6_practice', 195, '2026-10-07 20:48:50', 0),
+(278, 25, NULL, 'subnet_dissect_practice', 195, '2026-10-07 20:49:50', 0),
+(279, 26, NULL, 'showdown_practice', 196, '2026-10-07 20:49:50', 0),
+(280, 26, NULL, 'hex_conversion', 196, '2026-10-07 20:50:50', 0),
+(281, 26, NULL, 'scenario_practice', 196, '2026-10-07 20:51:50', 0),
+(282, 26, NULL, 'ipv6_practice', 196, '2026-10-07 20:52:50', 0),
+(283, 26, NULL, 'subnet_dissect_practice', 196, '2026-10-07 20:53:50', 0),
+(284, 26, NULL, 'binary_practice', 196, '2026-10-07 20:54:50', 0),
+(285, 26, NULL, 'showdown_practice', 196, '2026-10-07 20:55:50', 0),
+(286, 26, NULL, 'hex_conversion', 196, '2026-10-07 20:56:50', 0),
+(287, 26, NULL, 'scenario_practice', 196, '2026-10-07 20:57:50', 0),
+(288, 26, NULL, 'ipv6_practice', 196, '2026-10-07 20:58:50', 0),
+(289, 26, NULL, 'subnet_dissect_practice', 195, '2026-10-07 20:59:50', 0),
+(290, 26, NULL, 'binary_practice', 195, '2026-10-07 21:00:50', 0),
+(291, 27, NULL, 'hex_conversion', 170, '2026-10-07 20:54:50', 0),
+(292, 27, NULL, 'scenario_practice', 170, '2026-10-07 20:55:50', 0),
+(293, 27, NULL, 'ipv6_practice', 170, '2026-10-07 20:56:50', 0),
+(294, 27, NULL, 'subnet_dissect_practice', 170, '2026-10-07 20:57:50', 0),
+(295, 28, NULL, 'scenario_practice', 198, '2026-10-07 20:59:50', 0),
+(296, 28, NULL, 'ipv6_practice', 198, '2026-10-07 21:00:50', 0),
+(297, 28, NULL, 'subnet_dissect_practice', 198, '2026-10-07 21:01:50', 0),
+(298, 28, NULL, 'binary_practice', 198, '2026-10-07 21:02:50', 0),
+(299, 28, NULL, 'showdown_practice', 198, '2026-10-07 21:03:50', 0),
+(300, 28, NULL, 'hex_conversion', 198, '2026-10-07 21:04:50', 0),
+(301, 28, NULL, 'scenario_practice', 198, '2026-10-07 21:05:50', 0),
+(302, 28, NULL, 'ipv6_practice', 198, '2026-10-07 21:06:50', 0),
+(303, 28, NULL, 'subnet_dissect_practice', 198, '2026-10-07 21:07:50', 0),
+(304, 28, NULL, 'binary_practice', 198, '2026-10-07 21:08:50', 0),
+(305, 29, NULL, 'ipv6_practice', 180, '2026-10-07 21:04:50', 0),
+(306, 29, NULL, 'subnet_dissect_practice', 180, '2026-10-07 21:05:50', 0),
+(307, 29, NULL, 'binary_practice', 180, '2026-10-07 21:06:50', 0),
+(308, 29, NULL, 'showdown_practice', 180, '2026-10-07 21:07:50', 0),
+(309, 29, NULL, 'hex_conversion', 180, '2026-10-07 21:08:50', 0),
+(310, 29, NULL, 'scenario_practice', 180, '2026-10-07 21:09:50', 0),
+(311, 29, NULL, 'ipv6_practice', 180, '2026-10-07 21:10:50', 0),
+(312, 30, NULL, 'subnet_dissect_practice', 192, '2026-10-07 21:09:50', 0),
+(313, 30, NULL, 'binary_practice', 192, '2026-10-07 21:10:50', 0),
+(314, 30, NULL, 'showdown_practice', 192, '2026-10-07 21:11:50', 0),
+(315, 30, NULL, 'hex_conversion', 192, '2026-10-07 21:12:50', 0),
+(316, 30, NULL, 'scenario_practice', 192, '2026-10-07 21:13:50', 0),
+(317, 30, NULL, 'ipv6_practice', 192, '2026-10-07 21:14:50', 0),
+(318, 30, NULL, 'subnet_dissect_practice', 192, '2026-10-07 21:15:50', 0),
+(319, 30, NULL, 'binary_practice', 192, '2026-10-07 21:16:50', 0),
+(320, 30, NULL, 'showdown_practice', 192, '2026-10-07 21:17:50', 0),
+(321, 30, NULL, 'hex_conversion', 192, '2026-10-07 21:18:50', 0),
+(322, 30, NULL, 'scenario_practice', 192, '2026-10-07 21:19:50', 0),
+(323, 30, NULL, 'ipv6_practice', 192, '2026-10-07 21:20:50', 0),
+(324, 30, NULL, 'subnet_dissect_practice', 192, '2026-10-07 21:21:50', 0),
+(325, 30, NULL, 'binary_practice', 192, '2026-10-07 21:22:50', 0),
+(326, 30, NULL, 'showdown_practice', 192, '2026-10-07 21:23:50', 0),
+(327, 31, NULL, 'binary_practice', 178, '2026-10-07 21:14:50', 0),
+(328, 31, NULL, 'showdown_practice', 178, '2026-10-07 21:15:50', 0),
+(329, 31, NULL, 'hex_conversion', 178, '2026-10-07 21:16:50', 0),
+(330, 31, NULL, 'scenario_practice', 178, '2026-10-07 21:17:50', 0),
+(331, 31, NULL, 'ipv6_practice', 178, '2026-10-07 21:18:50', 0),
+(332, 32, NULL, 'showdown_practice', 194, '2026-10-07 21:19:50', 0),
+(333, 32, NULL, 'hex_conversion', 194, '2026-10-07 21:20:50', 0),
+(334, 32, NULL, 'scenario_practice', 194, '2026-10-07 21:21:50', 0),
+(335, 32, NULL, 'ipv6_practice', 193, '2026-10-07 21:22:50', 0),
+(336, 32, NULL, 'subnet_dissect_practice', 193, '2026-10-07 21:23:50', 0),
+(337, 32, NULL, 'binary_practice', 193, '2026-10-07 21:24:50', 0),
+(338, 32, NULL, 'showdown_practice', 193, '2026-10-07 21:25:50', 0),
+(339, 32, NULL, 'hex_conversion', 193, '2026-10-07 21:26:50', 0),
+(340, 32, NULL, 'scenario_practice', 193, '2026-10-07 21:27:50', 0),
+(341, 33, NULL, 'hex_conversion', 175, '2026-10-07 21:24:50', 0),
+(342, 33, NULL, 'scenario_practice', 175, '2026-10-07 21:25:50', 0),
+(343, 33, NULL, 'ipv6_practice', 175, '2026-10-07 21:26:50', 0),
+(344, 33, NULL, 'subnet_dissect_practice', 175, '2026-10-07 21:27:50', 0),
+(345, 33, NULL, 'binary_practice', 175, '2026-10-07 21:28:50', 0),
+(346, 33, NULL, 'showdown_practice', 175, '2026-10-07 21:29:50', 0),
+(347, 34, NULL, 'scenario_practice', 188, '2026-10-07 21:29:50', 0),
+(348, 34, NULL, 'ipv6_practice', 188, '2026-10-07 21:30:50', 0),
+(349, 34, NULL, 'subnet_dissect_practice', 188, '2026-10-07 21:31:50', 0),
+(350, 34, NULL, 'binary_practice', 188, '2026-10-07 21:32:50', 0),
+(351, 34, NULL, 'showdown_practice', 188, '2026-10-07 21:33:50', 0),
+(352, 34, NULL, 'hex_conversion', 188, '2026-10-07 21:34:50', 0),
+(353, 34, NULL, 'scenario_practice', 187, '2026-10-07 21:35:50', 0),
+(354, 34, NULL, 'ipv6_practice', 187, '2026-10-07 21:36:50', 0),
+(355, 34, NULL, 'subnet_dissect_practice', 187, '2026-10-07 21:37:50', 0),
+(356, 34, NULL, 'binary_practice', 187, '2026-10-07 21:38:50', 0),
+(357, 34, NULL, 'showdown_practice', 187, '2026-10-07 21:39:50', 0),
+(358, 34, NULL, 'hex_conversion', 187, '2026-10-07 21:40:50', 0),
+(359, 35, NULL, 'ipv6_practice', 190, '2026-10-07 21:34:50', 0),
+(360, 35, NULL, 'subnet_dissect_practice', 190, '2026-10-07 21:35:50', 0),
+(361, 35, NULL, 'binary_practice', 190, '2026-10-07 21:36:50', 0),
+(362, 35, NULL, 'showdown_practice', 190, '2026-10-07 21:37:50', 0),
+(370, 2, NULL, 'ipv6_practice', 90, '2026-10-11 17:39:13', 0);
 
 -- --------------------------------------------------------
 
@@ -190,10 +431,41 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar`, `is_admin`, `created_at`) VALUES
-(1, 'Admin1', 'admin1@gg.com', '$2y$10$ar5q20r5lI8eswq5BRKZEeHHTOjWl.BcdF1.TmZ5Clu31y6jpTIQG', 'fox', 1, '2026-09-26 19:03:39'),
-(2, 'Carlo', 'cma@gm.com', '$2y$10$m2GgOmwTRKb0fEWwC4mwSOKCzglQMmbOB7s/h0bAWoJ5B7SRX5tR.', 'fox', 0, '2026-09-26 19:08:38'),
+(1, 'Admin1', 'admin1@gg.com', '$2y$10$ar5q20r5lI8eswq5BRKZEeHHTOjWl.BcdF1.TmZ5Clu31y6jpTIQG', 'robot', 1, '2026-09-26 19:03:39'),
+(2, 'Carlo', 'cma@gm.com', '$2y$10$m2GgOmwTRKb0fEWwC4mwSOKCzglQMmbOB7s/h0bAWoJ5B7SRX5tR.', 'wolf', 0, '2026-09-26 19:08:38'),
 (3, 'test', 'test@m.com', '$2y$10$WTCSTDqewk6Tma71Ed0N8OLTpe.c38rLsEOquwrxh34AQ7NtzhDmW', 'fox', 0, '2026-09-26 19:10:12'),
-(4, 'aki00', 'aki@gmail.com', '$2y$10$Pmliz1t9MmktkI8Zc0V6iOLx1Xwc3RhLvsaKOWa6yO/ioUJweVOyu', 'fox', 0, '2026-09-28 14:18:19');
+(4, 'aki00', 'aki@gmail.com', '$2y$10$Pmliz1t9MmktkI8Zc0V6iOLx1Xwc3RhLvsaKOWa6yO/ioUJweVOyu', 'fox', 0, '2026-09-28 14:18:19'),
+(5, 'RaynBSIT1A', 'ingarraynelp@gmail.com', '$2y$10$EH7UBYdxl.AX94B8nF15KeteIHMYHZ9ZW3kGIuKMSXrTkld0snFpu', 'fox', 0, '2026-10-06 16:16:58'),
+(6, 'jams', 'jamienathaliegraagas@gmail.com', '$2y$10$RY4B4yA55xCB38O1QZgLfe4tlXHOqF.PJsBiX1/j/KrWZB.Anj2CK', 'fox', 0, '2026-10-06 16:17:42'),
+(7, 'Graham', 'judicio.o01@gmail.com', '$2y$10$5f1V8gL0h0uiAPgyRk99luDq.ilbOkHJ11FWCZ8Zt8fByb8ROpPOe', 'fox', 0, '2026-10-06 16:58:25'),
+(8, 'Roldan Eborde', 'mirandachadramiel@gmail.com', '$2y$10$XJhiLXtB/DMRXPm4N0ZsPeYFtVHSmDRLD3FuxWufS3DSmxtMj0mCa', 'fox', 0, '2026-10-06 20:23:54'),
+(9, 'JGBSIT', 'jg03@gmail.com', '$2y$10$ekkf14BNh0H79CEdaX.lQ.TOZBcLfLW2zq3wOLUyIXAzd4svaE1Ui', 'fox', 0, '2026-10-06 20:23:50'),
+(10, 'ash', 'ashbash@gmail.com', '$2y$10$.rSDdajRq/qBuN9ZK3I8zeXssEGKB82xT3Lp1w7CBVPJwSuhwUsFG', 'fox', 0, '2026-10-06 20:27:16'),
+(11, 'Noobie', 'secret@gmail.com', '$2y$10$U1vLf3Ex691u16cMn7.GTOyQaRZ8YOOF6CqZqm1ftHF7ahPHksy3i', 'panda', 0, '2026-10-06 20:31:42'),
+(12, 'sean', 'sean123@gmail.com', '$2y$10$uyAR9jjMErDdonG/bWp8beSaICCYE4cRXx6/B84l4S7FpGTkGPpFm', 'lion', 0, '2026-10-06 20:36:08'),
+(13, 'Tala', 't.garcia@gmail.com', '$2y$10$7npeniHWmi83xGPCRVYPluHaBYykkTY1yR0qkgVHEwk9ikzsT.Skq', 'panda', 0, '2026-10-06 20:40:25'),
+(14, 'rigbaby', 'irigbooks39@gmail.com', '$2y$10$j/0cLeWZJa8AnMIITs5DleQrFBE18OrSP2rDJSbkrEL2myVl.3yXG', 'fox', 0, '2026-10-06 20:45:13'),
+(15, 'MaRkkk', 'mark.reyes195@gmail.com', '$2y$10$0R79ENUb//MiV.5neFHRjeJ4o7zgk6N6Y18938swclUtaCKx1RlAm', 'lion', 0, '2026-10-06 20:49:37'),
+(16, 'Drew', 'andrew.aquino402@gmail.com', '$2y$10$kfaOykc3.qxx/9/MbuRwGuvQoiJka5GXalwpaoiCpah4N3xejRHsi', 'fox', 0, '2026-10-06 20:54:02'),
+(17, 'Ozzirne', 'oza417@gmail.com', '$2y$10$axbQ1ehC8a1oGj4AAr0LU.SMSU9BpOaXH5q1qqK6.FiNlDoTe5tqi', 'fox', 0, '2026-10-06 20:58:41'),
+(18, 'RandyBSIT', 'santi07@gmail.com', '$2y$10$PYk3HBPK1xOc4ctus/epFedCErfKlUn7iI9RDmK/NQpUX4JfGzlkW', 'fox', 0, '2026-10-06 21:03:19'),
+(19, 'Potato', 'hahaha@gmail.com', '$2y$10$IzJYYM5TqFJQmfmULtOuVuaAlGCg3qnchqpM7T8xqB9cuZzNxndq2', 'fox', 0, '2026-10-06 21:08:44'),
+(20, 'Guttie\'', 'l.gutierrez29@gmail.com', '$2y$10$buDIKt2grUrhYNX6YK3myuqoMYCySoTcpHiRbVEO781gtp6YjJEIu', 'fox', 0, '2026-10-06 21:14:06'),
+(21, 'Kevs', 'domin19@gmail.com', '$2y$10$Sls596AooMuGFVF5n1UapOsNaWfUrImmjx7LLxOaJ1WIWSqX8u82O', 'fox', 0, '2026-10-07 20:23:50'),
+(22, 'Anlala', 'grabeanlala@gmail.com', '$2y$10$SOwRk5qAQGwF7vKYoFbgMu/Itltm./VUCppCDB12fycJy7kyC9ZIG', 'fox', 0, '2026-10-07 20:28:14'),
+(23, 'Ryzen', 'bsbs@gmail.com', '$2y$10$4iCi/OiSlnqRese7AaSx..WMKWZoRt1oMj.YqTTMIxZipUK7iakGG', 'fox', 0, '2026-10-07 20:32:39'),
+(24, 'baymax', 'brera15@gmail.com', '$2y$10$buPfNpdkw2omZVSP6rPoo.jI9YCzaPjKoQVulWPy3j.9zjA7MC4aG', 'fox', 0, '2026-10-07 20:37:05'),
+(25, 'Beans', 'vinceno20@gmail.com', '$2y$10$g1RBNNc15qzZTMyQe/1UpOmsQ3Aze3oZaL/9yCfYApaWW7D2jWiIi', 'fox', 0, '2026-10-07 20:41:28'),
+(26, 'Mansory', 'minesori30@gmail.com', '$2y$10$.k5uNcEXt3Hon0IdhiEL5ua9jnyDyhjY3MEJObwsUdsofi57VcAq.', 'fox', 0, '2026-10-07 20:46:12'),
+(27, 'Pat', 'patricklim16@gmail.com', '$2y$10$ymepiNeOrQb8TTpJnyHXBeNubQaz/W4T5PM5pVfuYLGNS7bfVsq5K', 'fox', 0, '2026-10-07 20:50:37'),
+(28, 'Boy Puyat', 'boypuyat24@gmail.com', '$2y$10$MpFWf9Oor1g7s4/6gxitx.8bqvGXslDkhvVH2976b266VtkbeH6n2', 'fox', 0, '2026-10-07 20:55:03'),
+(29, 'G na G', 'gnagaming@gmail.com', '$2y$10$rJn8w0j8VfGbWGwULOiakerHcLzB5OT4gBtGs92G7rBsa3qz5K06.', 'fox', 0, '2026-10-07 20:59:46'),
+(30, 'Neneng B', 'manoulam@gmail.com', '$2y$10$Tn98ypKrNgw/ABItwxlq/ufioL9TCSs01bZ.nqtyRXUZOLh.rp79G', 'fox', 0, '2026-10-07 21:04:18'),
+(31, 'Ella Vated', 'ellavated17@gmail.com', '$2y$10$8YgRsfTLEQx4P4wC/P8wv.jpI3EN3hCNfghK1O69QWgHNSSMrvX8G', 'fox', 0, '2026-10-07 21:08:52'),
+(32, 'Sam Ting Wong', 'samting@gmail.com', '$2y$10$5k/KYJb9xCCy7eTt88dbdezBXtcdPfTLU2fBg6geBD5QykNe1PxmG', 'fox', 0, '2026-10-07 21:13:27'),
+(33, 'Dominguez', 'minguez05@gmail.com', '$2y$10$Li2.9yPYab9faiN7AFLjMuRDi2V29XyQUdxgl7sInGuUMQT1exE76', 'fox', 0, '2026-10-07 21:18:04'),
+(34, 'Mark', 'markmywords18@gmail.com', '$2y$10$YQXZzdTsBn3L9q/mk1IW1Of9fG4rsURXOFAtxpbjaxHAaUoOcxHla', 'fox', 0, '2026-10-07 21:22:41'),
+(35, 'Noah Idea', 'noahidea06@gmail.com', '$2y$10$g/BXKcCbysf2/jQ1I2NdnON3.nv40ilxfcroFRyqrLJeYjtvBtAGe', 'fox', 0, '2026-10-07 21:27:19');
 
 -- --------------------------------------------------------
 
@@ -213,7 +485,8 @@ CREATE TABLE `user_badges` (
 --
 
 INSERT INTO `user_badges` (`id`, `user_id`, `badge_id`, `earned_at`) VALUES
-(1, 2, 1, '2026-09-26 22:44:08');
+(1, 2, 1, '2026-09-26 22:44:08'),
+(2, 9, 1, '2026-10-10 21:50:50');
 
 -- --------------------------------------------------------
 
@@ -232,18 +505,50 @@ CREATE TABLE `user_progress` (
   `total_correct` int(11) NOT NULL DEFAULT 0,
   `total_wrong` int(11) NOT NULL DEFAULT 0,
   `current_streak` int(11) NOT NULL DEFAULT 0,
-  `last_activity_date` date DEFAULT NULL
+  `last_activity_date` date DEFAULT NULL,
+  `last_daily_challenge_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user_progress`
 --
 
-INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`) VALUES
-(1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL),
-(2, 1, 332, 332, 400, 0, 2, 6, 4, 0, NULL),
-(3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL),
-(4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL);
+INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`, `last_daily_challenge_date`) VALUES
+(1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
+(2, 2, 444, 44, 605, 0, 4, 11, 19, 0, NULL, NULL),
+(3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
+(4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
+(5, 8, 8830, 1485, 1912, 0, 13, 0, 0, 0, NULL, NULL),
+(6, 3, 1115, 10, 815, 0, 3, 0, 0, 0, NULL, NULL),
+(7, 2, 600, 100, 605, 0, 1, 0, 0, 0, NULL, NULL),
+(8, 3, 1280, 175, 815, 0, 2, 0, 0, 0, NULL, NULL),
+(9, 2, 1850, 30, 605, 0, 8, 8, 2, 0, NULL, '2026-10-10'),
+(10, 1, 720, 0, 500, 0, 4, 0, 0, 0, NULL, NULL),
+(11, 1, 2450, 0, 500, 0, 12, 0, 0, 0, NULL, NULL),
+(12, 1, 1320, 0, 500, 0, 6, 0, 0, 0, NULL, NULL),
+(13, 1, 980, 0, 500, 0, 5, 0, 0, 0, NULL, NULL),
+(14, 1, 2780, 0, 500, 0, 15, 0, 0, 0, NULL, NULL),
+(15, 1, 1560, 0, 500, 0, 9, 0, 0, 0, NULL, NULL),
+(16, 1, 2140, 0, 500, 0, 11, 0, 0, 0, NULL, NULL),
+(17, 1, 640, 0, 500, 0, 3, 0, 0, 0, NULL, NULL),
+(18, 1, 1920, 0, 500, 0, 10, 0, 0, 0, NULL, NULL),
+(19, 1, 1120, 0, 500, 0, 6, 0, 0, 0, NULL, NULL),
+(20, 1, 2650, 0, 500, 0, 14, 0, 0, 0, NULL, NULL),
+(21, 1, 840, 0, 500, 0, 4, 0, 0, 0, NULL, NULL),
+(22, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(23, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(24, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(25, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(26, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(27, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(28, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(29, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(30, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(31, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(32, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(33, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(34, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(35, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -360,25 +665,25 @@ ALTER TABLE `questions`
 -- AUTO_INCREMENT for table `remember_tokens`
 --
 ALTER TABLE `remember_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=371;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `user_badges`
 --
 ALTER TABLE `user_badges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

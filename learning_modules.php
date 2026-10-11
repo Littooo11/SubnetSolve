@@ -2,41 +2,53 @@
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "config.php";
+require "includes/module_progress.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit();
 }
-$username = $_SESSION["username"];
+$userId = $_SESSION["user_id"];
 
-// Same idea as games.php - add an entry here for each new module.
-// "url" = "#" means the actual lesson content isn't built yet.
+$progress = calculate_learning_progress($conn, $userId);
+$completedKeys = $progress["completed_keys"];
+
 $modules = [
     [
-        "name" => "How to Play: Dissect an IP Address",
-        "desc" => "Learn how network address, broadcast address, subnet mask, wildcard mask, and usable host range are calculated.",
-        "url"  => "learning/dissect_ip.php",
+        "key" => "dissect_ip",
+        "title" => "Dissect an IP Address",
+        "desc" => "Learn network, broadcast, wildcard masks, and usable host ranges step-by-step.",
+        "link" => "learning/dissect_ip.php",
+        "icon" => "🧭"
     ],
     [
-        "name" => "How to Play: Binary Game",
-        "desc" => "Learn how to convert binary numbers to decimal, step by step.",
-        "url"  => "learning/binary_game.php",
+        "key" => "binary_game",
+        "title" => "Binary Game",
+        "desc" => "Master binary-to-decimal conversion using bit place values.",
+        "link" => "learning/binary_game.php",
+        "icon" => "🔢"
     ],
     [
-        "name" => "How to Play: Subnet Showdown",
-        "desc" => "Learn the multiple-choice format and the topics you'll be quizzed on.",
-        "url"  => "#",
+        "key" => "hex_conversion",
+        "title" => "Hex Conversion",
+        "desc" => "Understand base-16 positional notation and convert hex to decimal.",
+        "link" => "learning/hex_conversion.php",
+        "icon" => "⚡"
     ],
     [
-    "name" => "How to Play: Hex Conversion",
-    "desc" => "Learn how to convert hexadecimal numbers to decimal, step by step.",
-    "url"  => "learning/hex_conversion.php",
+        "key" => "ipv6_game",
+        "title" => "IPv6 Game",
+        "desc" => "Learn full expansion, leading-zero stripping, and RFC 5952 zero compression.",
+        "link" => "learning/ipv6_game.php",
+        "icon" => "🌐"
     ],
     [
-    "name" => "How to Play: IPv6 Game",
-    "desc" => "Learn how IPv6 addresses are written, compressed, and classified.",
-    "url"  => "learning/ipv6_game.php",
-],
+        "key" => "subnet_showdown",
+        "title" => "Subnet Showdown",
+        "desc" => "Master conceptual multiple-choice subnetting questions.",
+        "link" => "learning/subnet_showdown.php",
+        "icon" => "⚔️"
+    ]
 ];
 ?>
 <!DOCTYPE html>
@@ -66,22 +78,43 @@ $modules = [
         <a href="achievements.php" class="nav-link">Achievements</a>
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
-        <a href="about.php" class="nav-link">About Us</a>   
     </aside>
 
     <main class="main">
         <div class="welcome">
             <h2>Learning Modules</h2>
-            <p>Not sure how a game works? Start here.</p>
+            <p>Complete each module's single mastery question to earn 20% progress toward lesson completion.</p>
+        </div>
+
+        <div class="game-card" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h3 style="margin: 0;">Overall Progress</h3>
+                <span style="font-weight: bold; color: var(--blue);"><?= $progress["percentage"] ?>% Completed</span>
+            </div>
+            <div class="progress-bar" style="height: 12px; background: #1e2947; border-radius: 6px; overflow: hidden;">
+                <div style="width: <?= $progress["percentage"] ?>%; background: var(--green); height: 100%; transition: width 0.4s ease;"></div>
+            </div>
+            <p style="margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--text-dim);">
+                <?= $progress["completed_count"] ?> of 5 lessons completed.
+            </p>
         </div>
 
         <div class="games-grid">
-            <?php foreach ($modules as $m): ?>
-                <div class="game-tile">
-                    <h3><?= htmlspecialchars($m["name"]) ?></h3>
-                    <p><?= htmlspecialchars($m["desc"]) ?></p>
-                    <a href="<?= htmlspecialchars($m["url"]) ?>">How to Play</a>
+            <?php foreach ($modules as $m): 
+                $isDone = in_array($m["key"], $completedKeys);
+            ?>
+            <a href="<?= $m['link'] ?>" class="game-tile" style="text-decoration: none; position: relative;">
+                <div class="game-icon"><?= $m['icon'] ?></div>
+                <div class="game-info">
+                    <h4>
+                        <?= htmlspecialchars($m['title']) ?>
+                        <?php if ($isDone): ?>
+                            <span style="color: var(--green); font-size: 0.9rem; margin-left: 0.4rem;">✓ Done (+20%)</span>
+                        <?php endif; ?>
+                    </h4>
+                    <p><?= htmlspecialchars($m['desc']) ?></p>
                 </div>
+            </a>
             <?php endforeach; ?>
         </div>
     </main>

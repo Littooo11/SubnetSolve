@@ -2,6 +2,7 @@
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 require "../config.php";
+require "../includes/block_admin_play.php";
 require "../includes/xp_engine.php";
 require "../includes/easy_instructions.php";
 
@@ -9,9 +10,11 @@ if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
     exit();
 }
+block_admins_from_playing($conn);
 $username = $_SESSION["username"];
 
-$difficultyDigits = ["easy" => 2, "medium" => 3, "hard" => 4];
+// Hex is always 2 digits (00-FF). Easy vs Hard differs in help and XP, not size.
+$difficultyDigits = ["easy" => 2, "hard" => 2];
 $difficulty = $_GET["difficulty"] ?? null;
 $showDifficultyScreen = !array_key_exists($difficulty, $difficultyDigits);
 $digits = $difficultyDigits[$difficulty] ?? 2;
@@ -54,16 +57,13 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
             <div class="game-card">
                 <div class="difficulty-select">
                     <h2>Choose a Difficulty</h2>
-                    <p class="sub">This controls how many hexadecimal digits you'll convert and how much XP each correct answer earns.</p>
-                    <div class="difficulty-grid">
+                    <p class="sub">Every question is a 2-digit hex number (00 to FF). The difficulty controls whether you get help, and how much XP each correct answer earns.</p>
+                    <div class="difficulty-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 380px;">
                         <a href="?difficulty=easy" class="difficulty-card easy">
-                            <span class="icon">🟢</span><h4>Easy</h4><p>2-digit hex (0x00-0xFF)<br>10 XP per correct</p>
-                        </a>
-                        <a href="?difficulty=medium" class="difficulty-card medium">
-                            <span class="icon">🟡</span><h4>Medium</h4><p>3-digit hex (0x000-0xFFF)<br>15 XP per correct</p>
+                            <span class="icon">🟢</span><h4>Easy</h4><p>Step-by-step instructions<br>10 XP per correct</p>
                         </a>
                         <a href="?difficulty=hard" class="difficulty-card hard">
-                            <span class="icon">🔴</span><h4>Difficult</h4><p>4-digit hex (0x0000-0xFFFF)<br>20 XP per correct</p>
+                            <span class="icon">🔴</span><h4>Hard</h4><p>No instructions<br>20 XP per correct</p>
                         </a>
                     </div>
                 </div>
@@ -78,7 +78,7 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
             <div class="big-timer" id="timerDisplay" style="margin-bottom:1rem;">03:00</div>
 
             <div class="binary-stage">
-                <div class="binary-number" id="hexDisplay">0x<?= str_repeat("-", $digits) ?></div>
+                <div class="binary-number" id="hexDisplay"><?= str_repeat("-", $digits) ?></div>
                 <div class="binary-hint">Convert this hexadecimal number to decimal</div>
 
                 <div class="binary-input-row">
@@ -131,7 +131,7 @@ const timerDisplay = document.getElementById("timerDisplay");
 
 function nextQuestion() {
     currentAnswer = Math.floor(Math.random() * (MAX_VAL + 1));
-    display.textContent = "0x" + currentAnswer.toString(16).toUpperCase().padStart(DIGITS, "0");
+    display.textContent = currentAnswer.toString(16).toUpperCase().padStart(DIGITS, "0");
     input.value = "";
     feedback.textContent = "";
     feedback.className = "binary-feedback";

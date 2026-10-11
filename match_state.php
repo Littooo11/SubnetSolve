@@ -14,7 +14,7 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 $code = strtoupper(trim($_GET["code"] ?? ""));
-$stmt = mysqli_prepare($conn, "SELECT * FROM matches WHERE room_code = ?");
+$stmt = mysqli_prepare($conn, "SELECT *, UNIX_TIMESTAMP(current_question_started_at) AS started_ts FROM matches WHERE room_code = ?");
 mysqli_stmt_bind_param($stmt, "s", $code);
 mysqli_stmt_execute($stmt);
 $match = mysqli_stmt_get_result($stmt)->fetch_assoc();
@@ -27,11 +27,9 @@ if (!$match) {
 
 $TIME_PER_QUESTION = 45;
 
-// Self-healing timeout: if the current question's time is up and not everyone
-// has answered yet, auto-fill missing answers as wrong and advance the round.
-// This means the match keeps moving even if a player closes their tab.
-if ($match["status"] === "in_progress" && $match["current_question_started_at"]) {
-    $elapsed = time() - strtotime($match["current_question_started_at"]);
+// Self-healing timeout: calculate elapsed time using pure Unix epoch timestamps
+if ($match["status"] === "in_progress" && $match["started_ts"]) {
+    $elapsed = max(0, time() - (int) $match["started_ts"]);
     if ($elapsed >= $TIME_PER_QUESTION) {
         $unanswered = mysqli_query($conn, "SELECT user_id FROM match_players WHERE match_id = " . (int) $match["id"] . " AND current_answer_index IS NULL");
         while ($row = mysqli_fetch_assoc($unanswered)) {
@@ -41,7 +39,7 @@ if ($match["status"] === "in_progress" && $match["current_question_started_at"])
         }
         advance_match($conn, $match["id"]);
 
-        // reload match row since it may have just changed (advanced or finished)
+        // Reload match row after potential advance or finish
         mysqli_stmt_execute($stmt);
         $match = mysqli_stmt_get_result($stmt)->fetch_assoc();
     }

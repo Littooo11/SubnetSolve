@@ -14,15 +14,16 @@ $username = $_SESSION["username"];
 $code = strtoupper(trim($_GET["code"] ?? ""));
 if ($code === "") { header("Location: lobby.php"); exit(); }
 
-$stmt = mysqli_prepare($conn, "SELECT * FROM matches WHERE room_code = ?");
+// Query UNIX_TIMESTAMP directly to ensure consistent UTC calculations
+$stmt = mysqli_prepare($conn, "SELECT *, UNIX_TIMESTAMP(current_question_started_at) AS started_ts FROM matches WHERE room_code = ?");
 mysqli_stmt_bind_param($stmt, "s", $code);
 mysqli_stmt_execute($stmt);
 $match = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
 if (!$match) { header("Location: lobby.php?error=" . urlencode("That lobby doesn't exist.")); exit(); }
 
-// Make sure I'm actually a participant - if not, route through join.php (handles password checks etc.)
-$meCheck = mysqli_prepare($conn, "SELECT * FROM match_players WHERE match_id = ? AND user_id = ?");
+// Make sure I'm actually a participant - if not, route through join.php
+$meCheck = mysqli_prepare($conn, "SELECT mp.*, COALESCE(u.avatar, 'fox') AS avatar FROM match_players mp JOIN users u ON u.id = mp.user_id WHERE mp.match_id = ? AND mp.user_id = ?");
 mysqli_stmt_bind_param($meCheck, "ii", $match["id"], $userId);
 mysqli_stmt_execute($meCheck);
 $me = mysqli_stmt_get_result($meCheck)->fetch_assoc();
@@ -35,7 +36,7 @@ if (!$me) {
 $TIME_PER_QUESTION = 45;
 
 // All players in this match (for opponent display + live leaderboard)
-$playersResult = mysqli_query($conn, "SELECT mp.*, u.username, u.avatar FROM match_players mp
+$playersResult = mysqli_query($conn, "SELECT mp.*, u.username, COALESCE(u.avatar, 'fox') AS avatar FROM match_players mp
     JOIN users u ON u.id = mp.user_id WHERE mp.match_id = " . (int) $match["id"] . " ORDER BY mp.score DESC");
 $players = mysqli_fetch_all($playersResult, MYSQLI_ASSOC);
 
@@ -55,11 +56,20 @@ if ($match["status"] === "in_progress") {
 $myAnswered = $me["current_answer_index"] !== null;
 $letters = ["A", "B", "C", "D"];
 
-$elapsed = $match["current_question_started_at"] ? time() - strtotime($match["current_question_started_at"]) : 0;
+// Calculate elapsed seconds using pure Unix epoch timestamps
+$elapsed = $match["started_ts"] ? max(0, time() - (int) $match["started_ts"]) : 0;
 $timeRemaining = max(0, $TIME_PER_QUESTION - $elapsed);
 
 function mode_label($m) {
-    return ["subnetting" => "Subnetting", "binary" => "Binary", "both" => "Both"][$m] ?? $m;
+    return [
+        "subnetting" => "Subnet Dissect",
+        "binary"     => "Binary Game",
+        "showdown"   => "Subnet Showdown",
+        "hex"        => "Hex Conversion",
+        "ipv6"       => "IPv6 Challenge",
+        "scenario"   => "Network Scenario",
+        "both"       => "Mixed Topics"
+    ][$m] ?? ucfirst($m);
 }
 ?>
 <!DOCTYPE html>
@@ -81,7 +91,7 @@ function mode_label($m) {
             </div>
         </div>
         <a href="dashboard.php" class="nav-link">Dashboard</a>
-        <a href="#" class="nav-link">Learning Modules</a>
+        <a href="learning_modules.php" class="nav-link">Learning Modules</a>
         <a href="practice.php" class="nav-link">Practice Mode</a>
         <a href="games.php" class="nav-link">Games</a>
         <a href="lobby.php" class="nav-link active">Multiplayer Lobby</a>
@@ -97,15 +107,15 @@ function mode_label($m) {
                 <a href="leave_match.php?code=<?= urlencode($code) ?>" class="showdown-back" onclick="return confirm('Leave this match?')">← Leave Match</a>
                 <div style="font-size:0.9rem; margin-top:0.2rem;">
                     <?= $match["visibility"] === "private" ? "Private" : "Public" ?> Lobby #<?= htmlspecialchars($code) ?>
-                    · 1v1 <?= mode_label($match["game_mode"]) ?>
+                    · <?= mode_label($match["game_mode"]) ?>
                 </div>
             </div>
 
             <?php if ($opponent && (int) $match["max_players"] === 2): ?>
             <div class="vs-block">
-                <div class="vs-player"><?= render_avatar($me["avatar"], 32) ?> <div><?= htmlspecialchars($username) ?><span class="pscore">Score: <span data-score-for="<?= $userId ?>"><?= $me["score"] ?></span></span></div></div>
+                <div class="vs-player"><?= render_avatar($me["avatar"] ?? "fox", 32) ?> <div><?= htmlspecialchars($username) ?><span class="pscore">Score: <span data-score-for="<?= $userId ?>"><?= $me["score"] ?></span></span></div></div>
                 <div class="vs-text">VS</div>
-                <div class="vs-player"><?= render_avatar($opponent["avatar"], 32) ?> <div><?= htmlspecialchars($opponent["username"]) ?><span class="pscore">Score: <span data-score-for="<?= $opponent['user_id'] ?>"><?= $opponent["score"] ?></span></span></div></div>
+                <div class="vs-player"><?= render_avatar($opponent["avatar"] ?? "fox", 32) ?> <div><?= htmlspecialchars($opponent["username"]) ?><span class="pscore">Score: <span data-score-for="<?= $opponent['user_id'] ?>"><?= $opponent["score"] ?></span></span></div></div>
             </div>
             <?php endif; ?>
 
@@ -129,7 +139,7 @@ function mode_label($m) {
                     <div style="display:flex; justify-content:center; gap:0.8rem; margin:1.2rem 0; flex-wrap:wrap;">
                         <?php foreach ($players as $p): ?>
                             <div style="text-align:center;">
-                                <?= render_avatar($p["avatar"], 44) ?>
+                                <?= render_avatar($p["avatar"] ?? "fox", 44) ?>
                                 <div style="font-size:0.75rem; margin-top:0.3rem;"><?= htmlspecialchars($p["username"]) ?></div>
                             </div>
                         <?php endforeach; ?>
@@ -141,7 +151,6 @@ function mode_label($m) {
                     <?php endif; ?>
                 </div>
             </div>
-
         <?php elseif ($match["status"] === "in_progress" && $currentQuestion): ?>
             <div class="showdown-card">
                 <div class="showdown-top-row">
@@ -154,13 +163,13 @@ function mode_label($m) {
                 </div>
 
                 <div class="showdown-meta-row">
-                    <div class="category-pill">🌐 Subnet Showdown</div>
+                    <div class="category-pill">🌐 <?= mode_label($match["game_mode"]) ?></div>
                 </div>
 
                 <div class="showdown-question"><?= htmlspecialchars($currentQuestion["prompt"]) ?></div>
 
                 <?php if ($myAnswered): ?>
-                    <div class="feedback-banner feedback-correct" style="margin-bottom:1rem;">✅ Answer submitted — waiting for your opponent...</div>
+                    <div class="feedback-banner feedback-correct" style="margin-bottom:1rem;">✅ Answer submitted — waiting for opponents...</div>
                     <?php foreach (json_decode($currentQuestion["options_json"], true) as $i => $opt): ?>
                         <div class="mcq-option <?= $i === (int) $me['current_answer_index'] ? 'selected' : '' ?>" style="pointer-events:none;">
                             <div class="mcq-radio"></div><span class="mcq-letter"><?= $letters[$i] ?>.</span><span><?= htmlspecialchars($opt) ?></span>
@@ -180,7 +189,6 @@ function mode_label($m) {
                 <?php endif; ?>
             </div>
             <div class="system-msg">💬 System: Match started! Good luck!</div>
-
         <?php elseif ($match["status"] === "finished"): ?>
             <div class="showdown-card">
                 <h2><?php
@@ -204,7 +212,7 @@ function mode_label($m) {
             <?php foreach ($players as $i => $p): ?>
                 <div class="live-lb-row" data-row-for="<?= $p['user_id'] ?>">
                     <span class="rank"><?= $i + 1 ?></span>
-                    <?= render_avatar($p["avatar"], 28) ?>
+                    <?= render_avatar($p["avatar"] ?? "fox", 28) ?>
                     <span class="plname"><?= htmlspecialchars($p["username"]) ?></span>
                     <span class="plscore" data-score-for="<?= $p['user_id'] ?>"><?= $p["score"] ?></span>
                 </div>
@@ -216,14 +224,13 @@ function mode_label($m) {
 <script>
 function selectOption(i) {
     document.querySelectorAll(".mcq-option").forEach(el => el.classList.remove("selected"));
-    document.querySelector(`.mcq-option[data-index="${i}"]`).classList.add("selected");
+    const selectedEl = document.querySelector(`.mcq-option[data-index="${i}"]`);
+    if (selectedEl) selectedEl.classList.add("selected");
     document.getElementById("selectedInput").value = i;
     document.getElementById("submitBtn").disabled = false;
 }
 
 <?php if ($match["status"] !== "finished"): ?>
-// Poll the server; reload the page whenever something relevant changes
-// (opponent joined, opponent answered, question advanced, match finished).
 let knownQuestionIndex = <?= (int) $match["current_question_index"] ?>;
 let knownStatus = "<?= $match["status"] ?>";
 let knownPlayerCount = <?= count($players) ?>;
@@ -232,15 +239,13 @@ setInterval(() => {
     fetch("match_state.php?code=<?= urlencode($code) ?>")
         .then(r => r.json())
         .then(data => {
-            // Live score updates - happens every poll, no reload needed
             if (data.players) {
                 data.players.forEach(p => {
-                    const el = document.querySelector(`[data-score-for="${p.user_id}"]`);
-                    if (el) el.textContent = p.score;
+                    const el = document.querySelectorAll(`[data-score-for="${p.user_id}"]`);
+                    el.forEach(node => node.textContent = p.score);
                 });
             }
 
-            // Reload only when something needs a fresh render (new question, match ended, someone joined)
             if (data.status !== knownStatus || data.current_question_index !== knownQuestionIndex || data.player_count !== knownPlayerCount) {
                 window.location.reload();
             }

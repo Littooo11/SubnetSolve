@@ -9,6 +9,7 @@ header("Expires: 0");
 
 require "config.php";
 require "includes/avatars.php";
+require_once "includes/module_progress.php";
 
 // If no active session, try to restore login from the remember-me cookie
 if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
@@ -78,7 +79,8 @@ $level        = $progress["level"];
 $careerXP     = $progress["career_xp"];
 $totalXP      = $progress["total_xp"];
 $xpToNextLvl  = $progress["xp_to_next_level"];
-$lessonsDone  = $progress["lessons_completed"];
+$moduleProg = calculate_learning_progress($conn, $userId);
+$lessonsDone = $moduleProg["percentage"] . "%";
 $quizzesDone  = $progress["quizzes_completed"];
 $streak       = $progress["current_streak"];
 
@@ -188,7 +190,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
             <div class="stat-card">
                 <div class="stat-icon" style="background:rgba(59,130,246,0.15); color:var(--blue);">L</div>
                 <div>
-                    <div class="value"><?= $lessonsDone ?></div>
+                    <div class="stat-value"><?= $lessonsDone ?></div>
                     <div class="label">Lessons Completed</div>
                 </div>
             </div>

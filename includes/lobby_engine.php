@@ -1,6 +1,10 @@
 <?php
 // includes/lobby_engine.php
 
+require_once "quiz_engine.php";
+require_once "ipv6_engine.php";
+require_once "scenario_engine.php";
+
 function generate_room_code($conn) {
     $chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O/0/I/1 to avoid confusion
     do {
@@ -14,10 +18,101 @@ function generate_room_code($conn) {
     return $code;
 }
 
+// Generates dynamic question based on requested game mode
+function generate_multiplayer_question($gameMode) {
+    $mode = $gameMode;
+    if ($mode === "both") {
+        $modes = ["subnetting", "binary", "showdown", "hex", "ipv6", "scenario"];
+        $mode = $modes[array_rand($modes)];
+    }
+
+    switch ($mode) {
+        case "binary":
+            $num = rand(1, 255);
+            $bin = sprintf("%08b", $num);
+            $options = [$bin];
+            while (count($options) < 4) {
+                $fake = sprintf("%08b", rand(1, 255));
+                if (!in_array($fake, $options)) $options[] = $fake;
+            }
+            shuffle($options);
+            return [
+                "prompt" => "Convert decimal $num to an 8-bit binary string:",
+                "options" => $options,
+                "correct_index" => array_search($bin, $options)
+            ];
+
+        case "hex":
+            $num = rand(10, 255);
+            $hex = strtoupper(dechex($num));
+            $options = [$hex];
+            while (count($options) < 4) {
+                $fake = strtoupper(dechex(rand(10, 255)));
+                if (!in_array($fake, $options)) $options[] = $fake;
+            }
+            shuffle($options);
+            return [
+                "prompt" => "Convert decimal $num to Hexadecimal (8-bit):",
+                "options" => $options,
+                "correct_index" => array_search($hex, $options)
+            ];
+
+        case "ipv6":
+            if (function_exists('generate_ipv6_question')) {
+                return generate_ipv6_question();
+            }
+            // Fallback IPv6 Question
+            $prefix = rand(48, 64);
+            $prompt = "What is the default subnet prefix length for standard IPv6 Global Unicast assignments?";
+            $options = ["/48", "/56", "/64", "/128"];
+            return [
+                "prompt" => $prompt,
+                "options" => $options,
+                "correct_index" => 2
+            ];
+
+        case "scenario":
+            if (function_exists('generate_scenario_question')) {
+                return generate_scenario_question();
+            }
+            // Fallback Scenario Question
+            return [
+                "prompt" => "A router needs to connect 50 hosts in a subnetwork. Which prefix length provides sufficient usable host addresses with minimal waste?",
+                "options" => ["/27 (30 hosts)", "/26 (62 hosts)", "/25 (126 hosts)", "/24 (254 hosts)"],
+                "correct_index" => 1
+            ];
+
+        case "showdown":
+        case "subnetting":
+        default:
+            if (function_exists('generate_match_question')) {
+                return generate_match_question($mode);
+            }
+            // Default subnet calculation question
+            $octets = [rand(10, 220), rand(0, 255), rand(0, 255), rand(1, 250)];
+            $ip = implode(".", $octets);
+            $cidr = rand(24, 30);
+            $maskOctet = 256 - pow(2, 32 - $cidr);
+            $correctMask = "255.255.255." . $maskOctet;
+            $options = [$correctMask, "255.255.255.0", "255.255.255.128", "255.255.255.240"];
+            $options = array_unique($options);
+            while (count($options) < 4) {
+                $options[] = "255.255.255." . (256 - pow(2, rand(1, 4)));
+                $options = array_unique($options);
+            }
+            shuffle($options);
+            return [
+                "prompt" => "What is the subnet mask for $ip/$cidr?",
+                "options" => $options,
+                "correct_index" => array_search($correctMask, $options)
+            ];
+    }
+}
+
 // Generates the full question set for a match and flips it to in_progress.
 function start_match($conn, $matchId, $gameMode, $totalQuestions) {
     for ($i = 0; $i < $totalQuestions; $i++) {
-        $q = generate_match_question($gameMode);
+        $q = generate_multiplayer_question($gameMode);
         $optionsJson = json_encode($q["options"]);
         $insert = mysqli_prepare($conn, "INSERT INTO match_questions (match_id, question_index, prompt, options_json, correct_index) VALUES (?, ?, ?, ?, ?)");
         mysqli_stmt_bind_param($insert, "iissi", $matchId, $i, $q["prompt"], $optionsJson, $q["correct_index"]);
@@ -29,8 +124,6 @@ function start_match($conn, $matchId, $gameMode, $totalQuestions) {
     mysqli_stmt_execute($update);
 }
 
-// Advances a match to its next question, or finishes it if that was the last one.
-// Resets every player's answer state for the new round.
 function advance_match($conn, $matchId) {
     $stmt = mysqli_prepare($conn, "SELECT current_question_index, total_questions FROM matches WHERE id = ?");
     mysqli_stmt_bind_param($stmt, "i", $matchId);
@@ -54,15 +147,12 @@ function advance_match($conn, $matchId) {
     mysqli_stmt_execute($resetPlayers);
 }
 
-// Marks a match finished, determines the winner, and saves each player's
-// result into the normal scores/XP/badge systems - same as any other game.
 function finish_match($conn, $matchId) {
     $playersResult = mysqli_query($conn, "SELECT user_id, score FROM match_players WHERE match_id = $matchId ORDER BY score DESC");
     $players = mysqli_fetch_all($playersResult, MYSQLI_ASSOC);
     if (empty($players)) return;
 
     $winnerId = $players[0]["user_id"];
-    // tie: if scores are equal, no single winner
     if (count($players) > 1 && $players[0]["score"] === $players[1]["score"]) $winnerId = null;
 
     $update = mysqli_prepare($conn, "UPDATE matches SET status = 'finished', ended_at = NOW(), winner_id = ? WHERE id = ?");
@@ -73,7 +163,7 @@ function finish_match($conn, $matchId) {
         $uid = $p["user_id"];
         $score = $p["score"];
 
-        $insert = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, ?, 'multiplayer_1v1', ?, NOW())");
+        $insert = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, ?, 'multiplayer_match', ?, NOW())");
         mysqli_stmt_bind_param($insert, "iii", $uid, $matchId, $score);
         mysqli_stmt_execute($insert);
 

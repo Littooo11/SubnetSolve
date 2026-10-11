@@ -5,6 +5,8 @@ require "includes/quiz_engine.php";
 require "includes/xp_engine.php";
 require "includes/badge_engine.php";
 require "includes/lobby_engine.php";
+require "includes/block_admin_play.php";
+block_admins_from_playing($conn);
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
@@ -42,7 +44,7 @@ $isParticipant = (bool) mysqli_stmt_get_result($already)->fetch_assoc();
 
 if (!$isParticipant) {
     $countResult = mysqli_query($conn, "SELECT COUNT(*) AS c FROM match_players WHERE match_id = " . (int) $match["id"]);
-    $count = mysqli_fetch_assoc($countResult)["c"];
+    $count = (int) mysqli_fetch_assoc($countResult)["c"];
 
     if ($count >= $match["max_players"]) fail("This lobby is full.");
 
@@ -52,7 +54,7 @@ if (!$isParticipant) {
 }
 
 $countResult = mysqli_query($conn, "SELECT COUNT(*) AS c FROM match_players WHERE match_id = " . (int) $match["id"]);
-$count = mysqli_fetch_assoc($countResult)["c"];
+$count = (int) mysqli_fetch_assoc($countResult)["c"];
 
 if ($count >= $match["max_players"] && $match["status"] === "waiting") {
     start_match($conn, $match["id"], $match["game_mode"], $match["total_questions"]);

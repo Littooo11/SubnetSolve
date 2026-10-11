@@ -2,6 +2,8 @@
 session_start();
 require "config.php";
 require "includes/lobby_engine.php";
+require "includes/block_admin_play.php";
+block_admins_from_playing($conn);
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
@@ -14,7 +16,18 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit();
 }
 
-$gameMode = in_array($_POST["game_mode"] ?? "", ["subnetting", "binary", "both"]) ? $_POST["game_mode"] : "subnetting";
+// Allowed game modes updated to include Showdown, Hex, IPv6, and Scenario
+$allowedGameModes = [
+    "subnetting",
+    "binary",
+    "showdown",
+    "hex",
+    "ipv6",
+    "scenario",
+    "both"
+];
+
+$gameMode = in_array($_POST["game_mode"] ?? "", $allowedGameModes) ? $_POST["game_mode"] : "subnetting";
 $visibility = ($_POST["visibility"] ?? "public") === "private" ? "private" : "public";
 $maxPlayers = in_array((int) ($_POST["max_players"] ?? 2), [2, 4, 6, 8]) ? (int) $_POST["max_players"] : 2;
 $roomName = trim($_POST["room_name"] ?? "");
