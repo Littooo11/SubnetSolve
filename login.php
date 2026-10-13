@@ -3,7 +3,11 @@ require "config.php";
 session_start();
 
 if (isset($_SESSION["user_id"])) {
-    header("Location: dashboard.php");
+    if (!empty($_SESSION["is_admin"])) {
+        header("Location: admin/dashboard.php");
+    } else {
+        header("Location: dashboard.php");
+    }
     exit();
 }
 
@@ -35,8 +39,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             setcookie("remember_token", $token, time() + (30 * 24 * 60 * 60), "/");
         }
 
-        header("Location: dashboard.php");
-        exit();
+        if (!empty($_SESSION["is_admin"])) {
+            header("Location: admin/dashboard.php");
+        } else {
+            header("Location: dashboard.php");
+        }
+exit();
     } else {
         $error = "Invalid email or password.";
     }

@@ -1,4 +1,29 @@
-/* admin.css - admin panel (uses dash.css color variables) */
+/* admin.css - Admin Panel Layout & Sidebar Styles */
+
+:root {
+    --bg: #0b1224;
+    --panel: #111a33;
+    --panel-light: #16213f;
+    --border: #23304f;
+    --text: #e7ebf5;
+    --text-dim: #8b93ab;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --green: #22c55e;
+    --orange: #f59e0b;
+    --gold: #eab308;
+    --teal: #14b8a6;
+    --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
 
 .admin-layout {
     display: grid;
@@ -14,13 +39,49 @@
     flex-direction: column;
 }
 
+.admin-sidebar .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-sidebar .brand .logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+}
+
+.admin-sidebar .brand h1 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #fff;
+}
+
+.admin-sidebar .brand h1 span {
+    color: var(--blue);
+}
+
+.admin-sidebar .brand p {
+    margin: 0;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+}
+
 .admin-nav-label {
     font-size: 0.68rem;
     letter-spacing: 0.08em;
     color: var(--text-dim);
     margin: 1.2rem 0 0.5rem 0.6rem;
+    font-weight: bold;
 }
-.admin-nav-label:first-child { margin-top: 0; }
+.admin-nav-label:first-of-type { margin-top: 0; }
 
 .admin-nav-link {
     display: flex;
@@ -34,8 +95,7 @@
     margin-bottom: 0.15rem;
 }
 .admin-nav-link:hover { background: var(--panel-light); color: var(--text); }
-.admin-nav-link.active { background: var(--blue); color: #fff; }
-.admin-nav-link .soon { margin-left: auto; font-size: 0.6rem; background: var(--panel-light); color: var(--text-dim); padding: 0.1rem 0.4rem; border-radius: 5px; }
+.admin-nav-link.active { background: var(--blue); color: #fff; font-weight: bold; }
 
 .admin-sidebar-footer {
     margin-top: auto;
@@ -45,7 +105,15 @@
     padding: 1rem;
     text-align: center;
 }
-.admin-sidebar-footer .brand-mini { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: bold; margin-bottom: 0.3rem; }
+.admin-sidebar-footer .brand-mini { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 0.5rem; 
+    font-weight: bold; 
+    margin-bottom: 0.3rem;
+    color: #fff;
+}
 .admin-sidebar-footer p { margin: 0; font-size: 0.72rem; color: var(--text-dim); }
 
 .admin-main { padding: 1.5rem 2rem; }
@@ -93,7 +161,7 @@
 .admin-stat-card .delta-sub { font-size: 0.72rem; color: var(--text-dim); }
 
 /* Panels */
-.admin-panels-row {
+.admin-panels-row, .admin-bottom-row {
     display: grid;
     grid-template-columns: 1.3fr 1fr 1fr;
     gap: 1rem;
@@ -112,15 +180,22 @@
     align-items: center;
     margin-bottom: 1rem;
 }
-.admin-panel-header h3 { margin: 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
-.admin-panel-header a { font-size: 0.78rem; color: var(--blue); text-decoration: none; }
-.admin-select {
-    background: var(--panel-light);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
+.admin-panel-header h3 { margin: 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+.admin-table th {
+    text-align: left;
+    padding: 0.6rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+}
+.admin-table td {
+    padding: 0.6rem;
+    border-bottom: 1px solid var(--border);
 }
 
 .legend-row {
@@ -149,59 +224,40 @@
 }
 .admin-activity-row .atime { margin-left: auto; color: var(--text-dim); font-size: 0.72rem; white-space: nowrap; }
 
-/* Bottom row: table + module list + reports */
-.admin-bottom-row {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr 1fr;
-    gap: 1rem;
-}
-
-.admin-table { width: 100%; border-collapse: collapse; }
-.admin-table th { text-align: left; font-size: 0.72rem; color: var(--text-dim); padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--border); }
-.admin-table td { padding: 0.55rem 0.4rem; font-size: 0.83rem; border-bottom: 1px solid var(--border); }
-.admin-table tr:last-child td { border-bottom: none; }
-
 .module-row {
     display: flex;
     align-items: center;
     gap: 0.7rem;
     padding: 0.5rem 0;
     border-bottom: 1px solid var(--border);
-    font-size: 0.83rem;
+    font-size: 0.85rem;
 }
-.module-row:last-child { border-bottom: none; }
-.module-rank {
-    width: 22px; height: 22px; border-radius: 6px;
-    background: var(--panel-light); color: var(--text-dim);
+.module-rank { width: 18px; font-weight: bold; color: var(--text-dim); }
+.module-icon {
+    width: 30px; height: 30px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.72rem; font-weight: bold; flex-shrink: 0;
+    font-size: 0.85rem; font-weight: bold;
 }
-.module-icon { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
-.module-plays { margin-left: auto; color: var(--text-dim); font-size: 0.76rem; white-space: nowrap; }
+.module-plays { margin-left: auto; color: var(--text-dim); font-size: 0.78rem; }
 
 .report-tile {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.8rem;
     padding: 0.7rem;
-    border-radius: 10px;
     background: var(--panel-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 0.6rem;
     text-decoration: none;
     color: var(--text);
-    margin-bottom: 0.6rem;
 }
-.report-tile:hover { border: 1px solid var(--blue); }
-.report-tile .ricon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.report-tile .rtext .t { font-weight: bold; font-size: 0.85rem; }
+.report-tile:hover { border-color: var(--blue); }
+.report-tile .ricon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+}
+.report-tile .rtext .t { font-size: 0.85rem; font-weight: bold; }
 .report-tile .rtext .d { font-size: 0.72rem; color: var(--text-dim); }
-.report-tile .rarrow { margin-left: auto; color: var(--text-dim); }
-
-@media (max-width: 1300px) {
-    .admin-stats-row { grid-template-columns: repeat(3, 1fr); }
-    .admin-panels-row, .admin-bottom-row { grid-template-columns: 1fr; }
-}
-@media (max-width: 900px) {
-    .admin-layout { grid-template-columns: 1fr; }
-    .admin-sidebar { display: none; }
-    .admin-stats-row { grid-template-columns: repeat(2, 1fr); }
-}
+.report-tile .rarrow { margin-left: auto; color: var(--text-dim); font-size: 1.1rem; }

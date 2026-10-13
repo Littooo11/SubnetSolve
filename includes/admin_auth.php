@@ -1,6 +1,4 @@
 <?php
-// includes/admin_auth.php
-// Include this at the top of any admin page (after session_start() and config.php).
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");

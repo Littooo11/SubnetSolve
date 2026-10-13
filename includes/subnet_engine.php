@@ -46,11 +46,11 @@ function generate_subnet_question($difficulty = "medium") {
     ];
 
     return [
-        "given_ip"     => "$oct1.$oct2.$oct3.$givenOct4",
-        "prefix"       => $prefix,
-        "oct1"         => $oct1,
-        "oct2"         => $oct2,
-        "oct3"         => $oct3,
+        "given_ip"        => "$oct1.$oct2.$oct3.$givenOct4",
+        "prefix"          => $prefix,
+        "oct1"            => $oct1,
+        "oct2"            => $oct2,
+        "oct3"            => $oct3,
         "network_oct4"   => $networkOct4,
         "broadcast_oct4" => $broadcastOct4,
         "host_start_oct4" => $hostStartOct4,
@@ -91,4 +91,56 @@ function check_subnet_answer($q, $submitted) {
     }
 
     return ["correct" => $correct, "details" => $details];
+}
+
+// Fetch a single random question from the database and dynamically shuffle options.
+function get_db_question($conn, $gameType) {
+    if (!$conn) return null;
+
+    $stmt = mysqli_prepare($conn, "SELECT * FROM game_questions WHERE game_type = ? ORDER BY RAND() LIMIT 1");
+    if (!$stmt) return null;
+
+    mysqli_stmt_bind_param($stmt, "s", $gameType);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+
+    if (!$row) return null;
+
+    // Map database column choices
+    $optionMap = [
+        "A" => $row["option_a"],
+        "B" => $row["option_b"],
+        "C" => $row["option_c"],
+        "D" => $row["option_d"]
+    ];
+    $correctText = $optionMap[strtoupper($row["correct_option"])] ?? $row["option_a"];
+
+    // Collect choices into an array and shuffle them dynamically
+    $options = [$row["option_a"], $row["option_b"], $row["option_c"], $row["option_d"]];
+    shuffle($options);
+
+    return [
+        "id"            => $row["id"],
+        "prompt"        => $row["question_text"],
+        "options"       => $options,
+        "correct_index" => array_search($correctText, $options),
+        "explanation"   => $row["explanation"] ?? ""
+    ];
+}
+function record_user_question_answer($conn, $userId, $questionId, $isCorrect) {
+    if (!$conn || !$userId || !$questionId) return;
+
+    $correctInc = $isCorrect ? 1 : 0;
+    
+    $stmt = mysqli_prepare($conn, "
+        INSERT INTO user_question_stats (user_id, question_id, times_encountered, times_correct, last_answered_at)
+        VALUES (?, ?, 1, ?, NOW())
+        ON DUPLICATE KEY UPDATE 
+            times_encountered = times_encountered + 1,
+            times_correct = times_correct + ?,
+            last_answered_at = NOW()
+    ");
+    mysqli_stmt_bind_param($stmt, "iiii", $userId, $questionId, $correctInc, $correctInc);
+    mysqli_stmt_execute($stmt);
 }

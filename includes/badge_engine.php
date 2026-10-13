@@ -1,6 +1,5 @@
 <?php
 // includes/badge_engine.php
-// Checks a user's current stats against all badge criteria and awards any newly-earned ones.
 
 function check_and_award_badges($conn, $userId) {
     $stmt = mysqli_prepare($conn, "SELECT level, career_xp, quizzes_completed, current_streak FROM user_progress WHERE user_id = ?");

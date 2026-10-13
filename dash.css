@@ -247,6 +247,14 @@ body {
 .stat-card .value { font-size: 1.3rem; font-weight: bold; }
 .stat-card .label { font-size: 0.75rem; color: var(--text-dim); }
 
+/* ===== Learning Module & Game Tiles ===== */
+.game-tile h3,
+.game-tile h4,
+.game-tile .game-info h3,
+.game-tile .game-info h4 {
+    color: #ffffff !important;
+}
+
 /* ===== Explore & Play ===== */
 .section-title { font-size: 1.1rem; margin: 0 0 1rem; }
 
@@ -269,7 +277,7 @@ body {
     border-radius: var(--radius);
     padding: 1rem;
 }
-.explore-card h4 { margin: 0.6rem 0 0.3rem; font-size: 0.95rem; }
+.explore-card h4 { margin: 0.6rem 0 0.3rem; font-size: 0.95rem; color: #ffffff; }
 .explore-card p { margin: 0 0 0.8rem; font-size: 0.8rem; color: var(--text-dim); min-height: 2.4em; }
 .explore-card a {
     display: inline-block;
@@ -329,8 +337,7 @@ body {
    RESPONSIVE / MOBILE
    ========================================================= */
 
-html,
-body {
+html,body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -373,7 +380,6 @@ body {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
-
 
 /* =========================
    MOBILE
@@ -454,7 +460,6 @@ body {
         display: none;
     }
 
-
     /* -------------------------
        MAIN
        ------------------------- */
@@ -464,7 +469,6 @@ body {
         min-width: 0;
         padding: 1rem;
     }
-
 
     /* -------------------------
        TOP BAR
@@ -496,7 +500,6 @@ body {
         justify-content: flex-start;
     }
 
-
     /* -------------------------
        WELCOME
        ------------------------- */
@@ -511,7 +514,6 @@ body {
         font-size: 0.85rem;
         line-height: 1.5;
     }
-
 
     /* -------------------------
        STAT CARDS
@@ -543,7 +545,6 @@ body {
         font-size: 0.9rem;
     }
 
-
     /* -------------------------
        EXPLORE
        ------------------------- */
@@ -572,7 +573,6 @@ body {
         text-align: center;
     }
 
-
     /* -------------------------
        PRO TIP
        ------------------------- */
@@ -586,7 +586,6 @@ body {
         line-height: 1.5;
     }
 }
-
 
 /* =========================
    SMALL PHONES
@@ -621,12 +620,10 @@ body {
         font-size: 0.7rem;
     }
 
-
     /* Welcome */
     .welcome h2 {
         font-size: 1.2rem;
     }
-
 
     /* Stats */
     .stats-grid {
@@ -653,7 +650,6 @@ body {
         font-size: 0.8rem;
     }
 
-
     /* Explore */
     .explore-panel {
         padding: 0.8rem;
@@ -666,7 +662,6 @@ body {
     .section-title {
         font-size: 1rem;
     }
-
 
     /* Search results */
     .search-results {
@@ -681,7 +676,6 @@ body {
         display: none;
     }
 }
-
 
 /* =========================
    VERY SMALL PHONES

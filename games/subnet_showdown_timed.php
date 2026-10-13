@@ -8,6 +8,7 @@ require "../includes/badge_engine.php";
 require "../includes/daily_challenge.php";
 require "../includes/avatars.php";
 require "../includes/easy_instructions.php";
+require_once "../includes/subnet_engine.php"; // Fixed: Added missing semicolon
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -56,7 +57,14 @@ if (!$showDifficultyScreen) {
             $state["selected"] = $selected;
             $state["answered"] = true;
 
-            if ($selected === $state["question"]["correct_index"]) {
+            $isCorrect = ($selected === $state["question"]["correct_index"]);
+
+            // Record question encounter & accuracy in the database if sourced from DB
+            if (isset($state["question"]["id"]) && $state["question"]["id"] > 0) {
+                record_user_question_answer($conn, $userId, $state["question"]["id"], $isCorrect);
+            }
+
+            if ($isCorrect) {
                 $state["correct"]++;
                 $state["streak"]++;
                 $base = 20 + min($state["streak"] * 2, 20);

@@ -8,6 +8,7 @@ header("Content-Type: application/json");
 require __DIR__ . "/../config.php";
 require __DIR__ . "/xp_engine.php";
 require __DIR__ . "/badge_engine.php";
+require_once __DIR__ . "/subnet_engine.php";
 
 if (!isset($_SESSION["user_id"])) {
     http_response_code(401);
@@ -26,6 +27,17 @@ $wrong    = isset($data["wrong"]) ? (int) $data["wrong"] : 0;
 if ($points < 0) $points = 0;
 if ($correct < 0) $correct = 0;
 if ($wrong < 0) $wrong = 0;
+
+// Log per-question performance into user_question_stats if passed in payload
+if (isset($data["question_answers"]) && is_array($data["question_answers"])) {
+    foreach ($data["question_answers"] as $qa) {
+        $qId = (int) ($qa["question_id"] ?? 0);
+        $isCorr = !empty($qa["is_correct"]);
+        if ($qId > 0) {
+            record_user_question_answer($conn, $userId, $qId, $isCorr);
+        }
+    }
+}
 
 $stmt = mysqli_prepare($conn, "INSERT INTO scores (user_id, match_id, game_type, points, played_at) VALUES (?, NULL, ?, ?, NOW())");
 mysqli_stmt_bind_param($stmt, "isi", $userId, $gameType, $points);

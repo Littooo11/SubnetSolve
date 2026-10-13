@@ -199,7 +199,6 @@ if (!$showDifficultyScreen) {
                 <?php endforeach; ?>
 
                 <input type="hidden" name="selected" id="selectedInput" value="<?= $state["selected"] ?? "" ?>">
-
                 <?php if (!$state["answered"]): ?>
                     <button type="submit" name="submit_answer" value="1" class="btn btn-primary" style="width:100%; margin-top:0.5rem;" id="submitBtn" disabled>Submit Answer</button>
                 <?php else: ?>

@@ -1,36 +1,50 @@
 /* learning.css - explanation cards + practice exercise feedback (loaded alongside dash.css/game.css) */
 
+/* Container to lay out learn-step cards horizontally */
+.learn-step-container {
+ display: flex;
+ flex-direction: row;
+ gap: 1rem;
+ flex-wrap: wrap;
+ margin-bottom: 0.8rem;
+}
+
+.learn-step-container .learn-step {
+ flex: 1 1 200px;
+ margin-bottom: 0;
+}
+
 .learn-step {
-    background: var(--panel-light);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    margin-bottom: 0.8rem;
+ background: var(--panel-light);
+ border: 1px solid var(--border);
+ border-radius: 10px;
+ padding: 1rem 1.2rem;
+ margin-bottom: 0.8rem;
 }
 .learn-step .step-title {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-weight: bold;
-    margin-bottom: 0.4rem;
-    color: var(--blue);
+ display: flex;
+ align-items: center;
+ gap: 0.6rem;
+ font-weight: bold;
+ margin-bottom: 0.4rem;
+ color: var(--blue);
 }
 .learn-step p { margin: 0; font-size: 0.88rem; line-height: 1.6; color: var(--text-dim); }
 .learn-step .formula {
-    display: inline-block;
-    background: rgba(59,130,246,0.12);
-    color: var(--blue);
-    padding: 0.15rem 0.5rem;
-    border-radius: 5px;
-    font-family: "Consolas", monospace;
-    font-size: 0.85rem;
-    margin: 0.3rem 0;
+ display: inline-block;
+ background: rgba(59,130,246,0.12);
+ color: var(--blue);
+ padding: 0.15rem 0.5rem;
+ border-radius: 5px;
+ font-family: "Consolas", monospace;
+ font-size: 0.85rem;
+ margin: 0.3rem 0;
 }
 .learn-step .worked {
-    margin-top: 0.5rem;
-    font-family: "Consolas", monospace;
-    font-size: 0.85rem;
-    color: var(--green);
+ margin-top: 0.5rem;
+ font-family: "Consolas", monospace;
+ font-size: 0.85rem;
+ color: var(--green);
 }
 
 .octet-box.correct { border-color: var(--green) !important; background: rgba(34,197,94,0.12) !important; }
@@ -48,14 +62,27 @@
 .bit-cell .contrib { font-size: 0.72rem; color: var(--green); }
 
 .learn-practice-input {
-    width: 140px;
-    text-align: center;
-    font-size: 1.4rem;
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: #0b1224;
-    color: var(--text);
+ width: 140px;
+ text-align: center;
+ font-size: 1.4rem;
+ padding: 0.6rem;
+ border-radius: 8px;
+ border: 1px solid var(--border);
+ background: #0b1224;
+ color: var(--text);
 }
 .learn-practice-input.correct { border-color: var(--green); background: rgba(34,197,94,0.12); }
 .learn-practice-input.incorrect { border-color: #ef4444; background: rgba(239,68,68,0.12); }
+
+.learn-step-container {
+ display: flex;
+ flex-direction: row;
+ gap: 1rem;
+ flex-wrap: wrap;
+ margin-bottom: 0.8rem;
+}
+
+.learn-step-container .learn-step {
+ flex: 1 1 200px;
+ margin-bottom: 0;
+}

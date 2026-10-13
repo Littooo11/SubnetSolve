@@ -205,8 +205,6 @@ document.getElementById("endBtn").addEventListener("click", async () => {
     document.getElementById("summaryCard").style.display = "block";
 });
 
-// If the player leaves without clicking End Session (Exit, sidebar link, closing the tab),
-// still save whatever they earned so far.
 window.addEventListener("pagehide", () => {
     if (saved || score <= 0) return;
     saved = true;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 11, 2026 at 01:29 PM
+-- Generation Time: Oct 13, 2026 at 08:41 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -56,6 +56,48 @@ INSERT INTO `badges` (`id`, `code`, `name`, `description`, `icon`, `criteria_typ
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `game_questions`
+--
+
+CREATE TABLE `game_questions` (
+  `id` int(11) NOT NULL,
+  `game_type` varchar(50) NOT NULL,
+  `question_text` text NOT NULL,
+  `option_a` varchar(255) NOT NULL,
+  `option_b` varchar(255) NOT NULL,
+  `option_c` varchar(255) NOT NULL,
+  `option_d` varchar(255) NOT NULL,
+  `correct_option` char(1) NOT NULL,
+  `explanation` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `game_questions`
+--
+
+INSERT INTO `game_questions` (`id`, `game_type`, `question_text`, `option_a`, `option_b`, `option_c`, `option_d`, `correct_option`, `explanation`, `created_at`) VALUES
+(1, 'subnet_showdown', 'What is the default subnet mask for a /24 network?', '255.255.0.0', '255.255.255.0', '255.0.0.0', '255.255.255.128', 'B', 'A /24 prefix uses 24 network bits, which equals 255.255.255.0.', '2026-10-13 13:06:23'),
+(2, 'subnet_showdown', 'What is the wildcard mask for a /24 network?', '0.0.255.255', '0.255.255.255', '0.0.0.255', '0.0.0.127', 'C', 'The wildcard mask is the inverse of 255.255.255.0, which is 0.0.0.255.', '2026-10-13 13:06:23'),
+(3, 'subnet_showdown', 'What is the default subnet mask for a /26 network?', '255.255.255.128', '255.255.255.224', '255.255.255.240', '255.255.255.192', 'D', 'A /26 prefix borrows 2 bits in the 4th octet (128 + 64 = 192).', '2026-10-13 13:06:23'),
+(4, 'subnet_showdown', 'What is the wildcard mask for a /26 network?', '0.0.0.63', '0.0.0.31', '0.0.0.127', '0.0.0.15', 'A', 'Block size for /26 is 64, making the wildcard mask 0.0.0.63.', '2026-10-13 13:06:23'),
+(5, 'subnet_showdown', 'How many usable host addresses are available in a /24 network?', '256', '254', '512', '128', 'B', '2^8 - 2 = 254 usable host addresses.', '2026-10-13 13:06:23'),
+(6, 'subnet_showdown', 'How many usable host addresses are available in a /26 network?', '64', '30', '62', '126', 'C', '2^6 - 2 = 62 usable host addresses.', '2026-10-13 13:06:23'),
+(7, 'subnet_showdown', 'How many usable host addresses are available in a /28 network?', '16', '30', '62', '14', 'D', '2^4 - 2 = 14 usable host addresses.', '2026-10-13 13:06:23'),
+(8, 'subnet_showdown', 'What class does the IP address 10.0.0.1 belong to?', 'Class A', 'Class B', 'Class C', 'Class D', 'A', 'Class A range is 1.0.0.0 to 126.255.255.255.', '2026-10-13 13:06:23'),
+(9, 'subnet_showdown', 'What class does the IP address 172.16.0.1 belong to?', 'Class A', 'Class B', 'Class C', 'Class D', 'B', 'Class B range is 128.0.0.0 to 191.255.255.255.', '2026-10-13 13:06:23'),
+(10, 'subnet_showdown', 'What class does the IP address 192.168.1.1 belong to?', 'Class A', 'Class B', 'Class C', 'Class D', 'C', 'Class C range is 192.0.0.0 to 223.255.255.255.', '2026-10-13 13:06:23'),
+(11, 'subnet_showdown', 'What class does the IP address 224.0.0.1 belong to?', 'Class A', 'Class B', 'Class C', 'Class D', 'D', 'Class D (224.0.0.0 to 239.255.255.255) is reserved for multicast.', '2026-10-13 13:06:23'),
+(12, 'scenario_game', 'The IT department needs a subnet that supports at least 50 usable host addresses for their new office. Which subnet mask provides enough addresses with the least waste?', '255.255.255.128', '255.255.255.192', '255.255.255.224', '255.255.255.240', 'B', 'A /26 mask (255.255.255.192) provides 62 usable host IPs, fitting 50 hosts with minimal waste.', '2026-10-13 13:06:23'),
+(13, 'scenario_game', 'The Marketing department needs a subnet supporting at least 100 usable host addresses. Which subnet mask provides enough addresses with the least waste?', '255.255.255.192', '255.255.255.0', '255.255.255.128', '255.255.255.224', 'C', 'A /25 mask (255.255.255.128) provides 126 usable host IPs.', '2026-10-13 13:06:23'),
+(14, 'scenario_game', 'The Finance department has been assigned the subnet 192.168.10.0/26. A technician needs the broadcast address to configure a network-wide alert. Which address should they use?', '192.168.10.0', '192.168.10.1', '192.168.10.62', '192.168.10.63', 'D', 'Block size is 64 (0 to 63). The broadcast address is 192.168.10.63.', '2026-10-13 13:06:23'),
+(15, 'scenario_game', 'A new Sales workstation needs an IP address inside the 192.168.1.0/26 subnet. Which of these addresses can actually be assigned to the workstation?', '192.168.1.25', '192.168.1.0', '192.168.1.63', '192.168.1.64', 'A', 'Usable IPs range from 192.168.1.1 to 192.168.1.62. 192.168.1.25 is valid.', '2026-10-13 13:06:23'),
+(16, 'scenario_game', 'An internal HR file server is configured with the IP address 10.1.5.20. Which statement is true about this server?', 'Directly reachable from the internet (public address)', 'Not directly reachable from the internet (private address)', 'Reserved exclusively for multicast traffic', 'It is a loopback address', 'B', '10.0.0.0/8 is a private IP address block (RFC 1918).', '2026-10-13 13:06:23'),
+(17, 'scenario_game', 'A Public Web Server is configured with the IP address 203.0.113.5. Which statement is true about this server?', 'Not directly reachable from the internet (private address)', 'Used exclusively for internal local broadcasting', 'Directly reachable from the internet (public address)', 'Assigned automatically via APIPA', 'C', '203.0.113.5 is a public IP address.', '2026-10-13 13:06:23');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `matches`
 --
 
@@ -79,6 +121,18 @@ CREATE TABLE `matches` (
   `ended_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `matches`
+--
+
+INSERT INTO `matches` (`id`, `room_code`, `room_name`, `description`, `password_hash`, `game_mode`, `visibility`, `max_players`, `host_user_id`, `status`, `current_question_index`, `current_question_started_at`, `total_questions`, `winner_id`, `created_at`, `started_at`, `ended_at`) VALUES
+(3, 'TRMCE6', '', '', NULL, 'binary', 'public', 2, 37, 'finished', 0, '2026-10-12 00:22:57', 10, 37, '2026-10-12 00:22:51', '2026-10-12 00:22:57', '2026-10-12 00:23:09'),
+(6, '7LC539', '', '', NULL, 'binary', 'public', 2, 37, 'finished', 9, '2026-10-12 00:26:54', 10, 37, '2026-10-12 00:25:38', '2026-10-12 00:25:45', '2026-10-12 00:26:59'),
+(7, 'NNQ7XW', '', '', NULL, 'hex', 'public', 2, 37, 'finished', 0, '2026-10-12 00:27:54', 10, 37, '2026-10-12 00:27:49', '2026-10-12 00:27:54', '2026-10-12 00:27:58'),
+(8, '92V3GM', '', '', NULL, 'binary', 'public', 2, 37, 'finished', 1, '2026-10-12 00:37:37', 10, 37, '2026-10-12 00:33:53', '2026-10-12 00:33:57', '2026-10-12 00:37:40'),
+(9, 'KTMK57', 'qasd', '', NULL, 'binary', 'public', 2, 39, 'finished', 2, '2026-10-12 16:07:41', 10, 39, '2026-10-12 16:05:50', '2026-10-12 16:06:14', '2026-10-12 16:08:15'),
+(10, 'TA4L5R', 'g20', '', '$2y$10$GSLUPN940d82PhiBjFVTLu1ya4tfvf4jvz3nx5FR1IEbXjNBI7ZzK', 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-12 16:11:00', 10, 39, '2026-10-12 16:10:32', '2026-10-12 16:11:00', '2026-10-12 16:11:19');
+
 -- --------------------------------------------------------
 
 --
@@ -97,6 +151,19 @@ CREATE TABLE `match_players` (
   `joined_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `match_players`
+--
+
+INSERT INTO `match_players` (`id`, `match_id`, `user_id`, `score`, `correct_count`, `wrong_count`, `current_answer_index`, `answered_at`, `joined_at`) VALUES
+(3, 3, 37, 0, 0, 0, NULL, NULL, '2026-10-12 00:22:51'),
+(7, 6, 37, 14481, 3, 7, 2, '2026-10-12 00:26:59', '2026-10-12 00:25:38'),
+(8, 6, 2, 9653, 2, 8, 3, '2026-10-12 00:26:57', '2026-10-12 00:25:45'),
+(9, 7, 37, 0, 0, 0, NULL, NULL, '2026-10-12 00:27:49'),
+(11, 8, 37, 0, 0, 1, NULL, NULL, '2026-10-12 00:33:53'),
+(13, 9, 39, 4821, 1, 1, NULL, NULL, '2026-10-12 16:05:50'),
+(15, 10, 39, 0, 0, 0, NULL, NULL, '2026-10-12 16:10:32');
+
 -- --------------------------------------------------------
 
 --
@@ -111,6 +178,72 @@ CREATE TABLE `match_questions` (
   `options_json` text NOT NULL,
   `correct_index` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `match_questions`
+--
+
+INSERT INTO `match_questions` (`id`, `match_id`, `question_index`, `prompt`, `options_json`, `correct_index`) VALUES
+(1, 3, 0, 'Convert decimal 57 to an 8-bit binary string:', '[\"00111001\",\"10000000\",\"01110111\",\"11010011\"]', 0),
+(2, 3, 1, 'Convert decimal 24 to an 8-bit binary string:', '[\"00011010\",\"10001101\",\"01011101\",\"00011000\"]', 3),
+(3, 3, 2, 'Convert decimal 169 to an 8-bit binary string:', '[\"11110110\",\"10101001\",\"01111011\",\"00010011\"]', 1),
+(4, 3, 3, 'Convert decimal 189 to an 8-bit binary string:', '[\"00011110\",\"10101010\",\"10111101\",\"01001000\"]', 2),
+(5, 3, 4, 'Convert decimal 121 to an 8-bit binary string:', '[\"01001000\",\"01111001\",\"01000100\",\"11101110\"]', 1),
+(6, 3, 5, 'Convert decimal 137 to an 8-bit binary string:', '[\"01010111\",\"10001001\",\"00011001\",\"11110110\"]', 1),
+(7, 3, 6, 'Convert decimal 63 to an 8-bit binary string:', '[\"00101001\",\"00000001\",\"01101110\",\"00111111\"]', 3),
+(8, 3, 7, 'Convert decimal 45 to an 8-bit binary string:', '[\"10000011\",\"01111110\",\"11111100\",\"00101101\"]', 3),
+(9, 3, 8, 'Convert decimal 12 to an 8-bit binary string:', '[\"00110110\",\"00101101\",\"00001000\",\"00001100\"]', 3),
+(10, 3, 9, 'Convert decimal 146 to an 8-bit binary string:', '[\"01000010\",\"01110101\",\"10010010\",\"00011110\"]', 2),
+(11, 6, 0, 'Convert decimal 34 to an 8-bit binary string:', '[\"11110001\",\"00100010\",\"11101000\",\"11011001\"]', 1),
+(12, 6, 1, 'Convert decimal 42 to an 8-bit binary string:', '[\"01110010\",\"00101010\",\"00111111\",\"11101100\"]', 1),
+(13, 6, 2, 'Convert decimal 196 to an 8-bit binary string:', '[\"10001000\",\"01011010\",\"11100110\",\"11000100\"]', 3),
+(14, 6, 3, 'Convert decimal 13 to an 8-bit binary string:', '[\"00111001\",\"00001101\",\"11010111\",\"11101111\"]', 1),
+(15, 6, 4, 'Convert decimal 104 to an 8-bit binary string:', '[\"10000000\",\"01101000\",\"00001010\",\"01010001\"]', 1),
+(16, 6, 5, 'Convert decimal 138 to an 8-bit binary string:', '[\"01100010\",\"10001010\",\"01001111\",\"00101000\"]', 1),
+(17, 6, 6, 'Convert decimal 110 to an 8-bit binary string:', '[\"00001100\",\"11010000\",\"01001111\",\"01101110\"]', 3),
+(18, 6, 7, 'Convert decimal 183 to an 8-bit binary string:', '[\"10110111\",\"10011001\",\"01001100\",\"10011111\"]', 0),
+(19, 6, 8, 'Convert decimal 7 to an 8-bit binary string:', '[\"01101111\",\"01000111\",\"10101111\",\"00000111\"]', 3),
+(20, 6, 9, 'Convert decimal 157 to an 8-bit binary string:', '[\"11000001\",\"10011101\",\"01010111\",\"11101110\"]', 1),
+(21, 7, 0, 'Convert decimal 135 to Hexadecimal (8-bit):', '[\"D3\",\"87\",\"28\",\"A3\"]', 1),
+(22, 7, 1, 'Convert decimal 96 to Hexadecimal (8-bit):', '[\"82\",\"5F\",\"60\",\"1E\"]', 2),
+(23, 7, 2, 'Convert decimal 45 to Hexadecimal (8-bit):', '[\"2D\",\"F4\",\"4E\",\"E7\"]', 0),
+(24, 7, 3, 'Convert decimal 118 to Hexadecimal (8-bit):', '[\"76\",\"66\",\"D\",\"FC\"]', 0),
+(25, 7, 4, 'Convert decimal 95 to Hexadecimal (8-bit):', '[\"FB\",\"BA\",\"5F\",\"80\"]', 2),
+(26, 7, 5, 'Convert decimal 27 to Hexadecimal (8-bit):', '[\"15\",\"74\",\"1B\",\"14\"]', 2),
+(27, 7, 6, 'Convert decimal 251 to Hexadecimal (8-bit):', '[\"C\",\"E5\",\"D7\",\"FB\"]', 3),
+(28, 7, 7, 'Convert decimal 172 to Hexadecimal (8-bit):', '[\"A2\",\"AC\",\"65\",\"AE\"]', 1),
+(29, 7, 8, 'Convert decimal 236 to Hexadecimal (8-bit):', '[\"D7\",\"AE\",\"50\",\"EC\"]', 3),
+(30, 7, 9, 'Convert decimal 50 to Hexadecimal (8-bit):', '[\"A7\",\"90\",\"9D\",\"32\"]', 3),
+(31, 8, 0, 'Convert decimal 122 to an 8-bit binary string:', '[\"11011000\",\"11101100\",\"11101011\",\"01111010\"]', 3),
+(32, 8, 1, 'Convert decimal 68 to an 8-bit binary string:', '[\"10101111\",\"00101100\",\"10011111\",\"01000100\"]', 3),
+(33, 8, 2, 'Convert decimal 39 to an 8-bit binary string:', '[\"00100111\",\"01011011\",\"11111011\",\"11111111\"]', 0),
+(34, 8, 3, 'Convert decimal 232 to an 8-bit binary string:', '[\"01011110\",\"00010111\",\"00110011\",\"11101000\"]', 3),
+(35, 8, 4, 'Convert decimal 70 to an 8-bit binary string:', '[\"01001111\",\"11110100\",\"01000110\",\"01001100\"]', 2),
+(36, 8, 5, 'Convert decimal 11 to an 8-bit binary string:', '[\"00101001\",\"00110110\",\"00001011\",\"00010101\"]', 2),
+(37, 8, 6, 'Convert decimal 122 to an 8-bit binary string:', '[\"01111010\",\"01110111\",\"00001000\",\"00101100\"]', 0),
+(38, 8, 7, 'Convert decimal 29 to an 8-bit binary string:', '[\"11000111\",\"01010011\",\"00011101\",\"00101001\"]', 2),
+(39, 8, 8, 'Convert decimal 37 to an 8-bit binary string:', '[\"00100101\",\"01110101\",\"01110100\",\"01010101\"]', 0),
+(40, 8, 9, 'Convert decimal 89 to an 8-bit binary string:', '[\"00011110\",\"11010000\",\"01011001\",\"01110101\"]', 2),
+(41, 9, 0, 'Convert decimal 135 to an 8-bit binary string:', '[\"10000111\",\"10011111\",\"11101000\",\"01010110\"]', 0),
+(42, 9, 1, 'Convert decimal 191 to an 8-bit binary string:', '[\"10111111\",\"01110000\",\"11111111\",\"11001001\"]', 0),
+(43, 9, 2, 'Convert decimal 205 to an 8-bit binary string:', '[\"11010001\",\"00110111\",\"11001101\",\"10001111\"]', 2),
+(44, 9, 3, 'Convert decimal 58 to an 8-bit binary string:', '[\"10100110\",\"11111101\",\"00111010\",\"11010011\"]', 2),
+(45, 9, 4, 'Convert decimal 199 to an 8-bit binary string:', '[\"10101110\",\"01110000\",\"11111100\",\"11000111\"]', 3),
+(46, 9, 5, 'Convert decimal 33 to an 8-bit binary string:', '[\"00010000\",\"00100001\",\"10101001\",\"00111010\"]', 1),
+(47, 9, 6, 'Convert decimal 166 to an 8-bit binary string:', '[\"01111010\",\"00010101\",\"11000101\",\"10100110\"]', 3),
+(48, 9, 7, 'Convert decimal 35 to an 8-bit binary string:', '[\"00100011\",\"11111011\",\"00000111\",\"01110110\"]', 0),
+(49, 9, 8, 'Convert decimal 208 to an 8-bit binary string:', '[\"01011101\",\"11010010\",\"11010000\",\"11000101\"]', 2),
+(50, 9, 9, 'Convert decimal 100 to an 8-bit binary string:', '[\"01000111\",\"01111100\",\"10011010\",\"01100100\"]', 3),
+(51, 10, 0, 'What is the wildcard mask for a /30 network?', '[\"0.0.0.31\",\"0.0.0.7\",\"0.0.0.15\",\"0.0.0.3\"]', 3),
+(52, 10, 1, 'What is the last usable host address for the IP address 192.168.45.182/27?', '[\"192.168.45.161\",\"192.168.45.190\",\"192.168.45.160\",\"192.168.45.191\"]', 1),
+(53, 10, 2, 'What is the last usable host address for the IP address 192.168.219.149/26?', '[\"192.168.219.191\",\"192.168.219.129\",\"192.168.219.128\",\"192.168.219.190\"]', 3),
+(54, 10, 3, 'What is the network address for the IP address 192.168.34.160/28?', '[\"192.168.34.175\",\"192.168.34.160\",\"192.168.34.161\",\"192.168.34.174\"]', 1),
+(55, 10, 4, 'Which of the following is a private IP address?', '[\"43.176.77.101\",\"44.90.208.121\",\"192.168.252.240\",\"144.109.253.16\"]', 2),
+(56, 10, 5, 'What is the wildcard mask for a /30 network?', '[\"0.0.0.31\",\"0.0.0.3\",\"0.0.0.255\",\"0.0.0.15\"]', 1),
+(57, 10, 6, 'What is the subnet mask for a /28 network?', '[\"255.255.255.248\",\"255.255.255.192\",\"255.255.255.224\",\"255.255.255.240\"]', 3),
+(58, 10, 7, 'What is the broadcast address for the IP address 192.168.179.198/27?', '[\"192.168.179.223\",\"192.168.179.222\",\"192.168.179.193\",\"192.168.179.192\"]', 0),
+(59, 10, 8, 'Which of the following is a private IP address?', '[\"198.243.104.233\",\"15.206.143.168\",\"145.236.99.60\",\"172.17.158.151\"]', 3),
+(60, 10, 9, 'What is the subnet mask for a /30 network?', '[\"255.255.255.252\",\"255.255.255.240\",\"255.255.255.128\",\"255.255.255.224\"]', 0);
 
 -- --------------------------------------------------------
 
@@ -147,7 +280,8 @@ INSERT INTO `remember_tokens` (`id`, `user_id`, `token`, `expires_at`) VALUES
 (1, 4, '93d83fdce85cede763ef0784b4a73ad833f0f4f7df385aa0b1209e3fe1a87c9e', '2026-10-28 08:18:34'),
 (2, 5, '6af8086bb23527c3f7f4c59247d8691a8dbe80ae37723c87a2f04fc51f84180d', '2026-11-05 10:17:13'),
 (3, 5, '41545392b1ee5ce4ae20fe64fd5017e5d3afdb9527dd2681abaa294ae9d7132a', '2026-11-05 11:49:04'),
-(4, 5, 'a4e5605f5831ae1fb68026dfc729ce2e1ec4697586886aa731d37231c3fd2e21', '2026-11-10 06:42:06');
+(4, 5, 'a4e5605f5831ae1fb68026dfc729ce2e1ec4697586886aa731d37231c3fd2e21', '2026-11-10 06:42:06'),
+(5, 36, 'f6ed08a45d715c57791571a9eb4faf4d7bf8077efc759d25de7f07d32730ce3d', '2026-11-10 16:04:32');
 
 -- --------------------------------------------------------
 
@@ -408,7 +542,22 @@ INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `playe
 (360, 35, NULL, 'subnet_dissect_practice', 190, '2026-10-07 21:35:50', 0),
 (361, 35, NULL, 'binary_practice', 190, '2026-10-07 21:36:50', 0),
 (362, 35, NULL, 'showdown_practice', 190, '2026-10-07 21:37:50', 0),
-(370, 2, NULL, 'ipv6_practice', 90, '2026-10-11 17:39:13', 0);
+(370, 2, NULL, 'ipv6_practice', 90, '2026-10-11 17:39:13', 0),
+(371, 2, NULL, 'showdown_timed', 144, '2026-10-12 00:08:44', 6),
+(372, 37, 3, 'multiplayer_match', 0, '2026-10-12 00:23:09', 0),
+(373, 37, 6, 'multiplayer_match', 14481, '2026-10-12 00:26:59', 0),
+(374, 2, 6, 'multiplayer_match', 9653, '2026-10-12 00:26:59', 0),
+(375, 37, 7, 'multiplayer_match', 0, '2026-10-12 00:27:58', 0),
+(376, 37, 8, 'multiplayer_match', 0, '2026-10-12 00:37:40', 0),
+(377, 39, 9, 'multiplayer_match', 4821, '2026-10-12 16:08:15', 0),
+(378, 39, 10, 'multiplayer_match', 0, '2026-10-12 16:11:19', 0),
+(379, 39, NULL, 'binary_practice', 90, '2026-10-12 16:27:48', 0),
+(380, 39, NULL, 'hex_practice', 40, '2026-10-12 16:31:34', 0),
+(381, 2, NULL, 'showdown_timed', 146, '2026-10-13 13:22:02', 6),
+(382, 2, NULL, 'showdown_timed', 0, '2026-10-13 13:24:08', 0),
+(383, 2, NULL, 'scenario_timed', 99, '2026-10-13 13:58:21', 3),
+(384, 2, NULL, 'showdown_timed', 68, '2026-10-13 14:02:02', 3),
+(385, 2, NULL, 'showdown_timed', 100, '2026-10-13 14:32:14', 4);
 
 -- --------------------------------------------------------
 
@@ -465,7 +614,12 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar`, `is_admin`
 (32, 'Sam Ting Wong', 'samting@gmail.com', '$2y$10$5k/KYJb9xCCy7eTt88dbdezBXtcdPfTLU2fBg6geBD5QykNe1PxmG', 'fox', 0, '2026-10-07 21:13:27'),
 (33, 'Dominguez', 'minguez05@gmail.com', '$2y$10$Li2.9yPYab9faiN7AFLjMuRDi2V29XyQUdxgl7sInGuUMQT1exE76', 'fox', 0, '2026-10-07 21:18:04'),
 (34, 'Mark', 'markmywords18@gmail.com', '$2y$10$YQXZzdTsBn3L9q/mk1IW1Of9fG4rsURXOFAtxpbjaxHAaUoOcxHla', 'fox', 0, '2026-10-07 21:22:41'),
-(35, 'Noah Idea', 'noahidea06@gmail.com', '$2y$10$g/BXKcCbysf2/jQ1I2NdnON3.nv40ilxfcroFRyqrLJeYjtvBtAGe', 'fox', 0, '2026-10-07 21:27:19');
+(35, 'Noah Idea', 'noahidea06@gmail.com', '$2y$10$g/BXKcCbysf2/jQ1I2NdnON3.nv40ilxfcroFRyqrLJeYjtvBtAGe', 'fox', 0, '2026-10-07 21:27:19'),
+(36, '000999', 'revenraintrinidad@gmail.com', '$2y$10$atLXwZqtADm9zh7p3og3Xu/2o8roURfYq3Ozsj8XbvH5lmCWd3zFy', 'fox', 0, '2026-10-11 22:04:10'),
+(37, 'ggg', 'ss.s@gm.com', '$2y$10$/8JdIVdS95rjjkklfqsG/.kuX18fS3F3aq2MhCiYz4poHiUM4c1T.', 'fox', 0, '2026-10-11 23:02:25'),
+(38, 'asdasds', 'asdasd@fa', '$2y$10$1nWW5u5HyurZmlnGBr/NE.C.NLGlchHglFJXYJXRpXNuM6iMbzJh2', 'fox', 0, '2026-10-11 23:05:52'),
+(39, 'Group20', 'g20@gmail.com', '$2y$10$Kvl2oO.5CuNguKFCrBFb1ewQsdTyAa5ZUZ5Gak3PLJUn1xQWAmM7e', 'fox', 0, '2026-10-12 15:52:53'),
+(40, 'asddasd', 'ddd@dd', '$2y$10$Ko9HiIuggBCDnuiK87L1DOBSuZCPVI8W5rrUhicVeyrEzlrtpPqKm', 'fox', 0, '2026-10-13 11:49:12');
 
 -- --------------------------------------------------------
 
@@ -486,7 +640,42 @@ CREATE TABLE `user_badges` (
 
 INSERT INTO `user_badges` (`id`, `user_id`, `badge_id`, `earned_at`) VALUES
 (1, 2, 1, '2026-09-26 22:44:08'),
-(2, 9, 1, '2026-10-10 21:50:50');
+(2, 9, 1, '2026-10-10 21:50:50'),
+(3, 37, 1, '2026-10-12 00:23:09'),
+(4, 37, 4, '2026-10-12 00:26:59'),
+(5, 37, 5, '2026-10-12 00:26:59'),
+(6, 37, 9, '2026-10-12 00:26:59'),
+(7, 2, 4, '2026-10-12 00:26:59'),
+(8, 2, 9, '2026-10-12 00:26:59'),
+(9, 39, 1, '2026-10-12 16:08:15'),
+(10, 39, 4, '2026-10-12 16:08:15'),
+(11, 2, 2, '2026-10-13 14:02:02');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_module_progress`
+--
+
+CREATE TABLE `user_module_progress` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `module_key` varchar(50) NOT NULL,
+  `completed_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_module_progress`
+--
+
+INSERT INTO `user_module_progress` (`id`, `user_id`, `module_key`, `completed_at`) VALUES
+(1, 2, 'binary_game', '2026-10-11 20:02:36'),
+(5, 2, 'dissect_ip', '2026-10-11 20:28:06'),
+(6, 2, 'hex_conversion', '2026-10-11 20:30:52'),
+(7, 2, 'ipv6_game', '2026-10-11 20:33:18'),
+(8, 2, 'subnet_showdown', '2026-10-11 20:34:24'),
+(9, 39, 'binary_game', '2026-10-12 15:57:20'),
+(12, 40, 'binary_game', '2026-10-13 11:49:29');
 
 -- --------------------------------------------------------
 
@@ -515,7 +704,7 @@ CREATE TABLE `user_progress` (
 
 INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`, `last_daily_challenge_date`) VALUES
 (1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
-(2, 2, 444, 44, 605, 0, 4, 11, 19, 0, NULL, NULL),
+(2, 9, 10754, 1597, 2139, 5, 11, 35, 62, 0, NULL, '2026-10-13'),
 (3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (5, 8, 8830, 1485, 1912, 0, 13, 0, 0, 0, NULL, NULL),
@@ -535,20 +724,40 @@ INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to
 (19, 1, 1120, 0, 500, 0, 6, 0, 0, 0, NULL, NULL),
 (20, 1, 2650, 0, 500, 0, 14, 0, 0, 0, NULL, NULL),
 (21, 1, 840, 0, 500, 0, 4, 0, 0, 0, NULL, NULL),
-(22, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(23, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(24, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(25, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(26, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(27, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(28, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(29, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(30, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(31, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(32, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(33, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(34, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(35, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL);
+(22, 1, 1450, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(23, 1, 920, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(24, 1, 2680, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(25, 1, 1170, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(26, 1, 2350, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(27, 1, 680, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(28, 1, 1980, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(29, 1, 1260, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(30, 1, 2880, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(31, 1, 890, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(32, 1, 1740, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(33, 1, 1050, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(34, 1, 2250, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(35, 1, 760, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(36, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(37, 11, 14481, 717, 2599, 0, 4, 3, 8, 0, NULL, NULL),
+(38, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(39, 6, 4951, 758, 1465, 1, 4, 1, 1, 0, NULL, NULL),
+(40, 1, 0, 0, 500, 1, 0, 0, 0, 0, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_question_stats`
+--
+
+CREATE TABLE `user_question_stats` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `question_id` int(11) NOT NULL,
+  `times_encountered` int(11) DEFAULT 1,
+  `times_correct` int(11) DEFAULT 0,
+  `last_answered_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -560,6 +769,12 @@ INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to
 ALTER TABLE `badges`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indexes for table `game_questions`
+--
+ALTER TABLE `game_questions`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `matches`
@@ -622,10 +837,25 @@ ALTER TABLE `user_badges`
   ADD KEY `badge_id` (`badge_id`);
 
 --
+-- Indexes for table `user_module_progress`
+--
+ALTER TABLE `user_module_progress`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_module` (`user_id`,`module_key`);
+
+--
 -- Indexes for table `user_progress`
 --
 ALTER TABLE `user_progress`
   ADD PRIMARY KEY (`user_id`);
+
+--
+-- Indexes for table `user_question_stats`
+--
+ALTER TABLE `user_question_stats`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_question` (`user_id`,`question_id`),
+  ADD KEY `question_id` (`question_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -638,22 +868,28 @@ ALTER TABLE `badges`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `game_questions`
+--
+ALTER TABLE `game_questions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `match_players`
 --
 ALTER TABLE `match_players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `match_questions`
 --
 ALTER TABLE `match_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `questions`
@@ -665,25 +901,37 @@ ALTER TABLE `questions`
 -- AUTO_INCREMENT for table `remember_tokens`
 --
 ALTER TABLE `remember_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=371;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=386;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `user_badges`
 --
 ALTER TABLE `user_badges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `user_module_progress`
+--
+ALTER TABLE `user_module_progress`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `user_question_stats`
+--
+ALTER TABLE `user_question_stats`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -730,10 +978,23 @@ ALTER TABLE `user_badges`
   ADD CONSTRAINT `user_badges_ibfk_2` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`);
 
 --
+-- Constraints for table `user_module_progress`
+--
+ALTER TABLE `user_module_progress`
+  ADD CONSTRAINT `user_module_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `user_progress`
 --
 ALTER TABLE `user_progress`
   ADD CONSTRAINT `user_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `user_question_stats`
+--
+ALTER TABLE `user_question_stats`
+  ADD CONSTRAINT `user_question_stats_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `user_question_stats_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `game_questions` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

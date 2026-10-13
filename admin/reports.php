@@ -44,9 +44,9 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <a href="users.php" class="admin-nav-link active">👥 User Management</a>
         <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
         <a href="reports.php" class="admin-nav-link">📊 Reports</a>
+        <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
         <div class="admin-nav-label">ACCOUNT</div>
-        <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
-        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
+        <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
     </aside>
 

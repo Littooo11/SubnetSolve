@@ -14,12 +14,15 @@ $errors = [];
 $success = "";
 
 function load_user($conn, $userId) {
-    $stmt = mysqli_prepare($conn, "SELECT username, email, avatar, created_at FROM users WHERE id = ?");
+    $stmt = mysqli_prepare($conn, "SELECT username, email, avatar, is_admin, created_at FROM users WHERE id = ?");
     mysqli_stmt_bind_param($stmt, "i", $userId);
     mysqli_stmt_execute($stmt);
     return mysqli_stmt_get_result($stmt)->fetch_assoc();
 }
 $user = load_user($conn, $userId);
+
+$roleLabel = !empty($user["is_admin"]) ? "Admin" : "Student";
+$roleClass = !empty($user["is_admin"]) ? "in_progress" : "waiting";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $newUsername = trim($_POST["username"] ?? "");
@@ -74,6 +77,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["username"] = $newUsername;
         $success = "Profile updated successfully.";
         $user = load_user($conn, $userId);
+        $roleLabel = !empty($user["is_admin"]) ? "Admin" : "Student";
+        $roleClass = !empty($user["is_admin"]) ? "in_progress" : "waiting";
     }
 }
 
@@ -136,6 +141,9 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
         <a href="profile.php" class="nav-link active">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
         <a href="about.php" class="nav-link">About Us</a>
+        <?php if (!empty($user["is_admin"])): ?>
+            <a href="admin/dashboard.php" class="nav-link" style="color:var(--orange);">🛠 Admin Panel</a>
+        <?php endif; ?>
     </aside>
 
     <main class="main">
@@ -157,7 +165,7 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
                 <div>
                     <div class="name-row">
                         <h2><?= htmlspecialchars($user["username"]) ?></h2>
-                        <span class="role-tag">Student</span>
+                        <span class="role-tag <?= $roleClass ?>"><?= htmlspecialchars($roleLabel) ?></span>
                     </div>
                     <div class="email"><?= htmlspecialchars($user["email"]) ?></div>
                     <div class="member-since">Member since: <?= date("M j, Y", strtotime($user["created_at"])) ?></div>
@@ -219,7 +227,7 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
             <h4>👤 Profile Information</h4>
             <div class="stat-line"><span>Username</span><span><?= htmlspecialchars($user["username"]) ?></span></div>
             <div class="stat-line"><span>Email</span><span><?= htmlspecialchars($user["email"]) ?></span></div>
-            <div class="stat-line"><span>Role</span><span>Student</span></div>
+            <div class="stat-line"><span>Role</span><span><?= htmlspecialchars($roleLabel) ?></span></div>
             <button class="btn btn-primary" id="editToggleBtn2" type="button" style="width:100%; margin-top:0.5rem;">Edit Profile</button>
         </div>
 
@@ -291,9 +299,7 @@ document.getElementById("editToggleBtn2").addEventListener("click", openModal);
 document.getElementById("closeModalBtn").addEventListener("click", closeModal);
 modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
-<?php if (!empty($errors)): ?>
-openModal();
-<?php endif; ?>
+<?php if (!empty($errors)): ?>openModal();<?php endif; ?>
 
 document.querySelectorAll(".avatar-option").forEach(opt => {
     opt.addEventListener("click", () => {

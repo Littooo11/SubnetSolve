@@ -43,8 +43,6 @@ if ($needsNewSession) {
     }
 }
 
-// Builds the attributes for one answer box: blank + required while answering,
-// then locked, pre-filled with what was typed, and colored green/red after submitting.
 function fld($name, $feedback, $submitted) {
     if ($feedback) {
         $val = htmlspecialchars((string) ($submitted[$name] ?? ""));

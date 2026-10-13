@@ -9,10 +9,68 @@ function pct_change($current, $previous) {
     if ($previous == 0) return $current > 0 ? 100 : 0;
     return round((($current - $previous) / $previous) * 100);
 }
+
 function scalar($conn, $sql) {
     $r = mysqli_query($conn, $sql);
     $row = mysqli_fetch_row($r);
     return $row ? (float) $row[0] : 0;
+}
+
+// ===== Helper Function for User Growth Data =====
+function get_user_growth_dataset($conn, $growthRange) {
+    $growthLabels = [];
+    $growthData = [];
+    $anchorDate = "2026-09-26";
+
+    switch ($growthRange) {
+        case "3_days":
+            $numDays = 3;
+            break;
+        case "30_days":
+            $numDays = 30;
+            break;
+        case "3_months":
+            $numDays = 90;
+            break;
+        case "6_months":
+            $numDays = 180;
+            break;
+        case "1_year":
+            $numDays = 365;
+            break;
+        case "all_time":
+            $start = new DateTime($anchorDate);
+            $today = new DateTime();
+            $numDays = max(1, $today->diff($start)->days + 1);
+            break;
+        case "7_days":
+        default:
+            $numDays = 7;
+            break;
+    }
+
+    for ($i = $numDays - 1; $i >= 0; $i--) {
+        $day = date("Y-m-d", strtotime("-$i days"));
+        
+        // Do not include dates prior to September 26, 2026
+        if ($day < $anchorDate) {
+            continue;
+        }
+
+        $count = scalar($conn, "SELECT COUNT(*) FROM users WHERE DATE(created_at) = '$day'");
+        $growthLabels[] = date("M j", strtotime($day));
+        $growthData[] = (int) $count;
+    }
+
+    return ["labels" => $growthLabels, "data" => $growthData];
+}
+
+// ===== AJAX Handler for User Growth Chart Switch =====
+if (isset($_GET["ajax_growth"])) {
+    header("Content-Type: application/json");
+    $range = $_GET["growth_range"] ?? "7_days";
+    echo json_encode(get_user_growth_dataset($conn, $range));
+    exit();
 }
 
 // ===== Stat cards (each compares the metric now vs the same metric 7 days ago) =====
@@ -36,24 +94,58 @@ $avgScore = scalar($conn, "SELECT AVG(points) FROM scores");
 $avgScoreWk = scalar($conn, "SELECT AVG(points) FROM scores WHERE played_at <= NOW() - INTERVAL 7 DAY");
 $avgDelta = pct_change($avgScore, $avgScoreWk);
 
-// ===== User Growth (registrations per day, last 7 days) =====
-$growthLabels = [];
-$growthData = [];
-for ($i = 6; $i >= 0; $i--) {
-    $day = date("Y-m-d", strtotime("-$i days"));
-    $count = scalar($conn, "SELECT COUNT(*) FROM users WHERE DATE(created_at) = '$day'");
-    $growthLabels[] = date("M j", strtotime($day));
-    $growthData[] = (int) $count;
-}
+// Initial User Growth Load (Last 7 Days by default)
+$initialGrowth = get_user_growth_dataset($conn, "7_days");
+$growthLabels = $initialGrowth["labels"];
+$growthData = $initialGrowth["data"];
 
-// ===== Game Category Popularity =====
 $categoryMap = [
-    "subnet_dissect_practice" => "Dissect an IP", "subnet_dissect_timed" => "Dissect an IP",
-    "binary_practice" => "Binary Game", "binary_game" => "Binary Game",
-    "showdown_practice" => "Subnet Showdown", "showdown_timed" => "Subnet Showdown",
-    "multiplayer_1v1" => "Multiplayer 1v1",
+    // Dissect an IP Address
+    "subnet_dissect_practice" => "Dissect an IP",
+    "subnet_dissect_timed"    => "Dissect an IP",
+
+    // Binary Game
+    "binary_practice"         => "Binary Game",
+    "binary_game"             => "Binary Game",
+    "binary_timed"            => "Binary Game",
+
+    // Hex Conversion
+    "hex_practice"            => "Hex Conversion",
+    "hex_game"                => "Hex Conversion",
+    "hex_timed"               => "Hex Conversion",
+
+    // IPv6 Game
+    "ipv6_practice"           => "IPv6 Game",
+    "ipv6_game"               => "IPv6 Game",
+    "ipv6_timed"              => "IPv6 Game",
+
+    // Subnet Showdown
+    "showdown_practice"       => "Subnet Showdown",
+    "showdown_timed"          => "Subnet Showdown",
+    "subnet_showdown"         => "Subnet Showdown",
+
+    // Scenario-Based Questions
+    "scenario_practice"       => "Scenario Game",
+    "scenario_game"           => "Scenario Game",
+    "scenario_timed"          => "Scenario Game",
+
+    // Multiplayer
+    "multiplayer_1v1"         => "Multiplayer 1v1",
+    "match_1v1"               => "Multiplayer 1v1",
 ];
-$categoryColors = ["Dissect an IP" => "#3b82f6", "Binary Game" => "#22c55e", "Subnet Showdown" => "#f59e0b", "Multiplayer 1v1" => "#8b5cf6", "Other" => "#64748b"];
+
+$categoryColors = [
+    "Dissect an IP"   => "#3b82f6",
+    "Binary Game"     => "#22c55e",
+    "Hex Conversion"  => "#ec4899",
+    "IPv6 Game"       => "#14b8a6",
+    "Subnet Showdown" => "#f59e0b",
+    "Scenario Game"   => "#06b6d4",
+    "Multiplayer 1v1" => "#8b5cf6",
+];
+
+
+$categoryColors = ["Dissect an IP" => "#3b82f6", "Binary Game" => "#22c55e", "Hex Conversion" => "#ec4899", "IPv6 Game" => "#f43b1e", "Subnet Showdown" => "#f59e0b", "Scenario Game" => "#048645", "Multiplayer 1v1" => "#8b5cf6", "Other" => "#64748b"];
 $rawCounts = [];
 $typeResult = mysqli_query($conn, "SELECT game_type, COUNT(*) AS c FROM scores GROUP BY game_type");
 while ($row = mysqli_fetch_assoc($typeResult)) {
@@ -63,7 +155,6 @@ while ($row = mysqli_fetch_assoc($typeResult)) {
 arsort($rawCounts);
 $categoryTotal = array_sum($rawCounts) ?: 1;
 
-// ===== Recent Activity (merged from several tables) =====
 $activity = [];
 $r = mysqli_query($conn, "SELECT username, created_at AS ts FROM users ORDER BY created_at DESC LIMIT 5");
 while ($row = mysqli_fetch_assoc($r)) $activity[] = ["ts" => $row["ts"], "icon" => "👤", "color" => "blue", "text" => "New user registered: " . $row["username"]];
@@ -83,12 +174,10 @@ while ($row = mysqli_fetch_assoc($r)) $activity[] = ["ts" => $row["ts"], "icon" 
 usort($activity, fn($a, $b) => strtotime($b["ts"]) - strtotime($a["ts"]));
 $activity = array_slice($activity, 0, 7);
 
-// ===== Top Performers =====
 $topPerformers = mysqli_fetch_all(mysqli_query($conn, "SELECT u.username, u.avatar, up.career_xp, up.quizzes_completed, up.total_correct, up.total_wrong
     FROM user_progress up JOIN users u ON u.id = up.user_id
     ORDER BY up.career_xp DESC LIMIT 5"), MYSQLI_ASSOC);
 
-// ===== Most Played Games =====
 $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", "#22c55e"], "Subnet Showdown" => ["🎯", "#f59e0b"], "Multiplayer 1v1" => ["⚔️", "#8b5cf6"], "Other" => ["🎮", "#64748b"]];
 ?>
 <!DOCTYPE html>
@@ -102,7 +191,8 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
-<div class="admin-layout">
+<div class="admin-layout
+```">
     <aside class="admin-sidebar">
         <div class="brand" style="margin-bottom:1.5rem;">
             <div class="logo">S</div>
@@ -115,12 +205,11 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link active">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link">👥 User Management</a>
-        <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
-        <a href="reports.php" class="admin-nav-link">📊 Reports</a>
+        <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
+        <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
 
         <div class="admin-nav-label">ACCOUNT</div>
-        <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
-        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
+        <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
 
         <div class="admin-sidebar-footer">
@@ -181,9 +270,17 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
 
         <div class="admin-panels-row">
             <div class="admin-panel">
-                <div class="admin-panel-header">
-                    <h3>👥 User Growth</h3>
-                    <span class="admin-select">Last 7 Days</span>
+                <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;">👥 User Growth</h3>
+                    <select id="growthRangeSelect" class="admin-select" style="padding:0.2rem 0.5rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; cursor:pointer;">
+                        <option value="3_days">Last 3 Days</option>
+                        <option value="7_days" selected>Last 7 Days</option>
+                        <option value="30_days">Last 30 Days (1 Month)</option>
+                        <option value="3_months">Last 3 Months</option>
+                        <option value="6_months">Last 6 Months</option>
+                        <option value="1_year">Last 1 Year</option>
+                        <option value="all_time">All Time (Since Sep 26, 2026)</option>
+                    </select>
                 </div>
                 <canvas id="growthChart" height="180"></canvas>
             </div>
@@ -293,7 +390,9 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
 </div>
 
 <script>
-new Chart(document.getElementById("growthChart"), {
+// Initialize Chart instance
+const growthChartCtx = document.getElementById("growthChart").getContext("2d");
+let growthChart = new Chart(growthChartCtx, {
     type: "line",
     data: {
         labels: <?= json_encode($growthLabels) ?>,
@@ -310,9 +409,23 @@ new Chart(document.getElementById("growthChart"), {
         plugins: { legend: { display: false } },
         scales: {
             x: { ticks: { color: "#8b93ab" }, grid: { color: "#23304f" } },
-            y: { ticks: { color: "#8b93ab" }, grid: { color: "#23304f" }, beginAtZero: true }
+            y: { ticks: { color: "#8b93ab", precision: 0 }, grid: { color: "#23304f" }, beginAtZero: true }
         }
     }
+});
+
+// Dynamic Update via AJAX (no full page reload)
+document.getElementById("growthRangeSelect").addEventListener("change", function() {
+    const selectedRange = this.value;
+    
+    fetch(`dashboard.php?ajax_growth=1&growth_range=${selectedRange}`)
+        .then(response => response.json())
+        .then(data => {
+            growthChart.data.labels = data.labels;
+            growthChart.data.datasets[0].data = data.data;
+            growthChart.update();
+        })
+        .catch(error => console.error("Error updating growth chart:", error));
 });
 
 new Chart(document.getElementById("categoryChart"), {

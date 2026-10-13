@@ -15,7 +15,6 @@
     color: var(--text-dim);
     margin-bottom: 1rem;
 }
-
 .breadcrumb b { color: var(--text); }
 
 .game-card {
@@ -41,7 +40,6 @@
     margin: 0 0 0.3rem;
     font-size: 1.3rem;
 }
-
 .game-card h2 .ip { color: var(--blue); }
 
 .game-card .sub {
@@ -142,7 +140,6 @@
     border-radius: 8px;
     font-size: 0.88rem;
 }
-
 .feedback-correct { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
 .feedback-wrong { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
 
@@ -175,7 +172,6 @@
     font-size: 0.85rem;
     margin-bottom: 0.5rem;
 }
-
 .stat-line .good { color: var(--green); }
 .stat-line .bad { color: #f87171; }
 .stat-line .xp { color: var(--gold); }
@@ -237,7 +233,6 @@
     font-size: 0.95rem;
     margin-bottom: 1rem;
 }
-
 .binary-feedback.good { color: var(--green); }
 .binary-feedback.bad { color: #f87171; }
 
@@ -270,7 +265,6 @@
     color: var(--green);
     text-align: center;
 }
-
 .big-timer.low { color: #f87171; }
 
 /* Leaderboard */
@@ -735,7 +729,7 @@
 .difficulty-card.medium h4 { color: var(--gold); }
 .difficulty-card.hard h4 { color: #f87171; }
 
-/* Games hub */
+/* Games hub & Learning Module Hub */
 .games-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -749,7 +743,14 @@
     padding: 1.3rem;
 }
 
-.game-tile h3 { margin: 0.6rem 0 0.3rem; }
+/* White Title Headings for Learning Modules & Game Cards */
+.game-tile h3,
+.game-tile h4,
+.game-tile .game-info h3,
+.game-tile .game-info h4 {
+    color: #ffffff !important;
+}
+
 .game-tile p { color: var(--text-dim); font-size: 0.85rem; margin: 0 0 1rem; }
 .game-tile a {
     display: inline-block;
@@ -767,8 +768,7 @@
    GAMES PAGE - MOBILE RESPONSIVE
    ========================================= */
 
-html,
-body {
+html,body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -789,9 +789,7 @@ body {
         min-width: 0;
         padding: 1.25rem;
     }
-
 }
-
 
 /* =========================================
    MOBILE
@@ -914,9 +912,7 @@ body {
         font-size: 0.9rem;
         border-radius: 8px;
     }
-
 }
-
 
 /* =========================================
    SMALL PHONES
@@ -989,9 +985,7 @@ body {
         padding: 0.65rem;
         font-size: 0.85rem;
     }
-
 }
-
 
 /* =========================================
    VERY SMALL PHONES
@@ -1019,5 +1013,4 @@ body {
     .game-tile p {
         font-size: 0.78rem;
     }
-
 }

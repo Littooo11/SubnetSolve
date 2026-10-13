@@ -30,9 +30,15 @@ if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
     }
 }
 
-// kick out anyone who isn't logged in
+// Kick out anyone who isn't logged in
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
+    exit();
+}
+
+// Redirect admins directly to the Admin Panel
+if (!empty($_SESSION["is_admin"])) {
+    header("Location: admin/dashboard.php");
     exit();
 }
 
