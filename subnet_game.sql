@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2026 at 08:41 AM
+-- Generation Time: Oct 13, 2026 at 03:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -557,7 +557,11 @@ INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `playe
 (382, 2, NULL, 'showdown_timed', 0, '2026-10-13 13:24:08', 0),
 (383, 2, NULL, 'scenario_timed', 99, '2026-10-13 13:58:21', 3),
 (384, 2, NULL, 'showdown_timed', 68, '2026-10-13 14:02:02', 3),
-(385, 2, NULL, 'showdown_timed', 100, '2026-10-13 14:32:14', 4);
+(385, 2, NULL, 'showdown_timed', 100, '2026-10-13 14:32:14', 4),
+(386, 2, NULL, 'showdown_timed', 152, '2026-10-13 17:46:06', 6),
+(387, 2, NULL, 'showdown_timed', 94, '2026-10-13 18:38:18', 4),
+(388, 2, NULL, 'scenario_timed', 68, '2026-10-13 18:40:33', 3),
+(389, 2, NULL, 'scenario_timed', 44, '2026-10-13 18:44:21', 2);
 
 -- --------------------------------------------------------
 
@@ -704,7 +708,7 @@ CREATE TABLE `user_progress` (
 
 INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`, `last_daily_challenge_date`) VALUES
 (1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
-(2, 9, 10754, 1597, 2139, 5, 11, 35, 62, 0, NULL, '2026-10-13'),
+(2, 9, 11112, 1955, 2139, 5, 15, 50, 87, 0, NULL, '2026-10-13'),
 (3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (5, 8, 8830, 1485, 1912, 0, 13, 0, 0, 0, NULL, NULL),
@@ -907,7 +911,7 @@ ALTER TABLE `remember_tokens`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=386;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=390;
 
 --
 -- AUTO_INCREMENT for table `users`
