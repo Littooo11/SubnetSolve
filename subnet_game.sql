@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2026 at 03:07 PM
+-- Generation Time: Oct 14, 2026 at 12:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -93,7 +93,21 @@ INSERT INTO `game_questions` (`id`, `game_type`, `question_text`, `option_a`, `o
 (14, 'scenario_game', 'The Finance department has been assigned the subnet 192.168.10.0/26. A technician needs the broadcast address to configure a network-wide alert. Which address should they use?', '192.168.10.0', '192.168.10.1', '192.168.10.62', '192.168.10.63', 'D', 'Block size is 64 (0 to 63). The broadcast address is 192.168.10.63.', '2026-10-13 13:06:23'),
 (15, 'scenario_game', 'A new Sales workstation needs an IP address inside the 192.168.1.0/26 subnet. Which of these addresses can actually be assigned to the workstation?', '192.168.1.25', '192.168.1.0', '192.168.1.63', '192.168.1.64', 'A', 'Usable IPs range from 192.168.1.1 to 192.168.1.62. 192.168.1.25 is valid.', '2026-10-13 13:06:23'),
 (16, 'scenario_game', 'An internal HR file server is configured with the IP address 10.1.5.20. Which statement is true about this server?', 'Directly reachable from the internet (public address)', 'Not directly reachable from the internet (private address)', 'Reserved exclusively for multicast traffic', 'It is a loopback address', 'B', '10.0.0.0/8 is a private IP address block (RFC 1918).', '2026-10-13 13:06:23'),
-(17, 'scenario_game', 'A Public Web Server is configured with the IP address 203.0.113.5. Which statement is true about this server?', 'Not directly reachable from the internet (private address)', 'Used exclusively for internal local broadcasting', 'Directly reachable from the internet (public address)', 'Assigned automatically via APIPA', 'C', '203.0.113.5 is a public IP address.', '2026-10-13 13:06:23');
+(17, 'scenario_game', 'A Public Web Server is configured with the IP address 203.0.113.5. Which statement is true about this server?', 'Not directly reachable from the internet (private address)', 'Used exclusively for internal local broadcasting', 'Directly reachable from the internet (public address)', 'Assigned automatically via APIPA', 'C', '203.0.113.5 is a public IP address.', '2026-10-13 13:06:23'),
+(18, 'scenario_game', 'Scenario: Office Network Expansion\nA company is setting up a new office. Its HR department needs 25 usable IP addresses for computers and printers. The network administrator wants to use the smallest subnet that can support all 25 devices. Which subnet prefix should the administrator choose?', '/28', '/27', '/29', '/26', 'B', 'A /27 subnet provides 30 usable host IP addresses (2^5 - 2), which perfectly accommodates 25 devices with minimal waste.', '2026-10-14 14:52:54'),
+(19, 'scenario_game', 'Scenario: Small Business Router\nA small business configures its router with the network 192.168.1.0/24. A technician needs to know how many usable IPv4 host addresses this network normally supports. What is the correct answer?', '24', '256', '254', '128', 'C', 'A /24 network has 8 host bits (2^8 = 256 total addresses). Subtracting network and broadcast addresses leaves 254 usable IPs.', '2026-10-14 14:52:54'),
+(20, 'scenario_game', 'Scenario: University Computer Laboratory\nA university has been assigned the network 192.168.10.0/24. The computer laboratory needs 100 usable host addresses. The IT administrator must select a subnet that can accommodate all the computers while minimizing wasted IP addresses. Which subnet prefix is the best choice?', '/26', '/24', '/25', '/27', 'C', 'A /25 prefix provides 126 usable host addresses (2^7 - 2 = 126), which fits 100 hosts with minimal waste.', '2026-10-14 14:52:54'),
+(21, 'scenario_game', 'Scenario: Company Department Allocation\nA company receives 192.168.20.0/24 for its internal network. It needs three separate subnets:\n• Sales: 100 usable hosts\n• Finance: 50 usable hosts\n• IT Support: 20 usable hosts\nWhich set of subnet prefixes meets all three requirements while using the smallest suitable subnet for each department?', 'Sales /26, Finance /27, IT /28', 'Sales /25, Finance /26, IT /27', 'Sales /24, Finance /25, IT /26', 'Sales /27, Finance /26, IT /25', 'B', 'Sales needs /25 (126 hosts), Finance needs /26 (62 hosts), and IT Support needs /27 (30 hosts).', '2026-10-14 14:52:54'),
+(22, 'scenario_game', 'Scenario: Network Technician Troubleshooting\nA technician sees the IP configuration 192.168.10.25/26 on a workstation. The technician must identify the subnet mask to check whether the workstation is configured correctly. Which subnet mask corresponds to /26?', '255.255.255.0', '255.255.255.192', '255.255.255.224', '255.255.255.128', 'B', 'A /26 prefix converts to binary as 11111111.11111111.11111111.11000000, which equals 255.255.255.192.', '2026-10-14 14:52:54'),
+(23, 'scenario_game', 'Scenario: Office Subnet Capacity\nA growing office has been assigned 10.10.10.0/27 for a group of computers. The IT manager plans to connect 28 computers and needs to know whether the subnet has enough usable addresses. Which statement is correct?', 'Yes, because /27 supports 32 usable hosts', 'Yes, because /27 supports 30 usable hosts', 'No, because /27 supports only 30 total addresses', 'No, because /27 supports only 14 usable hosts', 'B', 'A /27 subnet provides 30 usable host IP addresses (2^5 - 2 = 30), which is sufficient for 28 computers.', '2026-10-14 14:52:54'),
+(24, 'scenario_game', 'Scenario: New Branch Office\nA business has the address block 10.0.0.0/24. It needs a subnet for 60 employee devices and another subnet for 12 network devices. The administrator assigns the employee subnet first using 10.0.0.0/26. Which network address is the correct next allocation for the 12-device subnet, using the smallest suitable subnet?', '10.0.0.64/28', '10.0.0.32/28', '10.0.0.64/29', '10.0.0.0/28', 'A', '10.0.0.0/26 occupies IPs 10.0.0.0 - 10.0.0.63. The next available address is 10.0.0.64. A /28 prefix fits 14 usable hosts, making 10.0.0.64/28 the smallest suitable subnet.', '2026-10-14 14:52:54'),
+(25, 'scenario_game', 'Scenario: Hospital Network Design\nA hospital receives 172.16.5.0/24 for three departments:\n• Administration: 50 hosts\n• Medical staff: 25 hosts\n• Security systems: 10 hosts\nThe network engineer wants to allocate the largest subnet first and ensure that all subnets fit inside the assigned block without overlapping. Which allocation is valid and meets the minimum host requirements?', 'Admin 172.16.5.0/26, Medical 172.16.5.64/27, Security 172.16.5.96/28', 'Admin 172.16.5.0/27, Medical 172.16.5.32/27, Security 172.16.5.64/28', 'Admin 172.16.5.0/26, Medical 172.16.5.32/27, Security 172.16.5.96/28', 'Admin 172.16.5.0/26, Medical 172.16.5.64/28, Security 172.16.5.80/29', 'A', 'Admin gets 172.16.5.0/26 (IPs 0-63). Medical gets 172.16.5.64/27 (IPs 64-95). Security gets 172.16.5.96/28 (IPs 96-111). All subnets fit without overlap.', '2026-10-14 14:52:54'),
+(26, 'scenario_game', 'Scenario: ISP Address Allocation\nAn internet service provider assigns a customer the IPv4 block 203.0.113.0/28 for a small test network. The customer wants to know the total number of IP addresses in the assigned block, including reserved network and broadcast addresses. How many total addresses are included?', '8', '14', '16', '32', 'C', 'A /28 subnet has 4 host bits (32 - 28 = 4). Total addresses = 2^4 = 16.', '2026-10-14 14:52:54'),
+(27, 'scenario_game', 'Scenario: Multi-Branch Company Routing\nA company has multiple branch networks within 10.20.0.0/24. Its network engineer wants to advertise the entire block as one route rather than advertise four separate contiguous /26 networks. Which CIDR route summarizes the entire address block?', '10.20.0.0/25', '10.20.0.0/26', '10.20.0.0/23', '10.20.0.0/24', 'D', 'Four /26 subnets make up one full /24 network (10.20.0.0/24).', '2026-10-14 14:52:54'),
+(28, 'scenario_game', 'Scenario: Office Network Expansion\nA company is setting up a new office. Its HR department needs 25 usable IP addresses for computers and printers. The network administrator wants to use the smallest subnet that can support all 25 devices. Which subnet prefix should the administrator choose?', '/28', '/27', '/29', '/26', 'B', 'A /27 subnet provides 30 usable host IP addresses.', '2026-10-14 15:14:41'),
+(29, 'scenario_game', 'Scenario: Small Business Router\nA small business configures its router with the network 192.168.1.0/24. A technician needs to know how many usable IPv4 host addresses this network normally supports. What is the correct answer?', '24', '256', '254', '128', 'C', 'A /24 network has 254 usable host addresses.', '2026-10-14 15:14:41'),
+(30, 'scenario_game', 'Scenario: University Computer Laboratory\nA university has been assigned the network 192.168.10.0/24. The computer laboratory needs 100 usable host addresses. The IT administrator must select a subnet that can accommodate all the computers while minimizing wasted IP addresses. Which subnet prefix is the best choice?', '/26', '/24', '/25', '/27', 'C', 'A /25 prefix provides 126 usable host addresses.', '2026-10-14 15:14:41'),
+(31, 'scenario_game', 'Scenario: Network Technician Troubleshooting\nA technician sees the IP configuration 192.168.10.25/26 on a workstation. The technician must identify the subnet mask to check whether the workstation is configured correctly. Which subnet mask corresponds to /26?', '255.255.255.0', '255.255.255.192', '255.255.255.224', '255.255.255.128', 'B', 'A /26 prefix corresponds to 255.255.255.192.', '2026-10-14 15:14:41');
 
 -- --------------------------------------------------------
 
@@ -131,7 +145,8 @@ INSERT INTO `matches` (`id`, `room_code`, `room_name`, `description`, `password_
 (7, 'NNQ7XW', '', '', NULL, 'hex', 'public', 2, 37, 'finished', 0, '2026-10-12 00:27:54', 10, 37, '2026-10-12 00:27:49', '2026-10-12 00:27:54', '2026-10-12 00:27:58'),
 (8, '92V3GM', '', '', NULL, 'binary', 'public', 2, 37, 'finished', 1, '2026-10-12 00:37:37', 10, 37, '2026-10-12 00:33:53', '2026-10-12 00:33:57', '2026-10-12 00:37:40'),
 (9, 'KTMK57', 'qasd', '', NULL, 'binary', 'public', 2, 39, 'finished', 2, '2026-10-12 16:07:41', 10, 39, '2026-10-12 16:05:50', '2026-10-12 16:06:14', '2026-10-12 16:08:15'),
-(10, 'TA4L5R', 'g20', '', '$2y$10$GSLUPN940d82PhiBjFVTLu1ya4tfvf4jvz3nx5FR1IEbXjNBI7ZzK', 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-12 16:11:00', 10, 39, '2026-10-12 16:10:32', '2026-10-12 16:11:00', '2026-10-12 16:11:19');
+(10, 'TA4L5R', 'g20', '', '$2y$10$GSLUPN940d82PhiBjFVTLu1ya4tfvf4jvz3nx5FR1IEbXjNBI7ZzK', 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-12 16:11:00', 10, 39, '2026-10-12 16:10:32', '2026-10-12 16:11:00', '2026-10-12 16:11:19'),
+(11, '5DZR72', '', '', NULL, 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-14 17:16:40', 10, 39, '2026-10-14 17:16:29', '2026-10-14 17:16:40', '2026-10-14 17:16:42');
 
 -- --------------------------------------------------------
 
@@ -162,7 +177,8 @@ INSERT INTO `match_players` (`id`, `match_id`, `user_id`, `score`, `correct_coun
 (9, 7, 37, 0, 0, 0, NULL, NULL, '2026-10-12 00:27:49'),
 (11, 8, 37, 0, 0, 1, NULL, NULL, '2026-10-12 00:33:53'),
 (13, 9, 39, 4821, 1, 1, NULL, NULL, '2026-10-12 16:05:50'),
-(15, 10, 39, 0, 0, 0, NULL, NULL, '2026-10-12 16:10:32');
+(15, 10, 39, 0, 0, 0, NULL, NULL, '2026-10-12 16:10:32'),
+(17, 11, 39, 0, 0, 0, NULL, NULL, '2026-10-14 17:16:29');
 
 -- --------------------------------------------------------
 
@@ -243,7 +259,17 @@ INSERT INTO `match_questions` (`id`, `match_id`, `question_index`, `prompt`, `op
 (57, 10, 6, 'What is the subnet mask for a /28 network?', '[\"255.255.255.248\",\"255.255.255.192\",\"255.255.255.224\",\"255.255.255.240\"]', 3),
 (58, 10, 7, 'What is the broadcast address for the IP address 192.168.179.198/27?', '[\"192.168.179.223\",\"192.168.179.222\",\"192.168.179.193\",\"192.168.179.192\"]', 0),
 (59, 10, 8, 'Which of the following is a private IP address?', '[\"198.243.104.233\",\"15.206.143.168\",\"145.236.99.60\",\"172.17.158.151\"]', 3),
-(60, 10, 9, 'What is the subnet mask for a /30 network?', '[\"255.255.255.252\",\"255.255.255.240\",\"255.255.255.128\",\"255.255.255.224\"]', 0);
+(60, 10, 9, 'What is the subnet mask for a /30 network?', '[\"255.255.255.252\",\"255.255.255.240\",\"255.255.255.128\",\"255.255.255.224\"]', 0),
+(61, 11, 0, 'What is the subnet mask for 17.120.72.59/29?', '[\"255.255.255.248\",\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.128\"]', 0),
+(62, 11, 1, 'What is the subnet mask for 176.110.143.223/29?', '[\"255.255.255.0\",\"255.255.255.248\",\"255.255.255.128\",\"255.255.255.240\"]', 1),
+(63, 11, 2, 'What is the subnet mask for 210.89.26.61/27?', '[\"255.255.255.128\",\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.224\"]', 3),
+(64, 11, 3, 'What is the subnet mask for 107.150.108.186/30?', '[\"255.255.255.252\",\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.128\"]', 0),
+(65, 11, 4, 'What is the subnet mask for 28.88.204.210/30?', '[\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.128\",\"255.255.255.252\"]', 3),
+(66, 11, 5, 'What is the subnet mask for 101.70.100.76/27?', '[\"255.255.255.128\",\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.224\"]', 3),
+(67, 11, 6, 'What is the subnet mask for 160.123.2.79/27?', '[\"255.255.255.128\",\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.224\"]', 3),
+(68, 11, 7, 'What is the subnet mask for 202.168.249.65/26?', '[\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.128\",\"255.255.255.192\"]', 3),
+(69, 11, 8, 'What is the subnet mask for 190.171.228.127/26?', '[\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.192\",\"255.255.255.128\"]', 2),
+(70, 11, 9, 'What is the subnet mask for 168.131.87.15/28?', '[\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.128\",\"255.255.255.252\"]', 0);
 
 -- --------------------------------------------------------
 
@@ -561,7 +587,79 @@ INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `playe
 (386, 2, NULL, 'showdown_timed', 152, '2026-10-13 17:46:06', 6),
 (387, 2, NULL, 'showdown_timed', 94, '2026-10-13 18:38:18', 4),
 (388, 2, NULL, 'scenario_timed', 68, '2026-10-13 18:40:33', 3),
-(389, 2, NULL, 'scenario_timed', 44, '2026-10-13 18:44:21', 2);
+(389, 2, NULL, 'scenario_timed', 44, '2026-10-13 18:44:21', 2),
+(390, 2, NULL, 'showdown_timed', 135, '2026-10-14 15:04:08', 4),
+(391, 2, NULL, 'showdown_timed', 44, '2026-10-14 15:05:37', 1),
+(392, 39, NULL, 'scenario_timed', 135, '2026-10-14 15:10:23', 4),
+(393, 39, NULL, 'scenario_timed', 66, '2026-10-14 15:15:58', 2),
+(394, 39, 11, 'multiplayer_match', 0, '2026-10-14 17:16:42', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher_applications`
+--
+
+CREATE TABLE `teacher_applications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `student_emails` text NOT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `applied_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teacher_applications`
+--
+
+INSERT INTO `teacher_applications` (`id`, `user_id`, `student_emails`, `status`, `applied_at`) VALUES
+(1, 41, 'g20@gmail.com', 'approved', '2026-10-14 13:56:14'),
+(2, 43, 'cma@gm.com', 'approved', '2026-10-14 15:54:36');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher_invitations`
+--
+
+CREATE TABLE `teacher_invitations` (
+  `id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `status` enum('pending','accepted','rejected') DEFAULT 'pending',
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teacher_invitations`
+--
+
+INSERT INTO `teacher_invitations` (`id`, `teacher_id`, `student_id`, `status`, `created_at`) VALUES
+(1, 41, 2, 'rejected', '2026-10-14 15:52:29'),
+(5, 43, 2, 'accepted', '2026-10-14 15:54:42'),
+(6, 43, 39, 'accepted', '2026-10-14 16:48:15');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher_students`
+--
+
+CREATE TABLE `teacher_students` (
+  `id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `assigned_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teacher_students`
+--
+
+INSERT INTO `teacher_students` (`id`, `teacher_id`, `student_id`, `assigned_at`) VALUES
+(1, 41, 39, '2026-10-14 13:56:35'),
+(2, 43, 2, '2026-10-14 15:54:58'),
+(3, 43, 39, '2026-10-14 16:48:42');
 
 -- --------------------------------------------------------
 
@@ -576,54 +674,59 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `avatar` varchar(30) NOT NULL DEFAULT 'fox',
   `is_admin` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` datetime NOT NULL
+  `created_at` datetime NOT NULL,
+  `is_teacher` tinyint(1) DEFAULT 0,
+  `teacher_status` enum('none','pending','approved','rejected') DEFAULT 'none'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar`, `is_admin`, `created_at`) VALUES
-(1, 'Admin1', 'admin1@gg.com', '$2y$10$ar5q20r5lI8eswq5BRKZEeHHTOjWl.BcdF1.TmZ5Clu31y6jpTIQG', 'robot', 1, '2026-09-26 19:03:39'),
-(2, 'Carlo', 'cma@gm.com', '$2y$10$m2GgOmwTRKb0fEWwC4mwSOKCzglQMmbOB7s/h0bAWoJ5B7SRX5tR.', 'wolf', 0, '2026-09-26 19:08:38'),
-(3, 'test', 'test@m.com', '$2y$10$WTCSTDqewk6Tma71Ed0N8OLTpe.c38rLsEOquwrxh34AQ7NtzhDmW', 'fox', 0, '2026-09-26 19:10:12'),
-(4, 'aki00', 'aki@gmail.com', '$2y$10$Pmliz1t9MmktkI8Zc0V6iOLx1Xwc3RhLvsaKOWa6yO/ioUJweVOyu', 'fox', 0, '2026-09-28 14:18:19'),
-(5, 'RaynBSIT1A', 'ingarraynelp@gmail.com', '$2y$10$EH7UBYdxl.AX94B8nF15KeteIHMYHZ9ZW3kGIuKMSXrTkld0snFpu', 'fox', 0, '2026-10-06 16:16:58'),
-(6, 'jams', 'jamienathaliegraagas@gmail.com', '$2y$10$RY4B4yA55xCB38O1QZgLfe4tlXHOqF.PJsBiX1/j/KrWZB.Anj2CK', 'fox', 0, '2026-10-06 16:17:42'),
-(7, 'Graham', 'judicio.o01@gmail.com', '$2y$10$5f1V8gL0h0uiAPgyRk99luDq.ilbOkHJ11FWCZ8Zt8fByb8ROpPOe', 'fox', 0, '2026-10-06 16:58:25'),
-(8, 'Roldan Eborde', 'mirandachadramiel@gmail.com', '$2y$10$XJhiLXtB/DMRXPm4N0ZsPeYFtVHSmDRLD3FuxWufS3DSmxtMj0mCa', 'fox', 0, '2026-10-06 20:23:54'),
-(9, 'JGBSIT', 'jg03@gmail.com', '$2y$10$ekkf14BNh0H79CEdaX.lQ.TOZBcLfLW2zq3wOLUyIXAzd4svaE1Ui', 'fox', 0, '2026-10-06 20:23:50'),
-(10, 'ash', 'ashbash@gmail.com', '$2y$10$.rSDdajRq/qBuN9ZK3I8zeXssEGKB82xT3Lp1w7CBVPJwSuhwUsFG', 'fox', 0, '2026-10-06 20:27:16'),
-(11, 'Noobie', 'secret@gmail.com', '$2y$10$U1vLf3Ex691u16cMn7.GTOyQaRZ8YOOF6CqZqm1ftHF7ahPHksy3i', 'panda', 0, '2026-10-06 20:31:42'),
-(12, 'sean', 'sean123@gmail.com', '$2y$10$uyAR9jjMErDdonG/bWp8beSaICCYE4cRXx6/B84l4S7FpGTkGPpFm', 'lion', 0, '2026-10-06 20:36:08'),
-(13, 'Tala', 't.garcia@gmail.com', '$2y$10$7npeniHWmi83xGPCRVYPluHaBYykkTY1yR0qkgVHEwk9ikzsT.Skq', 'panda', 0, '2026-10-06 20:40:25'),
-(14, 'rigbaby', 'irigbooks39@gmail.com', '$2y$10$j/0cLeWZJa8AnMIITs5DleQrFBE18OrSP2rDJSbkrEL2myVl.3yXG', 'fox', 0, '2026-10-06 20:45:13'),
-(15, 'MaRkkk', 'mark.reyes195@gmail.com', '$2y$10$0R79ENUb//MiV.5neFHRjeJ4o7zgk6N6Y18938swclUtaCKx1RlAm', 'lion', 0, '2026-10-06 20:49:37'),
-(16, 'Drew', 'andrew.aquino402@gmail.com', '$2y$10$kfaOykc3.qxx/9/MbuRwGuvQoiJka5GXalwpaoiCpah4N3xejRHsi', 'fox', 0, '2026-10-06 20:54:02'),
-(17, 'Ozzirne', 'oza417@gmail.com', '$2y$10$axbQ1ehC8a1oGj4AAr0LU.SMSU9BpOaXH5q1qqK6.FiNlDoTe5tqi', 'fox', 0, '2026-10-06 20:58:41'),
-(18, 'RandyBSIT', 'santi07@gmail.com', '$2y$10$PYk3HBPK1xOc4ctus/epFedCErfKlUn7iI9RDmK/NQpUX4JfGzlkW', 'fox', 0, '2026-10-06 21:03:19'),
-(19, 'Potato', 'hahaha@gmail.com', '$2y$10$IzJYYM5TqFJQmfmULtOuVuaAlGCg3qnchqpM7T8xqB9cuZzNxndq2', 'fox', 0, '2026-10-06 21:08:44'),
-(20, 'Guttie\'', 'l.gutierrez29@gmail.com', '$2y$10$buDIKt2grUrhYNX6YK3myuqoMYCySoTcpHiRbVEO781gtp6YjJEIu', 'fox', 0, '2026-10-06 21:14:06'),
-(21, 'Kevs', 'domin19@gmail.com', '$2y$10$Sls596AooMuGFVF5n1UapOsNaWfUrImmjx7LLxOaJ1WIWSqX8u82O', 'fox', 0, '2026-10-07 20:23:50'),
-(22, 'Anlala', 'grabeanlala@gmail.com', '$2y$10$SOwRk5qAQGwF7vKYoFbgMu/Itltm./VUCppCDB12fycJy7kyC9ZIG', 'fox', 0, '2026-10-07 20:28:14'),
-(23, 'Ryzen', 'bsbs@gmail.com', '$2y$10$4iCi/OiSlnqRese7AaSx..WMKWZoRt1oMj.YqTTMIxZipUK7iakGG', 'fox', 0, '2026-10-07 20:32:39'),
-(24, 'baymax', 'brera15@gmail.com', '$2y$10$buPfNpdkw2omZVSP6rPoo.jI9YCzaPjKoQVulWPy3j.9zjA7MC4aG', 'fox', 0, '2026-10-07 20:37:05'),
-(25, 'Beans', 'vinceno20@gmail.com', '$2y$10$g1RBNNc15qzZTMyQe/1UpOmsQ3Aze3oZaL/9yCfYApaWW7D2jWiIi', 'fox', 0, '2026-10-07 20:41:28'),
-(26, 'Mansory', 'minesori30@gmail.com', '$2y$10$.k5uNcEXt3Hon0IdhiEL5ua9jnyDyhjY3MEJObwsUdsofi57VcAq.', 'fox', 0, '2026-10-07 20:46:12'),
-(27, 'Pat', 'patricklim16@gmail.com', '$2y$10$ymepiNeOrQb8TTpJnyHXBeNubQaz/W4T5PM5pVfuYLGNS7bfVsq5K', 'fox', 0, '2026-10-07 20:50:37'),
-(28, 'Boy Puyat', 'boypuyat24@gmail.com', '$2y$10$MpFWf9Oor1g7s4/6gxitx.8bqvGXslDkhvVH2976b266VtkbeH6n2', 'fox', 0, '2026-10-07 20:55:03'),
-(29, 'G na G', 'gnagaming@gmail.com', '$2y$10$rJn8w0j8VfGbWGwULOiakerHcLzB5OT4gBtGs92G7rBsa3qz5K06.', 'fox', 0, '2026-10-07 20:59:46'),
-(30, 'Neneng B', 'manoulam@gmail.com', '$2y$10$Tn98ypKrNgw/ABItwxlq/ufioL9TCSs01bZ.nqtyRXUZOLh.rp79G', 'fox', 0, '2026-10-07 21:04:18'),
-(31, 'Ella Vated', 'ellavated17@gmail.com', '$2y$10$8YgRsfTLEQx4P4wC/P8wv.jpI3EN3hCNfghK1O69QWgHNSSMrvX8G', 'fox', 0, '2026-10-07 21:08:52'),
-(32, 'Sam Ting Wong', 'samting@gmail.com', '$2y$10$5k/KYJb9xCCy7eTt88dbdezBXtcdPfTLU2fBg6geBD5QykNe1PxmG', 'fox', 0, '2026-10-07 21:13:27'),
-(33, 'Dominguez', 'minguez05@gmail.com', '$2y$10$Li2.9yPYab9faiN7AFLjMuRDi2V29XyQUdxgl7sInGuUMQT1exE76', 'fox', 0, '2026-10-07 21:18:04'),
-(34, 'Mark', 'markmywords18@gmail.com', '$2y$10$YQXZzdTsBn3L9q/mk1IW1Of9fG4rsURXOFAtxpbjaxHAaUoOcxHla', 'fox', 0, '2026-10-07 21:22:41'),
-(35, 'Noah Idea', 'noahidea06@gmail.com', '$2y$10$g/BXKcCbysf2/jQ1I2NdnON3.nv40ilxfcroFRyqrLJeYjtvBtAGe', 'fox', 0, '2026-10-07 21:27:19'),
-(36, '000999', 'revenraintrinidad@gmail.com', '$2y$10$atLXwZqtADm9zh7p3og3Xu/2o8roURfYq3Ozsj8XbvH5lmCWd3zFy', 'fox', 0, '2026-10-11 22:04:10'),
-(37, 'ggg', 'ss.s@gm.com', '$2y$10$/8JdIVdS95rjjkklfqsG/.kuX18fS3F3aq2MhCiYz4poHiUM4c1T.', 'fox', 0, '2026-10-11 23:02:25'),
-(38, 'asdasds', 'asdasd@fa', '$2y$10$1nWW5u5HyurZmlnGBr/NE.C.NLGlchHglFJXYJXRpXNuM6iMbzJh2', 'fox', 0, '2026-10-11 23:05:52'),
-(39, 'Group20', 'g20@gmail.com', '$2y$10$Kvl2oO.5CuNguKFCrBFb1ewQsdTyAa5ZUZ5Gak3PLJUn1xQWAmM7e', 'fox', 0, '2026-10-12 15:52:53'),
-(40, 'asddasd', 'ddd@dd', '$2y$10$Ko9HiIuggBCDnuiK87L1DOBSuZCPVI8W5rrUhicVeyrEzlrtpPqKm', 'fox', 0, '2026-10-13 11:49:12');
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `avatar`, `is_admin`, `created_at`, `is_teacher`, `teacher_status`) VALUES
+(1, 'Admin1', 'admin1@gg.com', '$2y$10$ar5q20r5lI8eswq5BRKZEeHHTOjWl.BcdF1.TmZ5Clu31y6jpTIQG', 'robot', 1, '2026-09-26 19:03:39', 0, 'none'),
+(2, 'Carlo', 'cma@gm.com', '$2y$10$m2GgOmwTRKb0fEWwC4mwSOKCzglQMmbOB7s/h0bAWoJ5B7SRX5tR.', 'wolf', 0, '2026-09-26 19:08:38', 0, 'none'),
+(3, 'test', 'test@m.com', '$2y$10$WTCSTDqewk6Tma71Ed0N8OLTpe.c38rLsEOquwrxh34AQ7NtzhDmW', 'fox', 0, '2026-09-26 19:10:12', 0, 'none'),
+(4, 'aki00', 'aki@gmail.com', '$2y$10$Pmliz1t9MmktkI8Zc0V6iOLx1Xwc3RhLvsaKOWa6yO/ioUJweVOyu', 'fox', 0, '2026-09-28 14:18:19', 0, 'none'),
+(5, 'RaynBSIT1A', 'ingarraynelp@gmail.com', '$2y$10$EH7UBYdxl.AX94B8nF15KeteIHMYHZ9ZW3kGIuKMSXrTkld0snFpu', 'fox', 0, '2026-10-06 16:16:58', 0, 'none'),
+(6, 'jams', 'jamienathaliegraagas@gmail.com', '$2y$10$RY4B4yA55xCB38O1QZgLfe4tlXHOqF.PJsBiX1/j/KrWZB.Anj2CK', 'fox', 0, '2026-10-06 16:17:42', 0, 'none'),
+(7, 'Graham', 'judicio.o01@gmail.com', '$2y$10$5f1V8gL0h0uiAPgyRk99luDq.ilbOkHJ11FWCZ8Zt8fByb8ROpPOe', 'fox', 0, '2026-10-06 16:58:25', 0, 'none'),
+(8, 'Roldan Eborde', 'mirandachadramiel@gmail.com', '$2y$10$XJhiLXtB/DMRXPm4N0ZsPeYFtVHSmDRLD3FuxWufS3DSmxtMj0mCa', 'fox', 0, '2026-10-06 20:23:54', 0, 'none'),
+(9, 'JGBSIT', 'jg03@gmail.com', '$2y$10$ekkf14BNh0H79CEdaX.lQ.TOZBcLfLW2zq3wOLUyIXAzd4svaE1Ui', 'fox', 0, '2026-10-06 20:23:50', 0, 'none'),
+(10, 'ash', 'ashbash@gmail.com', '$2y$10$.rSDdajRq/qBuN9ZK3I8zeXssEGKB82xT3Lp1w7CBVPJwSuhwUsFG', 'fox', 0, '2026-10-06 20:27:16', 0, 'none'),
+(11, 'Noobie', 'secret@gmail.com', '$2y$10$U1vLf3Ex691u16cMn7.GTOyQaRZ8YOOF6CqZqm1ftHF7ahPHksy3i', 'panda', 0, '2026-10-06 20:31:42', 0, 'none'),
+(12, 'sean', 'sean123@gmail.com', '$2y$10$uyAR9jjMErDdonG/bWp8beSaICCYE4cRXx6/B84l4S7FpGTkGPpFm', 'lion', 0, '2026-10-06 20:36:08', 0, 'none'),
+(13, 'Tala', 't.garcia@gmail.com', '$2y$10$7npeniHWmi83xGPCRVYPluHaBYykkTY1yR0qkgVHEwk9ikzsT.Skq', 'panda', 0, '2026-10-06 20:40:25', 0, 'none'),
+(14, 'rigbaby', 'irigbooks39@gmail.com', '$2y$10$j/0cLeWZJa8AnMIITs5DleQrFBE18OrSP2rDJSbkrEL2myVl.3yXG', 'fox', 0, '2026-10-06 20:45:13', 0, 'none'),
+(15, 'MaRkkk', 'mark.reyes195@gmail.com', '$2y$10$0R79ENUb//MiV.5neFHRjeJ4o7zgk6N6Y18938swclUtaCKx1RlAm', 'lion', 0, '2026-10-06 20:49:37', 0, 'none'),
+(16, 'Drew', 'andrew.aquino402@gmail.com', '$2y$10$kfaOykc3.qxx/9/MbuRwGuvQoiJka5GXalwpaoiCpah4N3xejRHsi', 'fox', 0, '2026-10-06 20:54:02', 0, 'none'),
+(17, 'Ozzirne', 'oza417@gmail.com', '$2y$10$axbQ1ehC8a1oGj4AAr0LU.SMSU9BpOaXH5q1qqK6.FiNlDoTe5tqi', 'fox', 0, '2026-10-06 20:58:41', 0, 'none'),
+(18, 'RandyBSIT', 'santi07@gmail.com', '$2y$10$PYk3HBPK1xOc4ctus/epFedCErfKlUn7iI9RDmK/NQpUX4JfGzlkW', 'fox', 0, '2026-10-06 21:03:19', 0, 'none'),
+(19, 'Potato', 'hahaha@gmail.com', '$2y$10$IzJYYM5TqFJQmfmULtOuVuaAlGCg3qnchqpM7T8xqB9cuZzNxndq2', 'fox', 0, '2026-10-06 21:08:44', 0, 'none'),
+(20, 'Guttie\'', 'l.gutierrez29@gmail.com', '$2y$10$buDIKt2grUrhYNX6YK3myuqoMYCySoTcpHiRbVEO781gtp6YjJEIu', 'fox', 0, '2026-10-06 21:14:06', 0, 'none'),
+(21, 'Kevs', 'domin19@gmail.com', '$2y$10$Sls596AooMuGFVF5n1UapOsNaWfUrImmjx7LLxOaJ1WIWSqX8u82O', 'fox', 0, '2026-10-07 20:23:50', 0, 'none'),
+(22, 'Anlala', 'grabeanlala@gmail.com', '$2y$10$SOwRk5qAQGwF7vKYoFbgMu/Itltm./VUCppCDB12fycJy7kyC9ZIG', 'fox', 0, '2026-10-07 20:28:14', 0, 'none'),
+(23, 'Ryzen', 'bsbs@gmail.com', '$2y$10$4iCi/OiSlnqRese7AaSx..WMKWZoRt1oMj.YqTTMIxZipUK7iakGG', 'fox', 0, '2026-10-07 20:32:39', 0, 'none'),
+(24, 'baymax', 'brera15@gmail.com', '$2y$10$buPfNpdkw2omZVSP6rPoo.jI9YCzaPjKoQVulWPy3j.9zjA7MC4aG', 'fox', 0, '2026-10-07 20:37:05', 0, 'none'),
+(25, 'Beans', 'vinceno20@gmail.com', '$2y$10$g1RBNNc15qzZTMyQe/1UpOmsQ3Aze3oZaL/9yCfYApaWW7D2jWiIi', 'fox', 0, '2026-10-07 20:41:28', 0, 'none'),
+(26, 'Mansory', 'minesori30@gmail.com', '$2y$10$.k5uNcEXt3Hon0IdhiEL5ua9jnyDyhjY3MEJObwsUdsofi57VcAq.', 'fox', 0, '2026-10-07 20:46:12', 0, 'none'),
+(27, 'Pat', 'patricklim16@gmail.com', '$2y$10$ymepiNeOrQb8TTpJnyHXBeNubQaz/W4T5PM5pVfuYLGNS7bfVsq5K', 'fox', 0, '2026-10-07 20:50:37', 0, 'none'),
+(28, 'Boy Puyat', 'boypuyat24@gmail.com', '$2y$10$MpFWf9Oor1g7s4/6gxitx.8bqvGXslDkhvVH2976b266VtkbeH6n2', 'fox', 0, '2026-10-07 20:55:03', 0, 'none'),
+(29, 'G na G', 'gnagaming@gmail.com', '$2y$10$rJn8w0j8VfGbWGwULOiakerHcLzB5OT4gBtGs92G7rBsa3qz5K06.', 'fox', 0, '2026-10-07 20:59:46', 0, 'none'),
+(30, 'Neneng B', 'manoulam@gmail.com', '$2y$10$Tn98ypKrNgw/ABItwxlq/ufioL9TCSs01bZ.nqtyRXUZOLh.rp79G', 'fox', 0, '2026-10-07 21:04:18', 0, 'none'),
+(31, 'Ella Vated', 'ellavated17@gmail.com', '$2y$10$8YgRsfTLEQx4P4wC/P8wv.jpI3EN3hCNfghK1O69QWgHNSSMrvX8G', 'fox', 0, '2026-10-07 21:08:52', 0, 'none'),
+(32, 'Sam Ting Wong', 'samting@gmail.com', '$2y$10$5k/KYJb9xCCy7eTt88dbdezBXtcdPfTLU2fBg6geBD5QykNe1PxmG', 'fox', 0, '2026-10-07 21:13:27', 0, 'none'),
+(33, 'Dominguez', 'minguez05@gmail.com', '$2y$10$Li2.9yPYab9faiN7AFLjMuRDi2V29XyQUdxgl7sInGuUMQT1exE76', 'fox', 0, '2026-10-07 21:18:04', 0, 'none'),
+(34, 'Mark', 'markmywords18@gmail.com', '$2y$10$YQXZzdTsBn3L9q/mk1IW1Of9fG4rsURXOFAtxpbjaxHAaUoOcxHla', 'fox', 0, '2026-10-07 21:22:41', 0, 'none'),
+(35, 'Noah Idea', 'noahidea06@gmail.com', '$2y$10$g/BXKcCbysf2/jQ1I2NdnON3.nv40ilxfcroFRyqrLJeYjtvBtAGe', 'fox', 0, '2026-10-07 21:27:19', 0, 'none'),
+(36, '000999', 'revenraintrinidad@gmail.com', '$2y$10$atLXwZqtADm9zh7p3og3Xu/2o8roURfYq3Ozsj8XbvH5lmCWd3zFy', 'fox', 0, '2026-10-11 22:04:10', 0, 'none'),
+(37, 'ggg', 'ss.s@gm.com', '$2y$10$/8JdIVdS95rjjkklfqsG/.kuX18fS3F3aq2MhCiYz4poHiUM4c1T.', 'fox', 0, '2026-10-11 23:02:25', 0, 'none'),
+(38, 'asdasds', 'asdasd@fa', '$2y$10$1nWW5u5HyurZmlnGBr/NE.C.NLGlchHglFJXYJXRpXNuM6iMbzJh2', 'fox', 0, '2026-10-11 23:05:52', 0, 'none'),
+(39, 'Group20', 'g20@gmail.com', '$2y$10$Kvl2oO.5CuNguKFCrBFb1ewQsdTyAa5ZUZ5Gak3PLJUn1xQWAmM7e', 'fox', 0, '2026-10-12 15:52:53', 0, 'none'),
+(40, 'asddasd', 'ddd@dd', '$2y$10$Ko9HiIuggBCDnuiK87L1DOBSuZCPVI8W5rrUhicVeyrEzlrtpPqKm', 'fox', 0, '2026-10-13 11:49:12', 0, 'none'),
+(41, 'Guro', 'g@ro', '$2y$10$NUu8aDPtlC6ZdJQtnKE2gOe360JwBlGf6vtc0LwfpptO1BNNiMX6.', 'fox', 0, '2026-10-14 13:34:24', 1, 'approved'),
+(42, 'teach', 'te@ch', '$2y$10$ZiKow.CnvCnYg2M4PEn5juuFis299llO83UvVmLcBgFqqYq7TO/Xa', 'fox', 0, '2026-10-14 15:53:41', 0, 'none'),
+(43, 'tea@ch', 'tea@ch', '$2y$10$1bRjupw09HGGjcvXGapSLeMFwaGKGgbaWieZ6L5OfNJ1yUV2diOQ6', 'fox', 0, '2026-10-14 15:54:09', 1, 'approved');
 
 -- --------------------------------------------------------
 
@@ -653,7 +756,9 @@ INSERT INTO `user_badges` (`id`, `user_id`, `badge_id`, `earned_at`) VALUES
 (8, 2, 9, '2026-10-12 00:26:59'),
 (9, 39, 1, '2026-10-12 16:08:15'),
 (10, 39, 4, '2026-10-12 16:08:15'),
-(11, 2, 2, '2026-10-13 14:02:02');
+(11, 2, 2, '2026-10-13 14:02:02'),
+(12, 2, 5, '2026-10-14 15:04:08'),
+(13, 39, 9, '2026-10-14 15:10:23');
 
 -- --------------------------------------------------------
 
@@ -708,7 +813,7 @@ CREATE TABLE `user_progress` (
 
 INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`, `last_daily_challenge_date`) VALUES
 (1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
-(2, 9, 11112, 1955, 2139, 5, 15, 50, 87, 0, NULL, '2026-10-13'),
+(2, 10, 11341, 45, 2368, 5, 17, 55, 102, 0, NULL, '2026-10-14'),
 (3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (5, 8, 8830, 1485, 1912, 0, 13, 0, 0, 0, NULL, NULL),
@@ -745,8 +850,11 @@ INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to
 (36, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
 (37, 11, 14481, 717, 2599, 0, 4, 3, 8, 0, NULL, NULL),
 (38, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(39, 6, 4951, 758, 1465, 1, 4, 1, 1, 0, NULL, NULL),
-(40, 1, 0, 0, 500, 1, 0, 0, 0, 0, NULL, NULL);
+(39, 6, 5202, 1009, 1465, 1, 7, 7, 15, 0, NULL, '2026-10-14'),
+(40, 1, 0, 0, 500, 1, 0, 0, 0, 0, NULL, NULL),
+(41, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(42, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
+(43, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -762,6 +870,32 @@ CREATE TABLE `user_question_stats` (
   `times_correct` int(11) DEFAULT 0,
   `last_answered_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_question_stats`
+--
+
+INSERT INTO `user_question_stats` (`id`, `user_id`, `question_id`, `times_encountered`, `times_correct`, `last_answered_at`) VALUES
+(1, 2, 8, 2, 2, '2026-10-14 15:03:59'),
+(2, 2, 2, 5, 1, '2026-10-14 15:05:36'),
+(3, 2, 9, 2, 0, '2026-10-14 15:05:25'),
+(5, 2, 3, 4, 1, '2026-10-14 15:04:06'),
+(11, 2, 7, 2, 0, '2026-10-14 15:05:30'),
+(12, 2, 6, 1, 0, '2026-10-14 15:04:55'),
+(13, 2, 10, 1, 0, '2026-10-14 15:04:57'),
+(14, 2, 1, 1, 0, '2026-10-14 15:05:06'),
+(15, 2, 5, 1, 0, '2026-10-14 15:05:10'),
+(17, 2, 11, 1, 1, '2026-10-14 15:05:21'),
+(21, 39, 16, 2, 2, '2026-10-14 15:15:23'),
+(22, 39, 21, 1, 0, '2026-10-14 15:15:21'),
+(24, 39, 18, 1, 0, '2026-10-14 15:15:26'),
+(25, 39, 31, 1, 0, '2026-10-14 15:15:41'),
+(26, 39, 23, 1, 0, '2026-10-14 15:15:44'),
+(27, 39, 19, 1, 1, '2026-10-14 15:15:49'),
+(28, 39, 28, 1, 0, '2026-10-14 15:15:52'),
+(29, 39, 17, 1, 0, '2026-10-14 15:15:54'),
+(30, 39, 22, 1, 0, '2026-10-14 15:15:56'),
+(31, 39, 29, 1, 0, '2026-10-14 15:15:57');
 
 --
 -- Indexes for dumped tables
@@ -823,7 +957,31 @@ ALTER TABLE `remember_tokens`
 ALTER TABLE `scores`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `match_id` (`match_id`);
+  ADD KEY `match_id` (`match_id`),
+  ADD KEY `idx_played_at` (`played_at`);
+
+--
+-- Indexes for table `teacher_applications`
+--
+ALTER TABLE `teacher_applications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `teacher_invitations`
+--
+ALTER TABLE `teacher_invitations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `teacher_student_invitation` (`teacher_id`,`student_id`),
+  ADD KEY `student_id` (`student_id`);
+
+--
+-- Indexes for table `teacher_students`
+--
+ALTER TABLE `teacher_students`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `teacher_student_pair` (`teacher_id`,`student_id`),
+  ADD KEY `student_id` (`student_id`);
 
 --
 -- Indexes for table `users`
@@ -845,7 +1003,8 @@ ALTER TABLE `user_badges`
 --
 ALTER TABLE `user_module_progress`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_module` (`user_id`,`module_key`);
+  ADD UNIQUE KEY `user_module` (`user_id`,`module_key`),
+  ADD KEY `idx_completed_at` (`completed_at`);
 
 --
 -- Indexes for table `user_progress`
@@ -875,25 +1034,25 @@ ALTER TABLE `badges`
 -- AUTO_INCREMENT for table `game_questions`
 --
 ALTER TABLE `game_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `match_players`
 --
 ALTER TABLE `match_players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `match_questions`
 --
 ALTER TABLE `match_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT for table `questions`
@@ -911,19 +1070,37 @@ ALTER TABLE `remember_tokens`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=390;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=395;
+
+--
+-- AUTO_INCREMENT for table `teacher_applications`
+--
+ALTER TABLE `teacher_applications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `teacher_invitations`
+--
+ALTER TABLE `teacher_invitations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `teacher_students`
+--
+ALTER TABLE `teacher_students`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `user_badges`
 --
 ALTER TABLE `user_badges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `user_module_progress`
@@ -935,7 +1112,7 @@ ALTER TABLE `user_module_progress`
 -- AUTO_INCREMENT for table `user_question_stats`
 --
 ALTER TABLE `user_question_stats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Constraints for dumped tables
@@ -973,6 +1150,26 @@ ALTER TABLE `remember_tokens`
 ALTER TABLE `scores`
   ADD CONSTRAINT `scores_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `scores_ibfk_2` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`);
+
+--
+-- Constraints for table `teacher_applications`
+--
+ALTER TABLE `teacher_applications`
+  ADD CONSTRAINT `teacher_applications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `teacher_invitations`
+--
+ALTER TABLE `teacher_invitations`
+  ADD CONSTRAINT `teacher_invitations_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `teacher_invitations_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `teacher_students`
+--
+ALTER TABLE `teacher_students`
+  ADD CONSTRAINT `teacher_students_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `teacher_students_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `user_badges`

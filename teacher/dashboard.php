@@ -261,7 +261,7 @@ $categoryTotal = $initialChartData["total"];
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
         body {
-            margin: 0;
+        margin: 0;
         padding: 0;
         background: var(--bg, #0b1224);
         color: var(--text, #e7ebf5);
@@ -385,77 +385,7 @@ $categoryTotal = $initialChartData["total"];
 
     <!-- Invite Student Section -->
     <div class="admin-panel" style="margin-bottom:1.5rem;">
-        <h3>➕ Invite Student</h3>
-        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:0.2rem; margin-bottom:0.8rem;">
-            Enter a registered student's email address to send them a class invitation. An invitation box will appear on their dashboard.
-        </p>
-        <form method="POST" style="display:flex; gap:0.6rem; max-width:550px;">
-            <input type="email" name="student_email" placeholder="student@example.com" required 
-                   style="flex:1; padding:0.5rem 0.8rem; background:var(--panel-light); border:1px solid var(--border); color:var(--text); border-radius:6px; font-size:0.88rem;">
-            <button type="submit" name="invite_student" class="btn btn-primary">Send Invitation</button>
-        </form>
-    </div>
 
-    <!-- Student Activity & Gameplay Chart -->
-    <div class="admin-panel" style="margin-bottom:1.5rem;">
-        <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h3 style="margin:0;">📊 Student Activity (Games & Lessons)</h3>
-            <div style="display:flex; gap:0.5rem;">
-                <select id="actStudentSelect" class="admin-select" style="padding:0.3rem 0.6rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:0.85rem; cursor:pointer;">
-                    <option value="all">All Students</option>
-                    <?php foreach ($students as $st): ?>
-                        <option value="<?= $st['id'] ?>"><?= htmlspecialchars($st['username']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <select id="actTimeSelect" class="admin-select" style="padding:0.3rem 0.6rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:0.85rem; cursor:pointer;">
-                    <option value="3_days">Last 3 Days</option>
-                    <option value="7_days" selected>Last 7 Days</option>
-                    <option value="30_days">Last 30 Days (1 Month)</option>
-                    <option value="3_months">Last 3 Months</option>
-                    <option value="6_months">Last 6 Months</option>
-                    <option value="1_year">Last 1 Year</option>
-                    <option value="all_time">All Time (Since Sep 26, 2026)</option>
-                </select>
-            </div>
-        </div>
-        <canvas id="teacherActivityChart" height="180"></canvas>
-    </div>
-
-    <!-- Section: Game Category Popularity -->
-    <div class="admin-panel" style="margin-bottom:1.5rem;">
-        <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h3 style="margin:0;">🎮 Game Category Popularity</h3>
-            <select id="studentFilterSelect" class="admin-select" style="padding:0.3rem 0.7rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:0.85rem; cursor:pointer;">
-                <option value="all">All Assigned Students</option>
-                <?php foreach ($students as $st): ?>
-                    <option value="<?= $st['id'] ?>"><?= htmlspecialchars($st['username']) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 280px 1fr; gap:2rem; align-items:center;">
-            <div style="height:210px; display:flex; justify-content:center; align-items:center;">
-                <canvas id="studentCategoryChart"></canvas>
-            </div>
-            <div id="chartLegendContainer">
-                <?php foreach ($rawCounts as $label => $count):
-                    $pct = round(($count / $categoryTotal) * 100);
-                    $color = $categoryColors[$label] ?? $categoryColors["Other"];
-                ?>
-                    <div class="legend-row" style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; padding:0.4rem 0; border-bottom:1px solid var(--border);">
-                        <span><span class="legend-dot" style="display:inline-block; width:10px; height:10px; border-radius:50%; background:<?= $color ?>; margin-right:0.5rem;"></span><strong><?= htmlspecialchars($label) ?></strong></span>
-                        <span class="pct" style="color:var(--text-dim);"><?= $count ?> plays (<?= $pct ?>%)</span>
-                    </div>
-                <?php endforeach; ?>
-                <?php if (empty($rawCounts)): ?>
-                    <p style="color:var(--text-dim); font-size:0.85rem; margin:0;">No game activity recorded for your students yet.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Student Roster Panel -->
-    <div class="admin-panel">
         <h3>👥 Student Roster</h3>
         <?php if (empty($students)): ?>
             <p style="color:var(--text-dim); margin-top:0.5rem;">No students currently associated with your account.</p>
@@ -505,6 +435,77 @@ $categoryTotal = $initialChartData["total"];
                 <?php endforeach; ?>
             </table>
         <?php endif; ?>
+
+        <h4>➕ Invite Student</h4>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:0.2rem; margin-bottom:0.8rem;">
+            Enter a registered student's email address to send them a class invitation. An invitation box will appear on their dashboard.
+        </p>
+        <form method="POST" style="display:flex; gap:0.6rem; max-width:550px;">
+            <input type="email" name="student_email" placeholder="student@example.com" required 
+                   style="flex:1; padding:0.5rem 0.8rem; background:var(--panel-light); border:1px solid var(--border); color:var(--text); border-radius:6px; font-size:0.88rem;">
+            <button type="submit" name="invite_student" class="btn btn-primary">Send Invitation</button>
+        </form>
+    </div>
+
+
+    <!-- Full-Width Widescreen Student Activity & Gameplay Chart -->
+    <div class="admin-panel" style="margin-bottom:1.5rem; width:100%; box-sizing:border-box;">
+        <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+            <h3 style="margin:0; font-size:0.95rem;">📊 Student Activity (Games & Lessons)</h3>
+            <div style="display:flex; gap:0.5rem;">
+                <select id="actStudentSelect" class="admin-select" style="padding:0.25rem 0.5rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:0.8rem; cursor:pointer;">
+                    <option value="all">All Students</option>
+                    <?php foreach ($students as $st): ?>
+                        <option value="<?= $st['id'] ?>"><?= htmlspecialchars($st['username']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select id="actTimeSelect" class="admin-select" style="padding:0.25rem 0.5rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:0.8rem; cursor:pointer;">
+                    <option value="3_days">Last 3 Days</option>
+                    <option value="7_days" selected>Last 7 Days</option>
+                    <option value="30_days">Last 30 Days (1 Month)</option>
+                    <option value="3_months">Last 3 Months</option>
+                    <option value="6_months">Last 6 Months</option>
+                    <option value="1_year">Last 1 Year</option>
+                    <option value="all_time">All Time (Since Sep 26, 2026)</option>
+                </select>
+            </div>
+        </div>
+        <div style="height:150px; width:100%; position:relative;">
+            <canvas id="teacherActivityChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Section: Game Category Popularity -->
+    <div class="admin-panel">
+        <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="margin:0;">🎮 Game Category Popularity</h3>
+            <select id="studentFilterSelect" class="admin-select" style="padding:0.3rem 0.7rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; font-size:0.85rem; cursor:pointer;">
+                <option value="all">All Assigned Students</option>
+                <?php foreach ($students as $st): ?>
+                    <option value="<?= $st['id'] ?>"><?= htmlspecialchars($st['username']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 280px 1fr; gap:2rem; align-items:center;">
+            <div style="height:210px; display:flex; justify-content:center; align-items:center;">
+                <canvas id="studentCategoryChart"></canvas>
+            </div>
+            <div id="chartLegendContainer">
+                <?php foreach ($rawCounts as $label => $count):
+                    $pct = round(($count / $categoryTotal) * 100);
+                    $color = $categoryColors[$label] ?? $categoryColors["Other"];
+                ?>
+                    <div class="legend-row" style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; padding:0.4rem 0; border-bottom:1px solid var(--border);">
+                        <span><span class="legend-dot" style="display:inline-block; width:10px; height:10px; border-radius:50%; background:<?= $color ?>; margin-right:0.5rem;"></span><strong><?= htmlspecialchars($label) ?></strong></span>
+                        <span class="pct" style="color:var(--text-dim);"><?= $count ?> plays (<?= $pct ?>%)</span>
+                    </div>
+                <?php endforeach; ?>
+                <?php if (empty($rawCounts)): ?>
+                    <p style="color:var(--text-dim); font-size:0.85rem; margin:0;">No game activity recorded for your students yet.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </main>
 </div><div id="breakdownModal" class="modal-overlay">
@@ -544,6 +545,8 @@ tension: 0.3
 ]
 },
 options: {
+responsive: true,
+maintainAspectRatio: false,
 plugins: { legend: { display: true, labels: { color: "#8b93ab" } } },
 scales: {
 x: { ticks: { color: "#8b93ab" }, grid: { color: "#23304f" } },
