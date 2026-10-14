@@ -15,7 +15,7 @@ require_once "includes/module_progress.php";
 if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
     $token = $_COOKIE["remember_token"];
 
-    $stmt = mysqli_prepare($conn, "SELECT u.id, u.username, u.is_admin FROM remember_tokens rt
+    $stmt = mysqli_prepare($conn, "SELECT u.id, u.username, u.is_admin, u.is_teacher FROM remember_tokens rt
                                     JOIN users u ON u.id = rt.user_id
                                     WHERE rt.token = ? AND rt.expires_at > NOW()");
     mysqli_stmt_bind_param($stmt, "s", $token);
@@ -24,9 +24,10 @@ if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_token"])) {
     $user = mysqli_fetch_assoc($result);
 
     if ($user) {
-        $_SESSION["user_id"]  = $user["id"];
-        $_SESSION["username"] = $user["username"];
-        $_SESSION["is_admin"] = (bool) $user["is_admin"];
+        $_SESSION["user_id"]    = $user["id"];
+        $_SESSION["username"]   = $user["username"];
+        $_SESSION["is_admin"]   = (bool) $user["is_admin"];
+        $_SESSION["is_teacher"] = (bool) $user["is_teacher"];
     }
 }
 
@@ -45,12 +46,65 @@ if (!empty($_SESSION["is_admin"])) {
 $username = $_SESSION["username"];
 $userId   = $_SESSION["user_id"];
 
+// ===== Handle Teacher Invitation Responses (Accept / Decline - Post/Redirect/Get) =====
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["invitation_id"])) {
+    $invId = (int)$_POST["invitation_id"];
+    $action = $_POST["invitation_action"] ?? "";
+
+    // Fetch invitation details to ensure ownership
+    $invStmt = mysqli_prepare($conn, "SELECT teacher_id, student_id FROM teacher_invitations WHERE id = ? AND student_id = ? AND status = 'pending'");
+    mysqli_stmt_bind_param($invStmt, "ii", $invId, $userId);
+    mysqli_stmt_execute($invStmt);
+    $inv = mysqli_stmt_get_result($invStmt)->fetch_assoc();
+
+    if ($inv) {
+        if ($action === "accept") {
+            // Update invitation status
+            $upInv = mysqli_prepare($conn, "UPDATE teacher_invitations SET status = 'accepted' WHERE id = ?");
+            mysqli_stmt_bind_param($upInv, "i", $invId);
+            mysqli_stmt_execute($upInv);
+
+            // Add student-teacher link
+            $addLink = mysqli_prepare($conn, "INSERT IGNORE INTO teacher_students (teacher_id, student_id) VALUES (?, ?)");
+            mysqli_stmt_bind_param($addLink, "ii", $inv["teacher_id"], $userId);
+            mysqli_stmt_execute($addLink);
+
+            $_SESSION["inv_msg"] = "Invitation accepted! You have joined your teacher's class roster.";
+        } elseif ($action === "reject") {
+            $upInv = mysqli_prepare($conn, "UPDATE teacher_invitations SET status = 'rejected' WHERE id = ?");
+            mysqli_stmt_bind_param($upInv, "i", $invId);
+            mysqli_stmt_execute($upInv);
+
+            $_SESSION["inv_msg"] = "Invitation declined.";
+        }
+    }
+    header("Location: dashboard.php");
+    exit();
+}
+
+// Read and clear flash message from session
+$invFeedback = $_SESSION["inv_msg"] ?? "";
+unset($_SESSION["inv_msg"]);
+
+// ===== Fetch Pending Teacher Invitations for Current Student =====
+$pendingInvs = [];
+$invQuery = mysqli_prepare($conn, "
+    SELECT ti.id, u.username AS teacher_name, ti.created_at 
+    FROM teacher_invitations ti 
+    JOIN users u ON u.id = ti.teacher_id 
+    WHERE ti.student_id = ? AND ti.status = 'pending'
+    ORDER BY ti.created_at DESC
+");
+mysqli_stmt_bind_param($invQuery, "i", $userId);
+mysqli_stmt_execute($invQuery);
+$pendingInvs = mysqli_fetch_all(mysqli_stmt_get_result($invQuery), MYSQLI_ASSOC);
+
 require "includes/daily_challenge.php";
 $dailyStatus = get_daily_challenge_progress($conn, $userId);
 
 // Safety check: if the database was reset/reimported, old session IDs
 // may no longer point to a real user. Catch that here instead of crashing.
-$userCheck = mysqli_prepare($conn, "SELECT id, avatar FROM users WHERE id = ?");
+$userCheck = mysqli_prepare($conn, "SELECT id, avatar, is_teacher FROM users WHERE id = ?");
 mysqli_stmt_bind_param($userCheck, "i", $userId);
 mysqli_stmt_execute($userCheck);
 $userRow = mysqli_stmt_get_result($userCheck)->fetch_assoc();
@@ -61,6 +115,7 @@ if (!$userRow) {
     exit();
 }
 $myAvatar = $userRow["avatar"];
+$_SESSION["is_teacher"] = (bool) $userRow["is_teacher"];
 
 // Pull this user's real progress. If for some reason there's no row yet
 // (e.g. an account created before this table existed), default to zeros.
@@ -85,8 +140,8 @@ $level        = $progress["level"];
 $careerXP     = $progress["career_xp"];
 $totalXP      = $progress["total_xp"];
 $xpToNextLvl  = $progress["xp_to_next_level"];
-$moduleProg = calculate_learning_progress($conn, $userId);
-$lessonsDone = $moduleProg["percentage"] . "%";
+$moduleProg   = calculate_learning_progress($conn, $userId);
+$lessonsDone  = $moduleProg["percentage"] . "%";
 $quizzesDone  = $progress["quizzes_completed"];
 $streak       = $progress["current_streak"];
 
@@ -99,7 +154,6 @@ while ($row = mysqli_fetch_assoc($topResult)) {
     $topPlayers[] = ["name" => $row["username"], "avatar" => $row["avatar"], "xp" => $row["career_xp"]];
 }
 
-// TODO: pull from a real activity log once games/quizzes exist
 $gameLabels = [
     "subnet_dissect_practice" => "Dissect an IP Address (Practice)",
     "subnet_dissect_timed"    => "Dissect an IP Address (Timed)",
@@ -152,19 +206,22 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
         <a href="profile.php" class="nav-link">Profile</a>
         <a href="settings.php" class="nav-link">Settings</a>
         <a href="about.php" class="nav-link">About Us</a>
+        <?php if (!empty($_SESSION["is_teacher"])): ?>
+            <a href="teacher/dashboard.php" class="nav-link" style="color:var(--green);">🎓 Teacher Portal</a>
+        <?php endif; ?>
         <?php if (!empty($_SESSION["is_admin"])): ?>
             <a href="admin/dashboard.php" class="nav-link" style="color:var(--orange);">🛠 Admin Panel</a>
         <?php endif; ?>
 
         <div class="daily-challenge">
-    <h4>Daily Challenge</h4>
-    <p>Complete 3 subnetting questions correctly</p>
-    <div class="progress-bar"><div style="width:<?= round(($dailyStatus["progress"] / $dailyStatus["target"]) * 100) ?>%"></div></div>
-    <div style="font-size:0.75rem; color:var(--text-dim);">
-        <?= $dailyStatus["progress"] ?> / <?= $dailyStatus["target"] ?>
-        <?= $dailyStatus["complete"] ? " ✅" : "" ?>
-    </div>
-</div>
+            <h4>Daily Challenge</h4>
+            <p>Complete 3 subnetting questions correctly</p>
+            <div class="progress-bar"><div style="width:<?= round(($dailyStatus["progress"] / $dailyStatus["target"]) * 100) ?>%"></div></div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">
+                <?= $dailyStatus["progress"] ?> / <?= $dailyStatus["target"] ?>
+                <?= $dailyStatus["complete"] ? " ✅" : "" ?>
+            </div>
+        </div>
     </aside>
 
     <!-- ===== Main content ===== -->
@@ -185,6 +242,10 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
 
         <?php if (!empty($_GET["error"])): ?>
             <div class="feedback-banner feedback-wrong" style="margin-bottom:1rem;"><?= htmlspecialchars($_GET["error"]) ?></div>
+        <?php endif; ?>
+
+        <?php if ($invFeedback): ?>
+            <div class="feedback-banner feedback-correct" style="margin-bottom:1rem;"><?= htmlspecialchars($invFeedback) ?></div>
         <?php endif; ?>
 
         <div class="welcome">
@@ -266,6 +327,29 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
                 <p>Remember: in subnetting, practice makes perfect! Keep challenging yourself every day to become a subnetting expert.</p>
             </div>
         </div>
+
+        <!-- ===== Teacher Invitations Panel ===== -->
+        <?php if (!empty($pendingInvs)): ?>
+        <div class="explore-panel" style="margin-top:1.5rem; border:1px solid var(--purple);">
+            <h3 class="section-title" style="color:var(--purple); margin-bottom:0.5rem;">🎓 Class Invitations</h3>
+            <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:1rem;">
+                The following teacher(s) have invited you to join their class roster so they can view your learning progress and game analytics:
+            </p>
+            <?php foreach ($pendingInvs as $inv): ?>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--panel-light); padding:0.8rem 1rem; border-radius:8px; margin-bottom:0.6rem; border:1px solid var(--border); flex-wrap:wrap; gap:0.8rem;">
+                    <div>
+                        <strong style="color:#fff;"><?= htmlspecialchars($inv["teacher_name"]) ?></strong> invited you to join their class.
+                        <div style="font-size:0.75rem; color:var(--text-dim); margin-top:0.2rem;"><?= date("M j, Y, g:i A", strtotime($inv["created_at"])) ?></div>
+                    </div>
+                    <form method="POST" style="display:flex; gap:0.5rem; margin:0;">
+                        <input type="hidden" name="invitation_id" value="<?= $inv['id'] ?>">
+                        <button type="submit" name="invitation_action" value="accept" class="btn btn-primary" style="padding:0.35rem 0.8rem; font-size:0.8rem;">Accept</button>
+                        <button type="submit" name="invitation_action" value="reject" class="btn btn-secondary" style="padding:0.35rem 0.8rem; font-size:0.8rem;">Decline</button>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
     </main>
 
     <!-- ===== Right column ===== -->

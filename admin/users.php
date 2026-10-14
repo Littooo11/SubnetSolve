@@ -46,6 +46,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_user_id"])) {
         mysqli_query($conn, "DELETE FROM user_badges WHERE user_id = $deleteId");
         mysqli_query($conn, "DELETE FROM user_module_progress WHERE user_id = $deleteId");
         mysqli_query($conn, "DELETE FROM user_question_stats WHERE user_id = $deleteId");
+        mysqli_query($conn, "DELETE FROM teacher_students WHERE teacher_id = $deleteId OR student_id = $deleteId");
+        mysqli_query($conn, "DELETE FROM teacher_invitations WHERE teacher_id = $deleteId OR student_id = $deleteId");
+        mysqli_query($conn, "DELETE FROM teacher_applications WHERE user_id = $deleteId");
         mysqli_query($conn, "DELETE FROM users WHERE id = $deleteId");
         $message = "User account and history deleted successfully.";
         $messageType = "good";
@@ -93,7 +96,7 @@ if (isset($_GET["fetch_detailed_history_user_id"])) {
 $search = trim($_GET["q"] ?? "");
 $where = $search !== "" ? "WHERE u.username LIKE '%" . mysqli_real_escape_string($conn, $search) . "%' OR u.email LIKE '%" . mysqli_real_escape_string($conn, $search) . "%'" : "";
 
-$result = mysqli_query($conn, "SELECT u.id, u.username, u.email, u.is_admin, u.created_at, 
+$result = mysqli_query($conn, "SELECT u.id, u.username, u.email, u.is_admin, u.is_teacher, u.created_at, 
     up.level, up.career_xp, up.quizzes_completed, up.total_correct, up.total_wrong
     FROM users u LEFT JOIN user_progress up ON up.user_id = u.id
     $where ORDER BY u.created_at DESC LIMIT 200");
@@ -137,10 +140,13 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link active">👥 User Management</a>
+        <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
         <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
-        <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
+        <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
+        <a href="reports.php" class="admin-nav-link">📊 Reports</a>
         <div class="admin-nav-label">ACCOUNT</div>
-        <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
+        <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
+        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
     </aside>
 
@@ -198,6 +204,8 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <td>
                         <?php if ($u["is_admin"]): ?>
                             <span class="status-pill in_progress">Admin</span>
+                        <?php elseif ($u["is_teacher"]): ?>
+                            <span class="status-pill in_progress" style="background:rgba(34,197,94,0.15); color:var(--green);">Teacher</span>
                         <?php else: ?>
                             <span class="status-pill waiting">Student</span>
                         <?php endif; ?>
@@ -317,16 +325,16 @@ function viewDetailedHistory(userId, username) {
     fetch("users.php?fetch_detailed_history_user_id=" + userId)
         .then(res => res.json())
         .then(data => {
-            // Render Per-Question Performance
             if (data.questions.length === 0) {
                 qTab.innerHTML = '<p style="color:var(--text-dim);">No individual question data logged for this user yet.</p>';
             } else {
-                let qHtml = '<table class="admin-table"><tr><th>Topic</th><th>Times Correct / Encountered</th><th>Accuracy</th><th>Last Answered</th></tr>';
+                let qHtml = '<table class="admin-table"><tr><th>Topic</th><th>Question</th><th>Times Correct / Encountered</th><th>Accuracy</th><th>Last Answered</th></tr>';
                 data.questions.forEach(q => {
                     let pct = Math.round((q.times_correct / q.times_encountered) * 100);
                     let accClass = pct >= 75 ? 'acc-high' : (pct >= 50 ? 'acc-mid' : 'acc-low');
                     qHtml += `<tr>
                         <td><span class="status-pill in_progress">${q.game_type}</span></td>
+                        <td style="max-width:300px;">${q.question_text}</td>
                         <td><strong style="color:var(--green);">${q.times_correct}</strong> / ${q.times_encountered}</td>
                         <td><span class="accuracy-badge ${accClass}">${pct}%</span></td>
                         <td style="font-size:0.75rem; color:var(--text-dim);">${new Date(q.last_answered_at).toLocaleString()}</td>
@@ -336,7 +344,6 @@ function viewDetailedHistory(userId, username) {
                 qTab.innerHTML = qHtml;
             }
 
-            // Render Game Sessions
             if (data.sessions.length === 0) {
                 sTab.innerHTML = '<p style="color:var(--text-dim);">No overall game sessions found for this user.</p>';
             } else {

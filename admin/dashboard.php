@@ -207,6 +207,8 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
         <a href="users.php" class="admin-nav-link">👥 User Management</a>
         <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
         <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
+        <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
+
 
         <div class="admin-nav-label">ACCOUNT</div>
         <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>

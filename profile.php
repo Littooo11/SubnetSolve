@@ -14,15 +14,28 @@ $errors = [];
 $success = "";
 
 function load_user($conn, $userId) {
-    $stmt = mysqli_prepare($conn, "SELECT username, email, avatar, is_admin, created_at FROM users WHERE id = ?");
+    $stmt = mysqli_prepare($conn, "SELECT username, email, avatar, is_admin, is_teacher, created_at FROM users WHERE id = ?");
     mysqli_stmt_bind_param($stmt, "i", $userId);
     mysqli_stmt_execute($stmt);
     return mysqli_stmt_get_result($stmt)->fetch_assoc();
 }
 $user = load_user($conn, $userId);
 
-$roleLabel = !empty($user["is_admin"]) ? "Admin" : "Student";
-$roleClass = !empty($user["is_admin"]) ? "in_progress" : "waiting";
+// Fetch linked teacher name if student is assigned to a teacher
+$teacherStmt = mysqli_prepare($conn, "
+    SELECT u.username AS teacher_name 
+    FROM teacher_students ts 
+    JOIN users u ON u.id = ts.teacher_id 
+    WHERE ts.student_id = ? 
+    LIMIT 1
+");
+mysqli_stmt_bind_param($teacherStmt, "i", $userId);
+mysqli_stmt_execute($teacherStmt);
+$teacherRow = mysqli_stmt_get_result($teacherStmt)->fetch_assoc();
+$teacherName = $teacherRow["teacher_name"] ?? null;
+
+$roleLabel = !empty($user["is_admin"]) ? "Admin" : (!empty($user["is_teacher"]) ? "Teacher" : "Student");
+$roleClass = !empty($user["is_admin"]) ? "in_progress" : (!empty($user["is_teacher"]) ? "in_progress" : "waiting");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $newUsername = trim($_POST["username"] ?? "");
@@ -69,16 +82,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $update = mysqli_prepare($conn, "UPDATE users SET username=?, email=?, avatar=?, password=? WHERE id=?");
             mysqli_stmt_bind_param($update, "ssssi", $newUsername, $newEmail, $newAvatar, $hashed, $userId);
         } else {
-            $update = mysqli_prepare($conn, "UPDATE users SET username=?, email=?, avatar=? WHERE id=?");
-            mysqli_stmt_bind_param($update, "sssi", $newUsername, $newEmail, $newAvatar, $userId);
+            $update = mysqli_prepare($conn, "UPDATE users SET username=?, email=? WHERE id=?");
+            mysqli_stmt_bind_param($update, "ssi", $newUsername, $newEmail, $userId);
         }
         mysqli_stmt_execute($update);
 
         $_SESSION["username"] = $newUsername;
         $success = "Profile updated successfully.";
         $user = load_user($conn, $userId);
-        $roleLabel = !empty($user["is_admin"]) ? "Admin" : "Student";
-        $roleClass = !empty($user["is_admin"]) ? "in_progress" : "waiting";
+        $roleLabel = !empty($user["is_admin"]) ? "Admin" : (!empty($user["is_teacher"]) ? "Teacher" : "Student");
+        $roleClass = !empty($user["is_admin"]) ? "in_progress" : (!empty($user["is_teacher"]) ? "in_progress" : "waiting");
     }
 }
 
@@ -166,6 +179,11 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
                     <div class="name-row">
                         <h2><?= htmlspecialchars($user["username"]) ?></h2>
                         <span class="role-tag <?= $roleClass ?>"><?= htmlspecialchars($roleLabel) ?></span>
+                        <?php if ($teacherName): ?>
+                            <span class="role-tag" style="background:rgba(139,92,246,0.15); color:var(--purple);">
+                                🎓 Student of <?= htmlspecialchars($teacherName) ?>
+                            </span>
+                        <?php endif; ?>
                     </div>
                     <div class="email"><?= htmlspecialchars($user["email"]) ?></div>
                     <div class="member-since">Member since: <?= date("M j, Y", strtotime($user["created_at"])) ?></div>
@@ -228,6 +246,9 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
             <div class="stat-line"><span>Username</span><span><?= htmlspecialchars($user["username"]) ?></span></div>
             <div class="stat-line"><span>Email</span><span><?= htmlspecialchars($user["email"]) ?></span></div>
             <div class="stat-line"><span>Role</span><span><?= htmlspecialchars($roleLabel) ?></span></div>
+            <?php if ($teacherName): ?>
+                <div class="stat-line"><span>Teacher</span><span style="color:var(--purple); font-weight:bold;"><?= htmlspecialchars($teacherName) ?></span></div>
+            <?php endif; ?>
             <button class="btn btn-primary" id="editToggleBtn2" type="button" style="width:100%; margin-top:0.5rem;">Edit Profile</button>
         </div>
 
