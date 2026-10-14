@@ -21,18 +21,30 @@ function load_user($conn, $userId) {
 }
 $user = load_user($conn, $userId);
 
-// Fetch linked teacher name if student is assigned to a teacher
+// Fetch ALL linked teacher names if student is assigned to one or more teachers
 $teacherStmt = mysqli_prepare($conn, "
     SELECT u.username AS teacher_name 
     FROM teacher_students ts 
     JOIN users u ON u.id = ts.teacher_id 
     WHERE ts.student_id = ? 
-    LIMIT 1
+    ORDER BY u.username ASC
 ");
 mysqli_stmt_bind_param($teacherStmt, "i", $userId);
 mysqli_stmt_execute($teacherStmt);
-$teacherRow = mysqli_stmt_get_result($teacherStmt)->fetch_assoc();
-$teacherName = $teacherRow["teacher_name"] ?? null;
+$teacherResult = mysqli_stmt_get_result($teacherStmt);
+
+$teacherList = [];
+while ($row = mysqli_fetch_assoc($teacherResult)) {
+    $teacherList[] = $row["teacher_name"];
+}
+
+$teacherCount = count($teacherList);
+$teacherText = "";
+if ($teacherCount === 1) {
+    $teacherText = $teacherList[0];
+} elseif ($teacherCount > 1) {
+    $teacherText = implode(", ", $teacherList);
+}
 
 $roleLabel = !empty($user["is_admin"]) ? "Admin" : (!empty($user["is_teacher"]) ? "Teacher" : "Student");
 $roleClass = !empty($user["is_admin"]) ? "in_progress" : (!empty($user["is_teacher"]) ? "in_progress" : "waiting");
@@ -82,8 +94,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $update = mysqli_prepare($conn, "UPDATE users SET username=?, email=?, avatar=?, password=? WHERE id=?");
             mysqli_stmt_bind_param($update, "ssssi", $newUsername, $newEmail, $newAvatar, $hashed, $userId);
         } else {
-            $update = mysqli_prepare($conn, "UPDATE users SET username=?, email=? WHERE id=?");
-            mysqli_stmt_bind_param($update, "ssi", $newUsername, $newEmail, $userId);
+            $update = mysqli_prepare($conn, "UPDATE users SET username=?, email=?, avatar=? WHERE id=?");
+            mysqli_stmt_bind_param($update, "sssi", $newUsername, $newEmail, $newAvatar, $userId);
         }
         mysqli_stmt_execute($update);
 
@@ -179,9 +191,9 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
                     <div class="name-row">
                         <h2><?= htmlspecialchars($user["username"]) ?></h2>
                         <span class="role-tag <?= $roleClass ?>"><?= htmlspecialchars($roleLabel) ?></span>
-                        <?php if ($teacherName): ?>
+                        <?php if ($teacherCount > 0): ?>
                             <span class="role-tag" style="background:rgba(139,92,246,0.15); color:var(--purple);">
-                                🎓 Student of <?= htmlspecialchars($teacherName) ?>
+                                🎓 Student of <?= htmlspecialchars($teacherText) ?>
                             </span>
                         <?php endif; ?>
                     </div>
@@ -246,8 +258,13 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
             <div class="stat-line"><span>Username</span><span><?= htmlspecialchars($user["username"]) ?></span></div>
             <div class="stat-line"><span>Email</span><span><?= htmlspecialchars($user["email"]) ?></span></div>
             <div class="stat-line"><span>Role</span><span><?= htmlspecialchars($roleLabel) ?></span></div>
-            <?php if ($teacherName): ?>
-                <div class="stat-line"><span>Teacher</span><span style="color:var(--purple); font-weight:bold;"><?= htmlspecialchars($teacherName) ?></span></div>
+            <?php if ($teacherCount > 0): ?>
+                <div class="stat-line">
+                    <span><?= $teacherCount > 1 ? "Teachers" : "Teacher" ?></span>
+                    <span style="color:var(--purple); font-weight:bold; text-align:right; max-width:180px; word-break:break-word;">
+                        <?= htmlspecialchars($teacherText) ?>
+                    </span>
+                </div>
             <?php endif; ?>
             <button class="btn btn-primary" id="editToggleBtn2" type="button" style="width:100%; margin-top:0.5rem;">Edit Profile</button>
         </div>

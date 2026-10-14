@@ -188,7 +188,6 @@ if (!$showDifficultyScreen) {
                     <?php endforeach; ?>
                 <?php endif; ?>
                 <div class="game-actions">
-                    <a href="subnet_practice.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                     <a href="../dashboard.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Dashboard</a>
                 </div>
             </div>

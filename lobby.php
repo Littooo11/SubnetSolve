@@ -32,8 +32,11 @@ if (isset($_POST["cancel_lobby_id"])) {
 
 $publicLobbies = [];
 if ($tab === "public") {
+    // Fetches only public/open lobbies that have NO password required
     $result = mysqli_query($conn, "SELECT m.*, (SELECT COUNT(*) FROM match_players mp WHERE mp.match_id = m.id) AS player_count
-        FROM matches m WHERE m.visibility = 'public' AND m.status IN ('waiting','in_progress')
+        FROM matches m 
+        WHERE m.status IN ('waiting','in_progress')
+          AND (m.password_hash IS NULL OR m.password_hash = '')
         ORDER BY m.created_at DESC LIMIT 30");
     $publicLobbies = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
@@ -48,7 +51,15 @@ if ($tab === "mine") {
 }
 
 function mode_label($m) {
-    return ["subnetting" => "Subnetting", "binary" => "Binary", "both" => "Both"][$m] ?? $m;
+    return [
+        "subnetting" => "Subnet Dissect (IPv4)",
+        "binary"     => "Binary Game",
+        "showdown"   => "Subnet Showdown",
+        "hex"        => "Hex Conversion",
+        "ipv6"       => "IPv6 Challenge",
+        "scenario"   => "Scenario Mode",
+        "both"       => "All Topics (Mixed)"
+    ][$m] ?? $m;
 }
 function status_label($s) {
     return ["waiting" => "Waiting", "in_progress" => "In Game", "finished" => "Finished"][$s] ?? $s;
@@ -87,16 +98,16 @@ function status_label($s) {
     <main class="main">
         <div class="welcome">
             <h2>Multiplayer Lobby</h2>
-            <p>Create or join a 1v1 match and test your skills in real time.</p>
+            <p>Create or join a match and test your skills in real time.</p>
         </div>
 
         <?php if ($error): ?>
             <div class="feedback-banner feedback-wrong" style="margin-bottom:1rem;"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <div class="tab-row" style="justify-content:space-between;">
+        <div class="tab-row" style="justify-content: space-between;">
             <div style="display:flex; gap:0.5rem;">
-                <a href="lobby.php?tab=public" class="tab-btn <?= $tab === 'public' ? 'active' : '' ?>">Public Lobbies</a>
+                <a href="lobby.php?tab=public" class="tab-btn <?= $tab === 'public' ? 'active' : '' ?>">All Lobbies</a>
                 <a href="lobby.php?tab=code" class="tab-btn <?= $tab === 'code' ? 'active' : '' ?>">Join with Code</a>
                 <a href="lobby.php?tab=mine" class="tab-btn <?= $tab === 'mine' ? 'active' : '' ?>">My Lobbies</a>
             </div>
@@ -106,7 +117,7 @@ function status_label($s) {
         <div class="explore-panel">
             <?php if ($tab === "public"): ?>
                 <?php if (empty($publicLobbies)): ?>
-                    <p style="color:var(--text-dim); font-size:0.9rem;">No public lobbies right now — create one!</p>
+                    <p style="color:var(--text-dim); font-size:0.9rem;">No open public lobbies right now — create one or join with a room code!</p>
                 <?php else: ?>
                 <table class="lb-table">
                     <tr><th>Room Code</th><th>Mode</th><th>Players</th><th>Status</th><th></th></tr>
@@ -182,18 +193,18 @@ function status_label($s) {
             <p style="font-size:0.8rem; color:var(--text-dim); margin-top:-0.3rem;">Set up your match and share the room code with your opponent.</p>
 
             <form method="POST" action="create_lobby.php" class="profile-form">
-                    <div class="form-group">
-                        <label for="game_mode">Game Mode</label>
-                        <select name="game_mode" id="game_mode" class="form-control">
-                            <option value="subnetting">Subnet Dissect (IPv4)</option>
-                            <option value="binary">Binary Game</option>
-                            <option value="showdown">Subnet Showdown</option>
-                            <option value="hex">Hexadecimal Conversion</option>
-                            <option value="ipv6">IPv6 Challenge</option>
-                            <option value="scenario">Network Scenario Mode</option>
-                            <option value="both">All Topics (Mixed)</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="game_mode">Game Mode</label>
+                    <select name="game_mode" id="game_mode" style="width:100%; padding:0.6rem; border-radius:8px; border:1px solid var(--border); background:var(--panel-light); color:var(--text); font-size:0.85rem;">
+                        <option value="subnetting">Subnet Dissect (IPv4)</option>
+                        <option value="binary">Binary Game</option>
+                        <option value="showdown">Subnet Showdown</option>
+                        <option value="hex">Hexadecimal Conversion</option>
+                        <option value="ipv6">IPv6 Challenge</option>
+                        <option value="scenario">Network Scenario Mode</option>
+                        <option value="both">All Topics (Mixed)</option>
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label>Lobby Size</label>
@@ -204,15 +215,6 @@ function status_label($s) {
                         <div class="mode-pill" data-value="8">8<br>Players</div>
                     </div>
                     <input type="hidden" name="max_players" id="maxPlayersInput" value="2">
-                </div>
-
-                <div class="form-group">
-                    <label>Match Type</label>
-                    <div class="type-pill-row" id="typePillRow">
-                        <div class="mode-pill selected" data-value="public">👥 Public</div>
-                        <div class="mode-pill" data-value="private">🔒 Private</div>
-                    </div>
-                    <input type="hidden" name="visibility" id="visibilityInput" value="public">
                 </div>
 
                 <div class="form-group">
@@ -227,7 +229,10 @@ function status_label($s) {
 
                 <div class="form-group">
                     <label>Password (Optional)</label>
-                    <input type="password" name="password" placeholder="Leave empty for no password">
+                    <input type="password" name="password" placeholder="Leave empty for public access">
+                    <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.3rem;">
+                        Password-protected lobbies will only be accessible via Room Code.
+                    </small>
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width:100%;">Create Lobby</button>
@@ -239,6 +244,7 @@ function status_label($s) {
 <script>
 function wirePillRow(rowId, inputId) {
     const row = document.getElementById(rowId);
+    if (!row) return;
     row.querySelectorAll(".mode-pill").forEach(pill => {
         pill.addEventListener("click", () => {
             row.querySelectorAll(".mode-pill").forEach(p => p.classList.remove("selected"));
@@ -247,9 +253,7 @@ function wirePillRow(rowId, inputId) {
         });
     });
 }
-wirePillRow("modePillRow", "gameModeInput");
 wirePillRow("sizePillRow", "maxPlayersInput");
-wirePillRow("typePillRow", "visibilityInput");
 </script>
 </body>
 </html>

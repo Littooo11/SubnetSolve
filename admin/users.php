@@ -80,7 +80,7 @@ if (isset($_GET["fetch_detailed_history_user_id"])) {
         SELECT game_type, points, played_at 
         FROM scores 
         WHERE user_id = ? 
-        ORDER BY played_at DESC LIMIT 20
+        ORDER BY played_at DESC LIMIT 30
     ");
     mysqli_stmt_bind_param($sStmt, "i", $uid);
     mysqli_stmt_execute($sStmt);
@@ -113,21 +113,29 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <style>
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center;
         }
         .modal-content {
             background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-            padding: 1.5rem; width: 95%; max-width: 800px; color: var(--text);
+            padding: 1.8rem; width: 95%; max-width: 1100px; color: var(--text);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .accuracy-badge { font-weight: bold; font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 6px; }
+        .accuracy-badge { font-weight: bold; font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 6px; display: inline-block; }
         .acc-high { background: rgba(34,197,94,0.15); color: var(--green); }
         .acc-mid { background: rgba(234,179,8,0.15); color: var(--gold); }
         .acc-low { background: rgba(239,68,68,0.15); color: #f87171; }
         .tab-btn-modal {
-            padding: 0.4rem 0.8rem; border-radius: 6px; background: var(--panel-light);
-            border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; margin-right: 0.4rem;
+            padding: 0.5rem 1.1rem; border-radius: 8px; background: var(--panel-light);
+            border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; margin-right: 0.5rem;
+            font-size: 0.88rem; transition: all 0.2s ease;
         }
-        .tab-btn-modal.active { background: var(--blue); color: #fff; font-weight: bold; }
+        .tab-btn-modal.active { background: var(--blue); color: #fff; font-weight: bold; border-color: var(--blue); }
+        .history-table-wrapper {
+            max-height: 550px; overflow-y: auto; margin-bottom: 1.2rem;
+            border: 1px solid var(--border); border-radius: 8px;
+        }
+        .history-table-wrapper table { width: 100%; border-collapse: collapse; }
+        .history-table-wrapper th { position: sticky; top: 0; background: var(--panel-light); z-index: 2; }
     </style>
 </head>
 <body>
@@ -140,13 +148,11 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link active">👥 User Management</a>
-        <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
         <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
-        <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
-        <a href="reports.php" class="admin-nav-link">📊 Reports</a>
+        <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
+        <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
         <div class="admin-nav-label">ACCOUNT</div>
         <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
-        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
     </aside>
 
@@ -263,22 +269,22 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
     </div>
 </div>
 
-<!-- Detailed Question & Game History Modal -->
+<!-- Expanded Detailed Question & Game History Modal -->
 <div id="historyModal" class="modal-overlay">
     <div class="modal-content">
-        <h3 style="margin-top:0;" id="historyTitle">Detailed Performance History</h3>
+        <h3 style="margin-top:0; font-size:1.3rem;" id="historyTitle">Detailed Performance History</h3>
         
-        <div style="margin-bottom:1rem;">
+        <div style="margin-bottom:1.2rem;">
             <button class="tab-btn-modal active" id="tabQuestionsBtn" onclick="switchModalTab('questions')">❓ Question Accuracy Breakdown</button>
             <button class="tab-btn-modal" id="tabSessionsBtn" onclick="switchModalTab('sessions')">🎮 Game Sessions</button>
         </div>
 
-        <div id="questionsTab" style="max-height:400px; overflow-y:auto; margin-bottom:1rem;">
-            <p style="color:var(--text-dim);">Loading question history...</p>
+        <div id="questionsTab" class="history-table-wrapper">
+            <p style="color:var(--text-dim); padding:1rem;">Loading question history...</p>
         </div>
 
-        <div id="sessionsTab" style="max-height:400px; overflow-y:auto; margin-bottom:1rem; display:none;">
-            <p style="color:var(--text-dim);">Loading session history...</p>
+        <div id="sessionsTab" class="history-table-wrapper" style="display:none;">
+            <p style="color:var(--text-dim); padding:1rem;">Loading session history...</p>
         </div>
 
         <div style="text-align:right;">
@@ -317,42 +323,44 @@ function viewDetailedHistory(userId, username) {
     const qTab = document.getElementById("questionsTab");
     const sTab = document.getElementById("sessionsTab");
     
-    qTab.innerHTML = '<p style="color:var(--text-dim);">Loading per-question encounter analytics...</p>';
-    sTab.innerHTML = '<p style="color:var(--text-dim);">Loading game session history...</p>';
+    qTab.innerHTML = '<p style="color:var(--text-dim); padding:1rem;">Loading per-question encounter analytics...</p>';
+    sTab.innerHTML = '<p style="color:var(--text-dim); padding:1rem;">Loading game session history...</p>';
     switchModalTab('questions');
     document.getElementById("historyModal").style.display = "flex";
 
     fetch("users.php?fetch_detailed_history_user_id=" + userId)
         .then(res => res.json())
         .then(data => {
+            // Render Per-Question Performance
             if (data.questions.length === 0) {
-                qTab.innerHTML = '<p style="color:var(--text-dim);">No individual question data logged for this user yet.</p>';
+                qTab.innerHTML = '<p style="color:var(--text-dim); padding:1rem;">No individual question data logged for this user yet.</p>';
             } else {
-                let qHtml = '<table class="admin-table"><tr><th>Topic</th><th>Question</th><th>Times Correct / Encountered</th><th>Accuracy</th><th>Last Answered</th></tr>';
+                let qHtml = '<table class="admin-table"><tr><th style="width:160px;">Topic</th><th>Question Prompt</th><th style="width:180px;">Times Correct / Encountered</th><th style="width:110px;">Accuracy</th><th style="width:180px;">Last Answered</th></tr>';
                 data.questions.forEach(q => {
                     let pct = Math.round((q.times_correct / q.times_encountered) * 100);
                     let accClass = pct >= 75 ? 'acc-high' : (pct >= 50 ? 'acc-mid' : 'acc-low');
                     qHtml += `<tr>
                         <td><span class="status-pill in_progress">${q.game_type}</span></td>
-                        <td style="max-width:300px;">${q.question_text}</td>
+                        <td style="line-height:1.4; word-break:break-word; padding-right:1rem;">${q.question_text}</td>
                         <td><strong style="color:var(--green);">${q.times_correct}</strong> / ${q.times_encountered}</td>
                         <td><span class="accuracy-badge ${accClass}">${pct}%</span></td>
-                        <td style="font-size:0.75rem; color:var(--text-dim);">${new Date(q.last_answered_at).toLocaleString()}</td>
+                        <td style="font-size:0.78rem; color:var(--text-dim);">${new Date(q.last_answered_at).toLocaleString()}</td>
                     </tr>`;
                 });
                 qHtml += '</table>';
                 qTab.innerHTML = qHtml;
             }
 
+            // Render Game Sessions
             if (data.sessions.length === 0) {
-                sTab.innerHTML = '<p style="color:var(--text-dim);">No overall game sessions found for this user.</p>';
+                sTab.innerHTML = '<p style="color:var(--text-dim); padding:1rem;">No overall game sessions found for this user.</p>';
             } else {
                 let sHtml = '<table class="admin-table"><tr><th>Game Mode</th><th>Points Earned</th><th>Date Played</th></tr>';
                 data.sessions.forEach(s => {
                     sHtml += `<tr>
                         <td><span class="status-pill waiting">${s.game_type}</span></td>
                         <td><strong style="color:var(--gold);">+${s.points} XP</strong></td>
-                        <td style="font-size:0.75rem; color:var(--text-dim);">${new Date(s.played_at).toLocaleString()}</td>
+                        <td style="font-size:0.78rem; color:var(--text-dim);">${new Date(s.played_at).toLocaleString()}</td>
                     </tr>`;
                 });
                 sHtml += '</table>';
@@ -360,7 +368,7 @@ function viewDetailedHistory(userId, username) {
             }
         })
         .catch(() => {
-            qTab.innerHTML = '<p style="color:#f87171;">Failed to load question analytics.</p>';
+            qTab.innerHTML = '<p style="color:#f87171; padding:1rem;">Failed to load question analytics.</p>';
         });
 }
 

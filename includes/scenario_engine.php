@@ -24,9 +24,11 @@ function scenario_dept() {
 // Fetch scenario question from database question bank
 function scenario_static_bank() {
     global $conn;
-    $dbQ = get_db_question($conn, "scenario_game");
-    if ($dbQ) {
-        return $dbQ;
+    if (isset($conn)) {
+        $dbQ = get_db_question($conn, "scenario_game");
+        if ($dbQ) {
+            return $dbQ;
+        }
     }
     // Fallback if DB query fails or has no rows
     return [
@@ -40,6 +42,12 @@ function scenario_static_bank() {
 
 // Scenario 1: "What mask satisfies this host requirement?"
 function scenario_host_requirement($difficulty) {
+    global $conn;
+    if (isset($conn)) {
+        $dbQ = get_db_question($conn, "scenario_game");
+        if ($dbQ) return $dbQ;
+    }
+
     $ranges = ["easy" => [24, 25], "medium" => [25, 26], "hard" => [26, 27]];
     [$min, $max] = $ranges[$difficulty] ?? $ranges["medium"];
     $correctPrefix = rand($min, $max);
@@ -69,6 +77,12 @@ function scenario_host_requirement($difficulty) {
 
 // Scenario 2: "Which address is the broadcast address for this assigned subnet?"
 function scenario_broadcast($difficulty) {
+    global $conn;
+    if (isset($conn)) {
+        $dbQ = get_db_question($conn, "scenario_game");
+        if ($dbQ) return $dbQ;
+    }
+
     $q = generate_subnet_question($difficulty);
     $base = "{$q['oct1']}.{$q['oct2']}.{$q['oct3']}.";
     $dept = scenario_dept();
@@ -88,6 +102,12 @@ function scenario_broadcast($difficulty) {
 
 // Scenario 3: "Which of these addresses can actually be assigned to a workstation?"
 function scenario_valid_host($difficulty) {
+    global $conn;
+    if (isset($conn)) {
+        $dbQ = get_db_question($conn, "scenario_game");
+        if ($dbQ) return $dbQ;
+    }
+
     $q = generate_subnet_question($difficulty);
     $base = "{$q['oct1']}.{$q['oct2']}.{$q['oct3']}.";
     $dept = scenario_dept();
@@ -109,6 +129,12 @@ function scenario_valid_host($difficulty) {
 
 // Scenario 4: "Is this server's address reachable directly from the public internet?"
 function scenario_public_private() {
+    global $conn;
+    if (isset($conn)) {
+        $dbQ = get_db_question($conn, "scenario_game");
+        if ($dbQ) return $dbQ;
+    }
+
     $privateGenerators = [
         fn() => "10." . rand(0, 255) . "." . rand(0, 255) . "." . rand(1, 254),
         fn() => "172." . rand(16, 31) . "." . rand(0, 255) . "." . rand(1, 254),
@@ -146,6 +172,12 @@ function scenario_public_private() {
 
 // Scenario 5: "Troubleshooting - what network is this misconfigured device actually on?"
 function scenario_network_troubleshoot($difficulty) {
+    global $conn;
+    if (isset($conn)) {
+        $dbQ = get_db_question($conn, "scenario_game");
+        if ($dbQ) return $dbQ;
+    }
+
     $q = generate_subnet_question($difficulty);
     $base = "{$q['oct1']}.{$q['oct2']}.{$q['oct3']}.";
     $dept = scenario_dept();
@@ -164,16 +196,8 @@ function scenario_network_troubleshoot($difficulty) {
 }
 
 // Main entry point
-function generate_scenario_question($difficulty = "medium") {
-    $templates = ["static_bank", "host_requirement", "broadcast", "valid_host", "public_private", "network_troubleshoot"];
-    $pick = $templates[array_rand($templates)];
-
-    switch ($pick) {
-        case "static_bank": return scenario_static_bank();
-        case "host_requirement": return scenario_host_requirement($difficulty);
-        case "broadcast": return scenario_broadcast($difficulty);
-        case "valid_host": return scenario_valid_host($difficulty);
-        case "public_private": return scenario_public_private();
-        case "network_troubleshoot": return scenario_network_troubleshoot($difficulty);
+if (!function_exists('generate_scenario_question')) {
+    function generate_scenario_question($difficulty = "medium") {
+        return scenario_static_bank();
     }
 }

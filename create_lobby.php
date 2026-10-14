@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit();
 }
 
-// Allowed game modes updated to include Showdown, Hex, IPv6, and Scenario
+// Allowed game modes restored
 $allowedGameModes = [
     "subnetting",
     "binary",
@@ -28,7 +28,8 @@ $allowedGameModes = [
 ];
 
 $gameMode = in_array($_POST["game_mode"] ?? "", $allowedGameModes) ? $_POST["game_mode"] : "subnetting";
-$visibility = ($_POST["visibility"] ?? "public") === "private" ? "private" : "public";
+$visibility = "public"; // Public by default
+
 $maxPlayers = in_array((int) ($_POST["max_players"] ?? 2), [2, 4, 6, 8]) ? (int) $_POST["max_players"] : 2;
 $roomName = trim($_POST["room_name"] ?? "");
 $description = trim($_POST["description"] ?? "");

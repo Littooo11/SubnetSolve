@@ -22,9 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["approve_app_id"])) {
         mysqli_stmt_bind_param($updateUser, "i", $teacherId);
         mysqli_stmt_execute($updateUser);
 
-        // 3. Link listed student emails to teacher
+        // 3. Send invitations to listed student emails
         $studentEmails = array_map('trim', explode(',', $app["student_emails"]));
-        $linkedCount = 0;
+        $invitedCount = 0;
 
         foreach ($studentEmails as $email) {
             if ($email === "") continue;
@@ -34,10 +34,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["approve_app_id"])) {
             $student = mysqli_stmt_get_result($findStudent)->fetch_assoc();
 
             if ($student) {
-                $link = mysqli_prepare($conn, "INSERT IGNORE INTO teacher_students (teacher_id, student_id) VALUES (?, ?)");
-                mysqli_stmt_bind_param($link, "ii", $teacherId, $student["id"]);
-                if (mysqli_stmt_execute($link)) {
-                    $linkedCount++;
+                $studentId = $student["id"];
+
+                // Insert invitation for the student (does not automatically link until student accepts)
+                $invStmt = mysqli_prepare($conn, "
+                    INSERT INTO teacher_invitations (teacher_id, student_id, status, created_at)
+                    VALUES (?, ?, 'pending', NOW())
+                    ON DUPLICATE KEY UPDATE status = 'pending', created_at = NOW()
+                ");
+                mysqli_stmt_bind_param($invStmt, "ii", $teacherId, $studentId);
+                if (mysqli_stmt_execute($invStmt)) {
+                    $invitedCount++;
                 }
             }
         }
@@ -47,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["approve_app_id"])) {
         mysqli_stmt_bind_param($updateApp, "i", $appId);
         mysqli_stmt_execute($updateApp);
 
-        $_SESSION["msg"] = "Approved teacher account for {$app['username']}. Linked {$linkedCount} student account(s).";
+        $_SESSION["msg"] = "Approved teacher account for {$app['username']}. Sent invitations to {$invitedCount} student account(s).";
         $_SESSION["msg_type"] = "good";
     }
 
@@ -114,13 +121,11 @@ $pendingApps = mysqli_fetch_all(mysqli_query($conn, "
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link">👥 User Management</a>
-        <a href="teacher_applications.php" class="admin-nav-link active">🎓 Teacher Apps</a>
         <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
-        <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
-        <a href="reports.php" class="admin-nav-link">📊 Reports</a>
+        <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
+        <a href="teacher_applications.php" class="admin-nav-link active">🎓 Teacher Apps</a>
         <div class="admin-nav-label">ACCOUNT</div>
         <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
-        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
     </aside>
 
@@ -128,7 +133,7 @@ $pendingApps = mysqli_fetch_all(mysqli_query($conn, "
         <div class="admin-topbar">
             <div>
                 <h2 style="margin:0 0 0.3rem;">Teacher Applications</h2>
-                <p style="color:var(--text-dim); margin:0;">Review pending applications and verify student email associations.</p>
+                <p style="color:var(--text-dim); margin:0;">Review pending applications and send class invitations to listed students.</p>
             </div>
         </div>
 
@@ -161,7 +166,7 @@ $pendingApps = mysqli_fetch_all(mysqli_query($conn, "
                         <td>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="approve_app_id" value="<?= $app['id'] ?>">
-                                <button type="submit" class="btn btn-primary" style="padding:0.25rem 0.6rem; font-size:0.75rem;">Approve</button>
+                                <button type="submit" class="btn btn-primary" style="padding:0.25rem 0.6rem; font-size:0.75rem;">Approve & Send Invites</button>
                             </form>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Reject this application?')">
                                 <input type="hidden" name="reject_app_id" value="<?= $app['id'] ?>">

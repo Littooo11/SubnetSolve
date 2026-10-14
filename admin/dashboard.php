@@ -23,39 +23,23 @@ function get_user_growth_dataset($conn, $growthRange) {
     $anchorDate = "2026-09-26";
 
     switch ($growthRange) {
-        case "3_days":
-            $numDays = 3;
-            break;
-        case "30_days":
-            $numDays = 30;
-            break;
-        case "3_months":
-            $numDays = 90;
-            break;
-        case "6_months":
-            $numDays = 180;
-            break;
-        case "1_year":
-            $numDays = 365;
-            break;
+        case "3_days": $numDays = 3; break;
+        case "30_days": $numDays = 30; break;
+        case "3_months": $numDays = 90; break;
+        case "6_months": $numDays = 180; break;
+        case "1_year": $numDays = 365; break;
         case "all_time":
             $start = new DateTime($anchorDate);
             $today = new DateTime();
             $numDays = max(1, $today->diff($start)->days + 1);
             break;
         case "7_days":
-        default:
-            $numDays = 7;
-            break;
+        default: $numDays = 7; break;
     }
 
     for ($i = $numDays - 1; $i >= 0; $i--) {
         $day = date("Y-m-d", strtotime("-$i days"));
-        
-        // Do not include dates prior to September 26, 2026
-        if ($day < $anchorDate) {
-            continue;
-        }
+        if ($day < $anchorDate) continue;
 
         $count = scalar($conn, "SELECT COUNT(*) FROM users WHERE DATE(created_at) = '$day'");
         $growthLabels[] = date("M j", strtotime($day));
@@ -65,15 +49,61 @@ function get_user_growth_dataset($conn, $growthRange) {
     return ["labels" => $growthLabels, "data" => $growthData];
 }
 
-// ===== AJAX Handler for User Growth Chart Switch =====
+// ===== Helper Function for System Activity Dataset (Games & Lessons) =====
+function get_system_activity_dataset($conn, $activityRange) {
+    $labels = [];
+    $gamesPlayed = [];
+    $lessonsCompleted = [];
+    $anchorDate = "2026-09-26";
+
+    switch ($activityRange) {
+        case "3_days": $numDays = 3; break;
+        case "30_days": $numDays = 30; break;
+        case "3_months": $numDays = 90; break;
+        case "6_months": $numDays = 180; break;
+        case "1_year": $numDays = 365; break;
+        case "all_time":
+            $start = new DateTime($anchorDate);
+            $today = new DateTime();
+            $numDays = max(1, $today->diff($start)->days + 1);
+            break;
+        case "7_days":
+        default: $numDays = 7; break;
+    }
+
+    for ($i = $numDays - 1; $i >= 0; $i--) {
+        $day = date("Y-m-d", strtotime("-$i days"));
+        if ($day < $anchorDate) continue;
+
+        $gamesCount = scalar($conn, "SELECT COUNT(*) FROM scores WHERE DATE(played_at) = '$day'");
+        $lessonsCount = scalar($conn, "SELECT COUNT(*) FROM user_module_progress WHERE DATE(completed_at) = '$day'");
+
+        $labels[] = date("M j", strtotime($day));
+        $gamesPlayed[] = (int) $gamesCount;
+        $lessonsCompleted[] = (int) $lessonsCount;
+    }
+
+    return [
+        "labels" => $labels,
+        "games" => $gamesPlayed,
+        "lessons" => $lessonsCompleted
+    ];
+}
+
+// ===== AJAX Endpoints =====
 if (isset($_GET["ajax_growth"])) {
     header("Content-Type: application/json");
-    $range = $_GET["growth_range"] ?? "7_days";
-    echo json_encode(get_user_growth_dataset($conn, $range));
+    echo json_encode(get_user_growth_dataset($conn, $_GET["growth_range"] ?? "7_days"));
     exit();
 }
 
-// ===== Stat cards (each compares the metric now vs the same metric 7 days ago) =====
+if (isset($_GET["ajax_activity"])) {
+    header("Content-Type: application/json");
+    echo json_encode(get_system_activity_dataset($conn, $_GET["activity_range"] ?? "7_days"));
+    exit();
+}
+
+// Stat Cards
 $totalUsers = scalar($conn, "SELECT COUNT(*) FROM users");
 $totalUsersWk = scalar($conn, "SELECT COUNT(*) FROM users WHERE created_at <= NOW() - INTERVAL 7 DAY");
 $usersDelta = pct_change($totalUsers, $totalUsersWk);
@@ -94,58 +124,17 @@ $avgScore = scalar($conn, "SELECT AVG(points) FROM scores");
 $avgScoreWk = scalar($conn, "SELECT AVG(points) FROM scores WHERE played_at <= NOW() - INTERVAL 7 DAY");
 $avgDelta = pct_change($avgScore, $avgScoreWk);
 
-// Initial User Growth Load (Last 7 Days by default)
+// Initial Load Datasets
 $initialGrowth = get_user_growth_dataset($conn, "7_days");
-$growthLabels = $initialGrowth["labels"];
-$growthData = $initialGrowth["data"];
+$initialActivity = get_system_activity_dataset($conn, "7_days");
 
 $categoryMap = [
-    // Dissect an IP Address
-    "subnet_dissect_practice" => "Dissect an IP",
-    "subnet_dissect_timed"    => "Dissect an IP",
-
-    // Binary Game
-    "binary_practice"         => "Binary Game",
-    "binary_game"             => "Binary Game",
-    "binary_timed"            => "Binary Game",
-
-    // Hex Conversion
-    "hex_practice"            => "Hex Conversion",
-    "hex_game"                => "Hex Conversion",
-    "hex_timed"               => "Hex Conversion",
-
-    // IPv6 Game
-    "ipv6_practice"           => "IPv6 Game",
-    "ipv6_game"               => "IPv6 Game",
-    "ipv6_timed"              => "IPv6 Game",
-
-    // Subnet Showdown
-    "showdown_practice"       => "Subnet Showdown",
-    "showdown_timed"          => "Subnet Showdown",
-    "subnet_showdown"         => "Subnet Showdown",
-
-    // Scenario-Based Questions
-    "scenario_practice"       => "Scenario Game",
-    "scenario_game"           => "Scenario Game",
-    "scenario_timed"          => "Scenario Game",
-
-    // Multiplayer
-    "multiplayer_1v1"         => "Multiplayer 1v1",
-    "match_1v1"               => "Multiplayer 1v1",
+    "subnet_dissect_practice" => "Dissect an IP", "subnet_dissect_timed" => "Dissect an IP",
+    "binary_practice" => "Binary Game", "binary_game" => "Binary Game",
+    "showdown_practice" => "Subnet Showdown", "showdown_timed" => "Subnet Showdown",
+    "multiplayer_1v1" => "Multiplayer 1v1",
 ];
-
-$categoryColors = [
-    "Dissect an IP"   => "#3b82f6",
-    "Binary Game"     => "#22c55e",
-    "Hex Conversion"  => "#ec4899",
-    "IPv6 Game"       => "#14b8a6",
-    "Subnet Showdown" => "#f59e0b",
-    "Scenario Game"   => "#06b6d4",
-    "Multiplayer 1v1" => "#8b5cf6",
-];
-
-
-$categoryColors = ["Dissect an IP" => "#3b82f6", "Binary Game" => "#22c55e", "Hex Conversion" => "#ec4899", "IPv6 Game" => "#f43b1e", "Subnet Showdown" => "#f59e0b", "Scenario Game" => "#048645", "Multiplayer 1v1" => "#8b5cf6", "Other" => "#64748b"];
+$categoryColors = ["Dissect an IP" => "#3b82f6", "Binary Game" => "#22c55e", "Subnet Showdown" => "#f59e0b", "Multiplayer 1v1" => "#8b5cf6", "Other" => "#64748b"];
 $rawCounts = [];
 $typeResult = mysqli_query($conn, "SELECT game_type, COUNT(*) AS c FROM scores GROUP BY game_type");
 while ($row = mysqli_fetch_assoc($typeResult)) {
@@ -191,8 +180,7 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
-<div class="admin-layout
-```">
+<div class="admin-layout">
     <aside class="admin-sidebar">
         <div class="brand" style="margin-bottom:1.5rem;">
             <div class="logo">S</div>
@@ -205,13 +193,14 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link active">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link">👥 User Management</a>
-        <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
-        <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
         <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
-
+        <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
+        <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
+        <a href="reports.php" class="admin-nav-link">📊 Reports</a>
 
         <div class="admin-nav-label">ACCOUNT</div>
-        <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
+        <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
+        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
 
         <div class="admin-sidebar-footer">
@@ -270,7 +259,8 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
             </div>
         </div>
 
-        <div class="admin-panels-row">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+            <!-- User Growth Chart -->
             <div class="admin-panel">
                 <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 style="margin:0;">👥 User Growth</h3>
@@ -287,6 +277,25 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
                 <canvas id="growthChart" height="180"></canvas>
             </div>
 
+            <!-- Activity & Gameplay Chart -->
+            <div class="admin-panel">
+                <div class="admin-panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;">📊 System Activity & Gameplay</h3>
+                    <select id="activityRangeSelect" class="admin-select" style="padding:0.2rem 0.5rem; background:var(--panel-light); color:var(--text); border:1px solid var(--border); border-radius:6px; cursor:pointer;">
+                        <option value="3_days">Last 3 Days</option>
+                        <option value="7_days" selected>Last 7 Days</option>
+                        <option value="30_days">Last 30 Days (1 Month)</option>
+                        <option value="3_months">Last 3 Months</option>
+                        <option value="6_months">Last 6 Months</option>
+                        <option value="1_year">Last 1 Year</option>
+                        <option value="all_time">All Time (Since Sep 26, 2026)</option>
+                    </select>
+                </div>
+                <canvas id="activityChart" height="180"></canvas>
+            </div>
+        </div>
+
+        <div class="admin-panels-row">
             <div class="admin-panel">
                 <div class="admin-panel-header"><h3>🎮 Game Category Popularity</h3></div>
                 <canvas id="categoryChart" height="180"></canvas>
@@ -313,52 +322,6 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
                             <div class="aicon" style="background:rgba(59,130,246,0.15);"><?= $a["icon"] ?></div>
                             <div><?= htmlspecialchars($a["text"]) ?></div>
                             <div class="atime"><?= date("g:i A", strtotime($a["ts"])) ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="admin-bottom-row">
-            <div class="admin-panel">
-                <div class="admin-panel-header">
-                    <h3>🏆 Top Performers</h3>
-                    <span class="admin-select">All Time</span>
-                </div>
-                <?php if (empty($topPerformers)): ?>
-                    <p style="color:var(--text-dim); font-size:0.82rem;">No players yet.</p>
-                <?php else: ?>
-                <table class="admin-table">
-                    <tr><th>#</th><th>User</th><th>Score</th><th>Games</th><th>Accuracy</th></tr>
-                    <?php foreach ($topPerformers as $i => $p):
-                        $total = $p["total_correct"] + $p["total_wrong"];
-                        $acc = $total > 0 ? round(($p["total_correct"] / $total) * 100) : 0;
-                    ?>
-                        <tr>
-                            <td><?= $i + 1 ?></td>
-                            <td><?= htmlspecialchars($p["username"]) ?></td>
-                            <td><?= number_format($p["career_xp"]) ?></td>
-                            <td><?= $p["quizzes_completed"] ?></td>
-                            <td><?= $acc ?>%</td>
-                        </tr>
-                    <?php endforeach; ?>
-                </table>
-                <?php endif; ?>
-            </div>
-
-            <div class="admin-panel">
-                <div class="admin-panel-header"><h3>📘 Most Played Games</h3></div>
-                <?php if (empty($rawCounts)): ?>
-                    <p style="color:var(--text-dim); font-size:0.82rem;">No data yet.</p>
-                <?php else: ?>
-                    <?php $rank = 1; foreach ($rawCounts as $label => $count):
-                        [$icon, $color] = $moduleIcons[$label] ?? $moduleIcons["Other"];
-                    ?>
-                        <div class="module-row">
-                            <div class="module-rank"><?= $rank++ ?></div>
-                            <div class="module-icon" style="background:<?= $color ?>22; color:<?= $color ?>;"><?= $icon ?></div>
-                            <div><?= htmlspecialchars($label) ?></div>
-                            <div class="module-plays"><?= number_format($count) ?> plays</div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -392,19 +355,19 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
 </div>
 
 <script>
-// Initialize Chart instance
+// Growth Chart
 const growthChartCtx = document.getElementById("growthChart").getContext("2d");
 let growthChart = new Chart(growthChartCtx, {
     type: "line",
     data: {
-        labels: <?= json_encode($growthLabels) ?>,
+        labels: <?= json_encode($initialGrowth["labels"]) ?>,
         datasets: [{
-            data: <?= json_encode($growthData) ?>,
+            label: "Registrations",
+            data: <?= json_encode($initialGrowth["data"]) ?>,
             borderColor: "#3b82f6",
             backgroundColor: "rgba(59,130,246,0.15)",
             fill: true,
-            tension: 0.3,
-            pointBackgroundColor: "#3b82f6",
+            tension: 0.3
         }]
     },
     options: {
@@ -416,20 +379,62 @@ let growthChart = new Chart(growthChartCtx, {
     }
 });
 
-// Dynamic Update via AJAX (no full page reload)
 document.getElementById("growthRangeSelect").addEventListener("change", function() {
-    const selectedRange = this.value;
-    
-    fetch(`dashboard.php?ajax_growth=1&growth_range=${selectedRange}`)
-        .then(response => response.json())
+    fetch(`dashboard.php?ajax_growth=1&growth_range=${this.value}`)
+        .then(r => r.json())
         .then(data => {
             growthChart.data.labels = data.labels;
             growthChart.data.datasets[0].data = data.data;
             growthChart.update();
-        })
-        .catch(error => console.error("Error updating growth chart:", error));
+        });
 });
 
+// Activity Chart (Games Played & Lessons Taken)
+const activityChartCtx = document.getElementById("activityChart").getContext("2d");
+let activityChart = new Chart(activityChartCtx, {
+    type: "line",
+    data: {
+        labels: <?= json_encode($initialActivity["labels"]) ?>,
+        datasets: [
+            {
+                label: "Games Played",
+                data: <?= json_encode($initialActivity["games"]) ?>,
+                borderColor: "#f59e0b",
+                backgroundColor: "rgba(245,158,11,0.15)",
+                fill: true,
+                tension: 0.3
+            },
+            {
+                label: "Lessons Completed",
+                data: <?= json_encode($initialActivity["lessons"]) ?>,
+                borderColor: "#22c55e",
+                backgroundColor: "rgba(34,197,94,0.15)",
+                fill: true,
+                tension: 0.3
+            }
+        ]
+    },
+    options: {
+        plugins: { legend: { display: true, labels: { color: "#8b93ab" } } },
+        scales: {
+            x: { ticks: { color: "#8b93ab" }, grid: { color: "#23304f" } },
+            y: { ticks: { color: "#8b93ab", precision: 0 }, grid: { color: "#23304f" }, beginAtZero: true }
+        }
+    }
+});
+
+document.getElementById("activityRangeSelect").addEventListener("change", function() {
+    fetch(`dashboard.php?ajax_activity=1&activity_range=${this.value}`)
+        .then(r => r.json())
+        .then(data => {
+            activityChart.data.labels = data.labels;
+            activityChart.data.datasets[0].data = data.games;
+            activityChart.data.datasets[1].data = data.lessons;
+            activityChart.update();
+        });
+});
+
+// Category Doughnut Chart
 new Chart(document.getElementById("categoryChart"), {
     type: "doughnut",
     data: {

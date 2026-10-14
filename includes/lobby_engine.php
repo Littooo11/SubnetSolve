@@ -1,9 +1,10 @@
 <?php
 // includes/lobby_engine.php
 
-require_once "quiz_engine.php";
-require_once "ipv6_engine.php";
-require_once "scenario_engine.php";
+require_once __DIR__ . "/subnet_engine.php";
+require_once __DIR__ . "/quiz_engine.php";
+require_once __DIR__ . "/ipv6_engine.php";
+require_once __DIR__ . "/scenario_engine.php";
 
 function generate_room_code($conn) {
     $chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O/0/I/1 to avoid confusion
@@ -19,7 +20,7 @@ function generate_room_code($conn) {
 }
 
 // Generates dynamic question based on requested game mode
-function generate_multiplayer_question($gameMode) {
+function generate_multiplayer_question($conn, $gameMode) {
     $mode = $gameMode;
     if ($mode === "both") {
         $modes = ["subnetting", "binary", "showdown", "hex", "ipv6", "scenario"];
@@ -62,16 +63,19 @@ function generate_multiplayer_question($gameMode) {
                 return generate_ipv6_question();
             }
             // Fallback IPv6 Question
-            $prefix = rand(48, 64);
-            $prompt = "What is the default subnet prefix length for standard IPv6 Global Unicast assignments?";
             $options = ["/48", "/56", "/64", "/128"];
             return [
-                "prompt" => $prompt,
+                "prompt" => "What is the default subnet prefix length for standard IPv6 Global Unicast assignments?",
                 "options" => $options,
                 "correct_index" => 2
             ];
 
         case "scenario":
+            // Attempt to fetch from database question bank first
+            if (function_exists('get_db_question')) {
+                $dbQ = get_db_question($conn, "scenario_game");
+                if ($dbQ) return $dbQ;
+            }
             if (function_exists('generate_scenario_question')) {
                 return generate_scenario_question();
             }
@@ -83,6 +87,21 @@ function generate_multiplayer_question($gameMode) {
             ];
 
         case "showdown":
+            // Attempt to fetch from database question bank first
+            if (function_exists('get_db_question')) {
+                $dbQ = get_db_question($conn, "subnet_showdown");
+                if ($dbQ) return $dbQ;
+            }
+            if (function_exists('generate_showdown_question')) {
+                return generate_showdown_question("medium");
+            }
+            // Fallback Showdown Question
+            return [
+                "prompt" => "What is the default subnet mask for a /26 network?",
+                "options" => ["255.255.255.0", "255.255.255.128", "255.255.255.192", "255.255.255.224"],
+                "correct_index" => 2
+            ];
+
         case "subnetting":
         default:
             if (function_exists('generate_match_question')) {
@@ -112,7 +131,7 @@ function generate_multiplayer_question($gameMode) {
 // Generates the full question set for a match and flips it to in_progress.
 function start_match($conn, $matchId, $gameMode, $totalQuestions) {
     for ($i = 0; $i < $totalQuestions; $i++) {
-        $q = generate_multiplayer_question($gameMode);
+        $q = generate_multiplayer_question($conn, $gameMode);
         $optionsJson = json_encode($q["options"]);
         $insert = mysqli_prepare($conn, "INSERT INTO match_questions (match_id, question_index, prompt, options_json, correct_index) VALUES (?, ?, ?, ?, ?)");
         mysqli_stmt_bind_param($insert, "iissi", $matchId, $i, $q["prompt"], $optionsJson, $q["correct_index"]);

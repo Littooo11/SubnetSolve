@@ -8,7 +8,7 @@ require "../includes/badge_engine.php";
 require "../includes/daily_challenge.php";
 require "../includes/avatars.php";
 require "../includes/easy_instructions.php";
-require_once "../includes/subnet_engine.php"; // Fixed: Added missing semicolon
+require_once "../includes/subnet_engine.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login.php");
@@ -27,6 +27,15 @@ $TIME_PER_QUESTION = 30;
 $validDifficulties = ["easy", "medium", "hard"];
 $difficulty = $_GET["difficulty"] ?? null;
 
+// Helper to pull from DB first for tracking, falling back to dynamic generator
+function fetch_showdown_question($conn, $difficulty) {
+    $dbQ = get_db_question($conn, "subnet_showdown");
+    if ($dbQ) {
+        return $dbQ;
+    }
+    return generate_showdown_question($difficulty);
+}
+
 $needsNewSession = !isset($_SESSION["showdown_timed"]) || isset($_GET["restart"]);
 $showDifficultyScreen = false;
 
@@ -41,7 +50,7 @@ if ($needsNewSession) {
             "score"   => 0,
             "streak"  => 0,
             "difficulty" => $difficulty,
-            "question" => generate_showdown_question($difficulty),
+            "question" => fetch_showdown_question($conn, $difficulty),
             "answered" => false,
             "selected"  => null,
         ];
@@ -96,7 +105,7 @@ if (!$showDifficultyScreen) {
                 $sessionDone = true;
             } else {
                 $state["q_index"]++;
-                $state["question"] = generate_showdown_question($state["difficulty"]);
+                $state["question"] = fetch_showdown_question($conn, $state["difficulty"]);
                 $state["answered"] = false;
                 $state["selected"] = null;
             }
@@ -169,7 +178,6 @@ if (!$showDifficultyScreen) {
                 <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;"><?= $b["icon"] ?> Badge Unlocked: <b><?= htmlspecialchars($b["name"]) ?></b></div>
             <?php endforeach; ?>
             <div class="game-actions">
-                <a href="subnet_showdown_timed.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                 <a href="../games.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Games</a>
             </div>
         </div>

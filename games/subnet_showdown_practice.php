@@ -162,7 +162,6 @@ if (!$showDifficultyScreen) {
                 <div class="feedback-banner feedback-correct" style="margin-top:0.8rem;"><?= $b["icon"] ?> Badge Unlocked: <b><?= htmlspecialchars($b["name"]) ?></b></div>
             <?php endforeach; ?>
             <div class="game-actions">
-                <a href="subnet_showdown_practice.php?restart=1&difficulty=<?= $sessionDifficulty ?>" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Play Again</a>
                 <a href="../practice.php" class="btn btn-secondary" style="text-decoration:none; display:inline-block;">Back to Practice Mode</a>
             </div>
         </div>

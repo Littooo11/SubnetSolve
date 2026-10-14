@@ -23,7 +23,7 @@ $loggedIn = isset($_SESSION["user_id"]);
 
     <div style="width:100%; max-width:720px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:2.5rem;">
 
-        <h2 style="margin-top:0;">About SubNetSolve</h2>
+        <h2 style="margin-top:0;">Privacy Policy Notice</h2>
         <p style="color:var(--text-dim); line-height:1.7;">
             SubNetSolve is a gamified web-based learning platform designed to help students learn and practice IPv4 addressing and subnetting in a more interactive and engaging way. It provides learning modules, interactive subnetting challenges, a binary game, leaderboards, and multiplayer activities that allow users to develop their networking and problem-solving skills while learning at their own pace.
         </p>
