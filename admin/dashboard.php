@@ -193,13 +193,12 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
         <div class="admin-nav-label">MAIN NAVIGATION</div>
         <a href="dashboard.php" class="admin-nav-link active">🏠 Dashboard</a>
         <a href="users.php" class="admin-nav-link">👥 User Management</a>
-        <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
         <a href="manage_questions.php" class="admin-nav-link">❓ Manage Questions</a>
-        <a href="../leaderboards.php" class="admin-nav-link">🏆 Leaderboard</a>
-        <a href="reports.php" class="admin-nav-link">📊 Reports</a>
+        <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
+        <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
 
         <div class="admin-nav-label">ACCOUNT</div>
-        <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
+        <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
         <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
 

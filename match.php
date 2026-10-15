@@ -82,6 +82,7 @@ function mode_label($m) {
 </head>
 <body>
 <div class="game-layout">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <aside class="sidebar">
         <div class="brand">
             <div class="logo">S</div>

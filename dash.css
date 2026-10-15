@@ -695,3 +695,151 @@ html,body {
         display: none;
     }
 }
+/* =========================================================
+   GLOBAL MOBILE & TABLET RESPONSIVENESS
+   ========================================================= */
+
+@media (max-width: 900px) {
+    /* Switch 3-column layout to a single column */
+    .layout, .layout.two-col, .game-layout, .showdown-layout, .lobby-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+    }
+
+    /* Horizontal scrollable navigation header on mobile */
+    .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 0.75rem 1rem !important;
+        gap: 0.5rem !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        white-space: nowrap !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar .brand {
+        margin-bottom: 0 !important;
+        margin-right: 0.5rem !important;
+        flex-shrink: 0;
+    }
+
+    .sidebar .brand p, .daily-challenge {
+        display: none !important;
+    }
+
+    .nav-link {
+        flex-shrink: 0;
+        margin-bottom: 0 !important;
+        padding: 0.5rem 0.8rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Adjust main content containers */
+    .main, .game-main, .right-col {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 1rem !important;
+        box-sizing: border-box !important;
+    }
+
+    .right-col {
+        border-left: none !important;
+        border-top: 1px solid var(--border) !important;
+    }
+
+    /* Stack grid cards to single columns */
+    .stats-grid, .stat-grid-4, .explore-grid, .games-grid, .difficulty-grid, .badge-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+    }
+
+    /* Widescreen elements scale down */
+    .binary-number {
+        font-size: 2.8rem !important;
+    }
+
+    .search-wrapper, .search {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Mobile Table Responsiveness */
+    .lb-table, .admin-table {
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+
+    /* Centered Responsive Modals */
+    .modal-overlay {
+        padding: 0.5rem !important;
+    }
+
+    .modal-content {
+        width: 95% !important;
+        max-width: 100% !important;
+        padding: 1.2rem !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-hero {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    .binary-input-row {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .binary-input {
+        width: 100% !important;
+        max-width: 200px !important;
+    }
+}
+/* Prevent desktop zoom-out scaling on mobile viewport */
+html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Ensure all images and containers fit within mobile screens */
+img, svg, canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    /* Ensure layouts stack cleanly without side-scrolling */
+    .layout, .layout.two-col, .game-layout, .showdown-layout, .lobby-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .main, .game-main, .right-col {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 1rem !important;
+    }
+}

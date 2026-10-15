@@ -59,6 +59,7 @@ exit();
     <link rel="stylesheet" href="auth.css">
 </head>
 <body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="auth-layout">
     <div class="auth-brand-panel">
         <div class="auth-brand-logo">

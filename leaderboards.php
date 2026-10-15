@@ -36,7 +36,7 @@ $sql = "SELECT u.id, u.username, u.avatar, up.level,
         WHERE u.is_admin = 0
         GROUP BY u.id, u.username, u.avatar, up.level
         ORDER BY total_score DESC
-        LIMIT 50";
+        LIMIT 20";
 $result = mysqli_query($conn, $sql);
 
 $players = [];
@@ -88,6 +88,7 @@ foreach ($tiersList as $i => $t) {
 </head>
 <body>
 <div class="layout">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <aside class="sidebar">
         <div class="brand">
             <div class="logo">S</div>
@@ -113,7 +114,7 @@ foreach ($tiersList as $i => $t) {
     <main class="main">
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div class="welcome">
-                <h2>🏆 Leaderboards</h2>
+                <h2>🏆 Leaderboards Top 20 Players</h2>
                 <p>See how you rank among other players. Keep practicing and climb the ranks!</p>
             </div>
             <select onchange="window.location.href=this.value" style="background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:0.5rem 0.8rem; font-size:0.82rem;">
@@ -150,7 +151,7 @@ foreach ($tiersList as $i => $t) {
             <?php endif; ?>
 
             <?php if ($myRank === null && $myRow): ?>
-                <p style="margin-top:1rem; color:var(--text-dim); font-size:0.85rem;">You're outside the top 50 for this filter — keep playing to break in!</p>
+                <p style="margin-top:1rem; color:var(--text-dim); font-size:0.85rem;">You're outside the top 20 for this filter — keep playing to break in!</p>
             <?php endif; ?>
         </div>
     </main>
@@ -170,7 +171,7 @@ foreach ($tiersList as $i => $t) {
                 </div>
                 <div class="stat-line"><span>Total Score</span><span class="xp"><?= number_format($myRow["total_score"]) ?></span></div>
                 <div class="stat-line"><span>Games Played</span><span><?= $myRow["games_played"] ?></span></div>
-                <div class="stat-line"><span>Rank</span><span>#<?= $myRank ?: "50+" ?></span></div>
+                <div class="stat-line"><span>Rank</span><span>#<?= $myRank ?: "20+" ?></span></div>
             <?php else: ?>
                 <p style="font-size:0.82rem; color:var(--text-dim);">Play a game to appear on the leaderboard.</p>
             <?php endif; ?>

@@ -75,6 +75,7 @@ function status_label($s) {
 </head>
 <body>
 <div class="layout lobby-layout">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <aside class="sidebar">
         <div class="brand">
             <div class="logo">S</div>

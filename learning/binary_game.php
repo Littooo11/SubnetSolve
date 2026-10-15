@@ -79,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && (isset($_POST["ajax"]) || isset($_S
 <html lang="en">
 <head>
  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
  <title>How to Play: Binary Game - SubNetSolve</title>
  <link rel="stylesheet" href="../dash.css">
  <link rel="stylesheet" href="../game.css">

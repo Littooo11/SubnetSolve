@@ -99,9 +99,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["submit_application"])
  </label>
  <textarea name="student_emails" placeholder="student1@example.com, student2@example.com" required
  style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border); background:var(--panel-light); color:var(--text); font-size:0.88rem; height:120px; box-sizing:border-box; line-height:1.4;"></textarea>
+<small style="color:#f87171; font-size:0.75rem; display:block; margin-top:0.2rem;">
+    Note: A computer or laptop is recommended to better maximize this feature.
+</small>    
  <small style="color:var(--text-dim); font-size:0.75rem; display:block; margin-top:0.4rem;">
- Ensure each student has registered an account using the listed email address so they can be associated with your account upon admin approval.
- </small>
+    Ensure each student has registered an account using the listed email address so they can be associated with your account upon admin approval.
+</small>
  </div>
 
  <div style="display:flex; gap:0.6rem;">

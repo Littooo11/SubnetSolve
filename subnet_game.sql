@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 14, 2026 at 12:47 PM
+-- Generation Time: Oct 15, 2026 at 12:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -146,7 +146,10 @@ INSERT INTO `matches` (`id`, `room_code`, `room_name`, `description`, `password_
 (8, '92V3GM', '', '', NULL, 'binary', 'public', 2, 37, 'finished', 1, '2026-10-12 00:37:37', 10, 37, '2026-10-12 00:33:53', '2026-10-12 00:33:57', '2026-10-12 00:37:40'),
 (9, 'KTMK57', 'qasd', '', NULL, 'binary', 'public', 2, 39, 'finished', 2, '2026-10-12 16:07:41', 10, 39, '2026-10-12 16:05:50', '2026-10-12 16:06:14', '2026-10-12 16:08:15'),
 (10, 'TA4L5R', 'g20', '', '$2y$10$GSLUPN940d82PhiBjFVTLu1ya4tfvf4jvz3nx5FR1IEbXjNBI7ZzK', 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-12 16:11:00', 10, 39, '2026-10-12 16:10:32', '2026-10-12 16:11:00', '2026-10-12 16:11:19'),
-(11, '5DZR72', '', '', NULL, 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-14 17:16:40', 10, 39, '2026-10-14 17:16:29', '2026-10-14 17:16:40', '2026-10-14 17:16:42');
+(11, '5DZR72', '', '', NULL, 'subnetting', 'public', 2, 39, 'finished', 0, '2026-10-14 17:16:40', 10, 39, '2026-10-14 17:16:29', '2026-10-14 17:16:40', '2026-10-14 17:16:42'),
+(13, 'MSPMEM', '', '', '$2y$10$eNJ2/Lyn9X7wneeRCoDKzOo4OCVxhJTjX4e2d.UE/HXhElSnYzAZG', 'scenario', 'public', 2, 39, 'finished', 1, '2026-10-14 22:41:04', 10, 2, '2026-10-14 22:40:33', '2026-10-14 22:40:47', '2026-10-14 22:41:12'),
+(14, '7GQ77K', '', '', NULL, 'binary', 'public', 2, 39, 'finished', 2, '2026-10-14 22:42:25', 10, 2, '2026-10-14 22:42:08', '2026-10-14 22:42:13', '2026-10-14 22:42:53'),
+(15, '7XC4GR', '', '', NULL, 'binary', 'public', 2, 39, 'finished', 9, '2026-10-14 22:43:51', 10, 2, '2026-10-14 22:43:01', '2026-10-14 22:43:05', '2026-10-14 22:43:56');
 
 -- --------------------------------------------------------
 
@@ -178,7 +181,11 @@ INSERT INTO `match_players` (`id`, `match_id`, `user_id`, `score`, `correct_coun
 (11, 8, 37, 0, 0, 1, NULL, NULL, '2026-10-12 00:33:53'),
 (13, 9, 39, 4821, 1, 1, NULL, NULL, '2026-10-12 16:05:50'),
 (15, 10, 39, 0, 0, 0, NULL, NULL, '2026-10-12 16:10:32'),
-(17, 11, 39, 0, 0, 0, NULL, NULL, '2026-10-14 17:16:29');
+(17, 11, 39, 0, 0, 0, NULL, NULL, '2026-10-14 17:16:29'),
+(21, 13, 2, 0, 0, 1, NULL, NULL, '2026-10-14 22:40:47'),
+(23, 14, 2, 4829, 1, 1, NULL, NULL, '2026-10-14 22:42:13'),
+(24, 15, 39, 14488, 3, 7, 3, '2026-10-14 22:43:56', '2026-10-14 22:43:01'),
+(25, 15, 2, 19315, 4, 6, 0, '2026-10-14 22:43:56', '2026-10-14 22:43:05');
 
 -- --------------------------------------------------------
 
@@ -269,7 +276,37 @@ INSERT INTO `match_questions` (`id`, `match_id`, `question_index`, `prompt`, `op
 (67, 11, 6, 'What is the subnet mask for 160.123.2.79/27?', '[\"255.255.255.128\",\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.224\"]', 3),
 (68, 11, 7, 'What is the subnet mask for 202.168.249.65/26?', '[\"255.255.255.0\",\"255.255.255.240\",\"255.255.255.128\",\"255.255.255.192\"]', 3),
 (69, 11, 8, 'What is the subnet mask for 190.171.228.127/26?', '[\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.192\",\"255.255.255.128\"]', 2),
-(70, 11, 9, 'What is the subnet mask for 168.131.87.15/28?', '[\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.128\",\"255.255.255.252\"]', 0);
+(70, 11, 9, 'What is the subnet mask for 168.131.87.15/28?', '[\"255.255.255.240\",\"255.255.255.0\",\"255.255.255.128\",\"255.255.255.252\"]', 0),
+(71, 13, 0, 'Scenario: ISP Address Allocation\nAn internet service provider assigns a customer the IPv4 block 203.0.113.0/28 for a small test network. The customer wants to know the total number of IP addresses in the assigned block, including reserved network and broadcast addresses. How many total addresses are included?', '[\"8\",\"16\",\"14\",\"32\"]', 1),
+(72, 13, 1, 'A new Sales workstation needs an IP address inside the 192.168.1.0/26 subnet. Which of these addresses can actually be assigned to the workstation?', '[\"192.168.1.0\",\"192.168.1.64\",\"192.168.1.25\",\"192.168.1.63\"]', 2),
+(73, 13, 2, 'Scenario: Network Technician Troubleshooting\nA technician sees the IP configuration 192.168.10.25/26 on a workstation. The technician must identify the subnet mask to check whether the workstation is configured correctly. Which subnet mask corresponds to /26?', '[\"255.255.255.0\",\"255.255.255.192\",\"255.255.255.224\",\"255.255.255.128\"]', 1),
+(74, 13, 3, 'The Marketing department needs a subnet supporting at least 100 usable host addresses. Which subnet mask provides enough addresses with the least waste?', '[\"255.255.255.192\",\"255.255.255.224\",\"255.255.255.128\",\"255.255.255.0\"]', 2),
+(75, 13, 4, 'The Marketing department needs a subnet supporting at least 100 usable host addresses. Which subnet mask provides enough addresses with the least waste?', '[\"255.255.255.192\",\"255.255.255.224\",\"255.255.255.0\",\"255.255.255.128\"]', 3),
+(76, 13, 5, 'Scenario: University Computer Laboratory\nA university has been assigned the network 192.168.10.0/24. The computer laboratory needs 100 usable host addresses. The IT administrator must select a subnet that can accommodate all the computers while minimizing wasted IP addresses. Which subnet prefix is the best choice?', '[\"\\/24\",\"\\/26\",\"\\/25\",\"\\/27\"]', 2),
+(77, 13, 6, 'The Marketing department needs a subnet supporting at least 100 usable host addresses. Which subnet mask provides enough addresses with the least waste?', '[\"255.255.255.128\",\"255.255.255.224\",\"255.255.255.192\",\"255.255.255.0\"]', 0),
+(78, 13, 7, 'Scenario: Network Technician Troubleshooting\nA technician sees the IP configuration 192.168.10.25/26 on a workstation. The technician must identify the subnet mask to check whether the workstation is configured correctly. Which subnet mask corresponds to /26?', '[\"255.255.255.0\",\"255.255.255.224\",\"255.255.255.128\",\"255.255.255.192\"]', 3),
+(79, 13, 8, 'The Finance department has been assigned the subnet 192.168.10.0/26. A technician needs the broadcast address to configure a network-wide alert. Which address should they use?', '[\"192.168.10.63\",\"192.168.10.62\",\"192.168.10.0\",\"192.168.10.1\"]', 0),
+(80, 13, 9, 'Scenario: Office Network Expansion\nA company is setting up a new office. Its HR department needs 25 usable IP addresses for computers and printers. The network administrator wants to use the smallest subnet that can support all 25 devices. Which subnet prefix should the administrator choose?', '[\"\\/27\",\"\\/26\",\"\\/29\",\"\\/28\"]', 0),
+(81, 14, 0, 'Convert decimal 22 to an 8-bit binary string:', '[\"11101101\",\"01000010\",\"11001010\",\"00010110\"]', 3),
+(82, 14, 1, 'Convert decimal 234 to an 8-bit binary string:', '[\"00011001\",\"11101010\",\"10101000\",\"00110111\"]', 1),
+(83, 14, 2, 'Convert decimal 14 to an 8-bit binary string:', '[\"01101001\",\"10111011\",\"00001110\",\"00001000\"]', 2),
+(84, 14, 3, 'Convert decimal 101 to an 8-bit binary string:', '[\"11111100\",\"01100101\",\"10101000\",\"10011011\"]', 1),
+(85, 14, 4, 'Convert decimal 94 to an 8-bit binary string:', '[\"00011010\",\"00010001\",\"01000010\",\"01011110\"]', 3),
+(86, 14, 5, 'Convert decimal 205 to an 8-bit binary string:', '[\"11110100\",\"01111000\",\"11001101\",\"00101100\"]', 2),
+(87, 14, 6, 'Convert decimal 188 to an 8-bit binary string:', '[\"01110110\",\"00111000\",\"10111100\",\"10011100\"]', 2),
+(88, 14, 7, 'Convert decimal 104 to an 8-bit binary string:', '[\"01101000\",\"00111101\",\"10001100\",\"00000110\"]', 0),
+(89, 14, 8, 'Convert decimal 40 to an 8-bit binary string:', '[\"01001101\",\"00101000\",\"11000101\",\"10001000\"]', 1),
+(90, 14, 9, 'Convert decimal 146 to an 8-bit binary string:', '[\"01011011\",\"01001001\",\"10011000\",\"10010010\"]', 3),
+(91, 15, 0, 'Convert decimal 213 to an 8-bit binary string:', '[\"00100101\",\"01011101\",\"01111101\",\"11010101\"]', 3),
+(92, 15, 1, 'Convert decimal 153 to an 8-bit binary string:', '[\"11101100\",\"10010100\",\"10011001\",\"11111101\"]', 2),
+(93, 15, 2, 'Convert decimal 198 to an 8-bit binary string:', '[\"10110110\",\"11000110\",\"00011111\",\"11101101\"]', 1),
+(94, 15, 3, 'Convert decimal 222 to an 8-bit binary string:', '[\"00100000\",\"00000110\",\"11011110\",\"01001101\"]', 2),
+(95, 15, 4, 'Convert decimal 228 to an 8-bit binary string:', '[\"11100100\",\"00000001\",\"10001101\",\"00011100\"]', 0),
+(96, 15, 5, 'Convert decimal 13 to an 8-bit binary string:', '[\"11010110\",\"11010100\",\"00001101\",\"01100000\"]', 2),
+(97, 15, 6, 'Convert decimal 171 to an 8-bit binary string:', '[\"11111111\",\"10101011\",\"01110011\",\"01000001\"]', 1),
+(98, 15, 7, 'Convert decimal 236 to an 8-bit binary string:', '[\"11111101\",\"01000111\",\"11101100\",\"11001001\"]', 2),
+(99, 15, 8, 'Convert decimal 241 to an 8-bit binary string:', '[\"11110001\",\"00101111\",\"11001011\",\"11101010\"]', 0),
+(100, 15, 9, 'Convert decimal 44 to an 8-bit binary string:', '[\"00101100\",\"01100010\",\"01001111\",\"00000101\"]', 0);
 
 -- --------------------------------------------------------
 
@@ -592,7 +629,23 @@ INSERT INTO `scores` (`id`, `user_id`, `match_id`, `game_type`, `points`, `playe
 (391, 2, NULL, 'showdown_timed', 44, '2026-10-14 15:05:37', 1),
 (392, 39, NULL, 'scenario_timed', 135, '2026-10-14 15:10:23', 4),
 (393, 39, NULL, 'scenario_timed', 66, '2026-10-14 15:15:58', 2),
-(394, 39, 11, 'multiplayer_match', 0, '2026-10-14 17:16:42', 0);
+(394, 39, 11, 'multiplayer_match', 0, '2026-10-14 17:16:42', 0),
+(395, 2, NULL, 'showdown_timed', 88, '2026-10-14 21:33:09', 4),
+(396, 39, NULL, 'binary_practice', 105, '2026-10-14 21:38:33', 0),
+(397, 2, NULL, 'ipv6_practice', 66, '2026-10-14 21:55:52', 0),
+(398, 2, NULL, 'ipv6_timed', 0, '2026-10-14 22:05:38', 0),
+(399, 2, NULL, 'ipv6_timed', 22, '2026-10-14 22:09:05', 1),
+(400, 2, NULL, 'binary_practice', 75, '2026-10-14 22:16:57', 0),
+(401, 2, NULL, 'ipv6_practice', 68, '2026-10-14 22:19:58', 0),
+(402, 2, NULL, 'ipv6_timed', 33, '2026-10-14 22:28:22', 1),
+(403, 2, NULL, 'ipv6_timed', 33, '2026-10-14 22:28:57', 1),
+(404, 2, NULL, 'ipv6_timed', 69, '2026-10-14 22:31:31', 2),
+(405, 2, 13, 'multiplayer_match', 0, '2026-10-14 22:41:12', 0),
+(406, 2, 14, 'multiplayer_match', 4829, '2026-10-14 22:42:53', 0),
+(407, 2, 15, 'multiplayer_match', 19315, '2026-10-14 22:43:56', 0),
+(408, 2, 15, 'multiplayer_match', 19315, '2026-10-14 22:43:56', 0),
+(409, 39, 15, 'multiplayer_match', 14488, '2026-10-14 22:43:56', 0),
+(410, 39, 15, 'multiplayer_match', 14488, '2026-10-14 22:43:56', 0);
 
 -- --------------------------------------------------------
 
@@ -758,7 +811,12 @@ INSERT INTO `user_badges` (`id`, `user_id`, `badge_id`, `earned_at`) VALUES
 (10, 39, 4, '2026-10-12 16:08:15'),
 (11, 2, 2, '2026-10-13 14:02:02'),
 (12, 2, 5, '2026-10-14 15:04:08'),
-(13, 39, 9, '2026-10-14 15:10:23');
+(13, 39, 9, '2026-10-14 15:10:23'),
+(14, 2, 10, '2026-10-14 22:43:56'),
+(15, 2, 6, '2026-10-14 22:43:56'),
+(17, 39, 2, '2026-10-14 22:43:56'),
+(18, 39, 5, '2026-10-14 22:43:56'),
+(20, 39, 10, '2026-10-14 22:43:56');
 
 -- --------------------------------------------------------
 
@@ -813,7 +871,7 @@ CREATE TABLE `user_progress` (
 
 INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to_next_level`, `lessons_completed`, `quizzes_completed`, `total_correct`, `total_wrong`, `current_streak`, `last_activity_date`, `last_daily_challenge_date`) VALUES
 (1, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
-(2, 10, 11341, 45, 2368, 5, 17, 55, 102, 0, NULL, '2026-10-14'),
+(2, 21, 55254, 4920, 5003, 5, 30, 78, 182, 0, NULL, '2026-10-14'),
 (3, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (4, 1, 0, 0, 400, 0, 0, 0, 0, 0, NULL, NULL),
 (5, 8, 8830, 1485, 1912, 0, 13, 0, 0, 0, NULL, NULL),
@@ -850,7 +908,7 @@ INSERT INTO `user_progress` (`user_id`, `level`, `career_xp`, `total_xp`, `xp_to
 (36, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
 (37, 11, 14481, 717, 2599, 0, 4, 3, 8, 0, NULL, NULL),
 (38, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
-(39, 6, 5202, 1009, 1465, 1, 7, 7, 15, 0, NULL, '2026-10-14'),
+(39, 17, 34283, 1400, 4022, 1, 10, 13, 29, 0, NULL, '2026-10-14'),
 (40, 1, 0, 0, 500, 1, 0, 0, 0, 0, NULL, NULL),
 (41, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
 (42, 1, 0, 0, 500, 0, 0, 0, 0, 0, NULL, NULL),
@@ -876,16 +934,16 @@ CREATE TABLE `user_question_stats` (
 --
 
 INSERT INTO `user_question_stats` (`id`, `user_id`, `question_id`, `times_encountered`, `times_correct`, `last_answered_at`) VALUES
-(1, 2, 8, 2, 2, '2026-10-14 15:03:59'),
-(2, 2, 2, 5, 1, '2026-10-14 15:05:36'),
-(3, 2, 9, 2, 0, '2026-10-14 15:05:25'),
-(5, 2, 3, 4, 1, '2026-10-14 15:04:06'),
+(1, 2, 8, 3, 2, '2026-10-14 21:33:01'),
+(2, 2, 2, 6, 2, '2026-10-14 21:33:03'),
+(3, 2, 9, 4, 1, '2026-10-14 21:33:08'),
+(5, 2, 3, 5, 1, '2026-10-14 21:32:59'),
 (11, 2, 7, 2, 0, '2026-10-14 15:05:30'),
 (12, 2, 6, 1, 0, '2026-10-14 15:04:55'),
-(13, 2, 10, 1, 0, '2026-10-14 15:04:57'),
+(13, 2, 10, 2, 1, '2026-10-14 21:32:55'),
 (14, 2, 1, 1, 0, '2026-10-14 15:05:06'),
-(15, 2, 5, 1, 0, '2026-10-14 15:05:10'),
-(17, 2, 11, 1, 1, '2026-10-14 15:05:21'),
+(15, 2, 5, 4, 0, '2026-10-14 21:33:04'),
+(17, 2, 11, 2, 2, '2026-10-14 21:29:48'),
 (21, 39, 16, 2, 2, '2026-10-14 15:15:23'),
 (22, 39, 21, 1, 0, '2026-10-14 15:15:21'),
 (24, 39, 18, 1, 0, '2026-10-14 15:15:26'),
@@ -895,7 +953,8 @@ INSERT INTO `user_question_stats` (`id`, `user_id`, `question_id`, `times_encoun
 (28, 39, 28, 1, 0, '2026-10-14 15:15:52'),
 (29, 39, 17, 1, 0, '2026-10-14 15:15:54'),
 (30, 39, 22, 1, 0, '2026-10-14 15:15:56'),
-(31, 39, 29, 1, 0, '2026-10-14 15:15:57');
+(31, 39, 29, 1, 0, '2026-10-14 15:15:57'),
+(32, 39, 10, 1, 0, '2026-10-14 21:26:34');
 
 --
 -- Indexes for dumped tables
@@ -1040,19 +1099,19 @@ ALTER TABLE `game_questions`
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `match_players`
 --
 ALTER TABLE `match_players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `match_questions`
 --
 ALTER TABLE `match_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT for table `questions`
@@ -1070,7 +1129,7 @@ ALTER TABLE `remember_tokens`
 -- AUTO_INCREMENT for table `scores`
 --
 ALTER TABLE `scores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=395;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=411;
 
 --
 -- AUTO_INCREMENT for table `teacher_applications`
@@ -1100,19 +1159,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_badges`
 --
 ALTER TABLE `user_badges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `user_module_progress`
 --
 ALTER TABLE `user_module_progress`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `user_question_stats`
 --
 ALTER TABLE `user_question_stats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- Constraints for dumped tables

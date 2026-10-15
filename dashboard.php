@@ -179,6 +179,7 @@ $xpPercent = $xpToNextLvl > 0 ? round(($totalXP / $xpToNextLvl) * 100) : 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SubNetSolve</title>
     <link rel="stylesheet" href="dash.css">
     <link rel="stylesheet" href="game.css">

@@ -152,7 +152,7 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <a href="game_popularity.php" class="admin-nav-link">🎮 Game Category Popularity</a>
         <a href="teacher_applications.php" class="admin-nav-link">🎓 Teacher Apps</a>
         <div class="admin-nav-label">ACCOUNT</div>
-        <a href="../profile.php" class="admin-nav-link">👤 Admin Profile</a>
+        <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
     </aside>
 

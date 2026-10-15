@@ -36,6 +36,7 @@ $criteriaLabels = [
     <link rel="stylesheet" href="game.css">
 </head>
 <body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="layout two-col">
     <aside class="sidebar">
         <div class="brand">

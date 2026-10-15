@@ -142,6 +142,7 @@ $earnedIds = array_column(mysqli_stmt_get_result($earnedStmt)->fetch_all(MYSQLI_
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Profile - SubNetSolve</title>
     <link rel="stylesheet" href="dash.css">
     <link rel="stylesheet" href="game.css">

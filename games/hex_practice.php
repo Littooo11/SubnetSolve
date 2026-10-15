@@ -26,9 +26,41 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hex Conversion (Practice) - SubNetSolve</title>
     <link rel="stylesheet" href="../dash.css">
     <link rel="stylesheet" href="../game.css">
+    <style>
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            max-width: 220px;
+            margin: 0.8rem auto 1.2rem;
+        }
+        .keypad-btn {
+            font-family: "Consolas", monospace;
+            font-size: 1.25rem !important;
+            font-weight: bold;
+            padding: 0.6rem 0 !important;
+            background: var(--panel-light) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            border-radius: 8px !important;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+        .keypad-btn:hover {
+            border-color: var(--blue) !important;
+            background: var(--panel) !important;
+        }
+        .keypad-btn:active {
+            transform: scale(0.95);
+            background: var(--blue) !important;
+            color: #ffffff !important;
+        }
+    </style>
 </head>
 <body>
 <div class="game-layout">
@@ -80,9 +112,28 @@ $pointsPerCorrect = $showDifficultyScreen ? 10 : (int) round(10 * difficulty_mul
                 <div class="binary-number" id="hexDisplay"><?= str_repeat("-", $digits) ?></div>
                 <div class="binary-hint">Convert this hexadecimal number to decimal</div>
 
-                <div class="binary-input-row">
-                    <input type="number" min="0" max="<?= $maxVal ?>" class="binary-input" id="answerInput" autocomplete="off" placeholder="?">
-                    <button class="btn btn-primary" id="submitBtn">Submit</button>
+                <div class="binary-input-row" style="margin-bottom:0.5rem;">
+                    <input type="number" min="0" max="<?= $maxVal ?>" class="binary-input" id="answerInput" autocomplete="off" placeholder="?" inputmode="numeric">
+                </div>
+
+                <!-- On-Screen Keypad -->
+                <div class="keypad-grid">
+                    <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+                    <button type="button" class="keypad-btn" onclick="clearInput()" style="color:#f87171;">C</button>
+                    <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+                    <button type="button" class="keypad-btn" onclick="backspaceInput()">⌫</button>
+                </div>
+
+                <div style="text-align:center; margin-bottom:1rem;">
+                    <button class="btn btn-primary" id="submitBtn" style="min-width:140px; font-size:1rem;">Submit</button>
                 </div>
 
                 <div class="binary-feedback" id="feedback"></div>
@@ -131,6 +182,23 @@ const display = document.getElementById("hexDisplay");
 const input = document.getElementById("answerInput");
 const feedback = document.getElementById("feedback");
 
+function pressKey(val) {
+    if (saved) return;
+    if (input.value.length < 5) {
+        input.value += val;
+    }
+}
+
+function clearInput() {
+    if (saved) return;
+    input.value = "";
+}
+
+function backspaceInput() {
+    if (saved) return;
+    input.value = input.value.slice(0, -1);
+}
+
 function nextQuestion() {
     currentAnswer = Math.floor(Math.random() * (MAX_VAL + 1));
     display.textContent = currentAnswer.toString(16).toUpperCase().padStart(DIGITS, "0");
@@ -163,7 +231,13 @@ function submitAnswer() {
 }
 
 document.getElementById("submitBtn").addEventListener("click", submitAnswer);
-input.addEventListener("keydown", (e) => { if (e.key === "Enter") submitAnswer(); });
+
+input.addEventListener("keydown", (e) => { 
+    if (e.key === "Enter") {
+        e.preventDefault();
+        submitAnswer(); 
+    }
+});
 
 function addBanner(html, cls) {
     const banner = document.createElement("div");
