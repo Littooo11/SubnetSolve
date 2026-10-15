@@ -199,7 +199,6 @@ $moduleIcons = ["Dissect an IP" => ["🌐", "#3b82f6"], "Binary Game" => ["01", 
 
         <div class="admin-nav-label">ACCOUNT</div>
         <a href="profile.php" class="admin-nav-link">👤 Admin Profile</a>
-        <a href="../dashboard.php" class="admin-nav-link">↩ Back to Site</a>
         <a href="../logout.php" class="admin-nav-link">🚪 Logout</a>
 
         <div class="admin-sidebar-footer">
